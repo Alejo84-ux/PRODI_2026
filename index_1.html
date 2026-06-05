@@ -396,7 +396,31 @@
     0%,100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(0.8); }
   }
- 
+ /* ── OPEN PRONOS BTN ── */
+  /* ... (código del botón) ... */
+
+  /* ── EXTRAS ── */
+  .extras-layout { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+  .extras-col { flex: 1; min-width: 250px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+  .extras-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .extra-block { background: var(--bg3); padding: 12px; border-radius: 8px; border: 1px solid var(--border); transition: border-color 0.15s; }
+  .extra-block.saved { border-color: rgba(45,158,92,0.4); }
+  .extra-label { font-size: 11px; color: var(--gold); margin-bottom: 8px; display: block; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+  .extra-in { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: border-color 0.15s; }
+  .extra-in:focus { border-color: var(--green-light); }
+  .arg-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding: 10px 0; }
+  .arg-row:last-child { border: none; }
+  .arg-label { font-size: 13px; font-weight: 500; color: var(--text); }
+  .arg-in { width: 60px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 18px; padding: 6px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; outline: none; transition: border-color 0.15s; }
+  .arg-in:focus { border-color: var(--green-light); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 520px) {
+    .hero h1 { font-size: 36px; }
+    .team-name { font-size: 11px; }
+    .header-nav .hnav-btn { padding: 6px 8px; font-size: 12px; }
+  }
+</style>
   /* ── RESPONSIVE ── */
   @media (max-width: 520px) {
     .hero h1 { font-size: 36px; }
@@ -562,6 +586,16 @@
         <button class="phase-tab" onclick="setPhase(this,'cuartos')">Cuartos</button>
         <button class="phase-tab" onclick="setPhase(this,'semis')">Semis</button>
         <button class="phase-tab" onclick="setPhase(this,'final')">Final</button>
+        <div class="phase-tabs" id="phase-tabs">
+        <button class="phase-tab active" onclick="setPhase(this,'grupos')">Fase de grupos</button>
+        <button class="phase-tab" onclick="setPhase(this,'r32')">Ronda 32</button>
+        <button class="phase-tab" onclick="setPhase(this,'r16')">Octavos</button>
+        <button class="phase-tab" onclick="setPhase(this,'cuartos')">Cuartos</button>
+        <button class="phase-tab" onclick="setPhase(this,'semis')">Semis</button>
+        <button class="phase-tab" onclick="setPhase(this,'final')">Final</button>
+        
+        <button class="phase-tab" onclick="setPhase(this,'extras')" style="border-color: var(--gold); color: var(--gold);">🌟 Extras</button>
+      </div>
       </div>
       <div id="matches-container"></div>
       <button class="btn-save" onclick="savePronosticos()">💾 GUARDAR PRONÓSTICOS</button>
@@ -729,15 +763,100 @@ const FIXTURE = {
     { id:'FINAL', label:'🏆 FINAL', local:'Gan. SF 1', visita:'Gan. SF 2', fecha:'19 Jul', hora:'17:00 ARG', sede:'MetLife, East Rutherford' },
   ]
 };
- 
+
+  // ── DATA: PRONÓSTICOS EXTRAS ──
+const EXTRAS_DATA = {
+  arg: [
+    { id: 'arg_1', label: '1° Partido' },
+    { id: 'arg_2', label: '2° Partido' },
+    { id: 'arg_3', label: '3° Partido' },
+    { id: 'arg_8', label: 'Octavos (8°)' },
+    { id: 'arg_4', label: 'Cuartos (4°)' },
+    { id: 'arg_S', label: 'Semis (S°)' },
+    { id: 'arg_F', label: 'Final (F°)' }
+  ],
+  grid: [
+    { id: 'ext_eq_goleador', label: 'Equipo más Goleador' },
+    { id: 'ext_eq_rojas', label: 'Equipo más Rojas' },
+    { id: 'ext_grande_afuera', label: 'Grande Afuera en Grupos' },
+    { id: 'ext_batacazo', label: 'Batacazo' },
+    { id: 'ext_mejor_jugador', label: 'Mejor Jugador del Mundial' },
+    { id: 'ext_mejor_gol', label: 'Mejor gol' },
+    { id: 'ext_mvp_final', label: 'MVP en la Final' },
+    { id: 'ext_cant_penales', label: 'Cantidad Partidos a Penales', type: 'number' },
+    { id: 'ext_goleador', label: 'Goleador (Jugador)' },
+    { id: 'ext_valla_menos', label: 'Valla Menos Vencida' },
+    { id: 'ext_gol_140', label: 'Gol n°140 de Argentina' },
+    { id: 'ext_subcampeon', label: 'Sub-campeón' }
+  ]
+};
+  
 // ── STATE ──
 let currentUser = null;
 let pronosticos = {};
 let currentPhase = 'grupos';
  
 // ── RENDER ──
+// ── NUEVA FUNCIÓN PARA MARCAR CAMBIOS EN EXTRAS ──
+function markExtraChanged(id) {
+  const el = document.getElementById(id);
+  if(el) el.style.borderColor = 'rgba(201,162,39,0.4)';
+  const block = document.getElementById('eb-' + id);
+  if(block) block.style.borderColor = 'rgba(201,162,39,0.4)';
+}
+
+// ── REEMPLAZAR RENDER MATCHES ──
 function renderMatches(phase) {
   const container = document.getElementById('matches-container');
+
+  // Si la pestaña elegida es "Extras", generamos su propio HTML
+  if (phase === 'extras') {
+    let argHtml = EXTRAS_DATA.arg.map(e => `
+      <div class="arg-row">
+        <span class="arg-label">${e.label}</span>
+        <input type="text" class="arg-in" style="width: 140px; text-align: left; font-size: 13px;" id="${e.id}" placeholder="Ej: Messi" onchange="markExtraChanged('${e.id}')">
+      </div>
+    `).join('');
+
+    let gridHtml = EXTRAS_DATA.grid.map(e => `
+      <div class="extra-block" id="eb-${e.id}">
+        <label class="extra-label">${e.label}</label>
+        <input type="${e.type || 'text'}" class="extra-in" id="${e.id}" placeholder="..." onchange="markExtraChanged('${e.id}')">
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="extras-layout">
+        <div class="extras-col">
+          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--text); margin-bottom:12px;">Autor Gol <span style="color:#75AADB">Argentina</span></h3>
+          ${argHtml}
+        </div>
+        <div class="extras-col">
+          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--gold); margin-bottom:12px;">Predicciones Generales</h3>
+          <div class="extras-grid">
+            ${gridHtml}
+          </div>
+        </div>
+      </div>
+    `; = `
+      <div class="extras-layout">
+        <div class="extras-col">
+          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--text); margin-bottom:12px;">Goles de <span style="color:#75AADB">Argentina</span></h3>
+          ${argHtml}
+        </div>
+        <div class="extras-col">
+          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--gold); margin-bottom:12px;">Predicciones Generales</h3>
+          <div class="extras-grid">
+            ${gridHtml}
+          </div>
+        </div>
+      </div>
+    `;
+    loadInputValues();
+    return;
+  }
+
+  // Render normal de partidos
   const matches = FIXTURE[phase];
   if (!matches) return;
  
@@ -755,49 +874,113 @@ function renderMatches(phase) {
   }
   loadInputValues();
 }
- 
-function matchCard(m) {
-  const saved = currentUser && pronosticos[currentUser] && pronosticos[currentUser][m.id];
-  const hv = saved ? saved.h : '';
-  const av = saved ? saved.a : '';
-  return `
-    <div class="match-card${saved ? ' saved' : ''}" id="mc-${m.id}">
-      <div class="match-top">
-        <div class="team-block">
-          <span class="team-name">${m.local}</span>
-        </div>
-        <div class="score-inputs">
-          <input class="score-in" type="number" min="0" max="20" placeholder="?" id="h-${m.id}" value="${hv}" onchange="markChanged('${m.id}')">
-          <span class="vs-sep">—</span>
-          <input class="score-in" type="number" min="0" max="20" placeholder="?" id="a-${m.id}" value="${av}" onchange="markChanged('${m.id}')">
-        </div>
-        <div class="team-block" style="justify-content:flex-end">
-          <span class="team-name" style="text-align:right">${m.visita}</span>
-        </div>
-      </div>
-      <div class="match-meta">
-        <span>📅 ${m.fecha}</span>
-        <span>🕐 ${m.hora}</span>
-        <span>📍 ${m.sede}</span>
-      </div>
-    </div>
-  `;
-}
- 
-function markChanged(id) {
-  const card = document.getElementById('mc-' + id);
-  if (card) card.style.borderColor = 'rgba(201,162,39,0.4)';
-}
- 
+
+// ── REEMPLAZAR LOAD INPUT VALUES ──
 function loadInputValues() {
   if (!currentUser) return;
   const ups = pronosticos[currentUser] || {};
+
+  // Cargar datos si estamos en la pestaña Extras
+  if (currentPhase === 'extras') {
+    const ext = ups.extras || {};
+    [...EXTRAS_DATA.arg, ...EXTRAS_DATA.grid].forEach(e => {
+      const el = document.getElementById(e.id);
+      if (el && ext[e.id] !== undefined) {
+        el.value = ext[e.id];
+        // Pintar de verde si está guardado
+        if (ext[e.id] !== '') {
+          if (e.id.startsWith('arg_')) el.style.borderColor = 'rgba(45,158,92,0.4)';
+          const block = document.getElementById('eb-' + e.id);
+          if (block) block.classList.add('saved');
+        }
+      }
+    });
+    return;
+  }
+
+  // Cargar datos normales de partidos
   Object.keys(ups).forEach(id => {
+    if(id === 'extras') return; // Evitar procesar extras como si fueran partidos
     const hi = document.getElementById('h-' + id);
     const ai = document.getElementById('a-' + id);
     if (hi) hi.value = ups[id].h;
     if (ai) ai.value = ups[id].a;
   });
+}
+
+// ── REEMPLAZAR SAVE PRONOSTICOS ──
+async function savePronosticos() {
+  if (!currentUser) { showToast('⚠️ Primero ingresá al grupo'); return; }
+
+  let count = 0;
+  if (!pronosticos[currentUser]) pronosticos[currentUser] = {};
+
+  // Si el usuario guardó desde la pantalla de Extras, guardamos solo los extras
+  if (currentPhase === 'extras') {
+    if (!pronosticos[currentUser].extras) pronosticos[currentUser].extras = {};
+    const todosExtras = [...EXTRAS_DATA.arg, ...EXTRAS_DATA.grid];
+    todosExtras.forEach(e => {
+      const el = document.getElementById(e.id);
+      if (el && el.value !== '') {
+        pronosticos[currentUser].extras[e.id] = el.type === 'number' ? parseInt(el.value) : el.value.trim();
+        count++;
+        // Feedback visual
+        if (e.id.startsWith('arg_')) {
+          el.style.borderColor = 'rgba(45,158,92,0.4)';
+        } else {
+          const block = document.getElementById('eb-' + e.id);
+          if(block) { block.classList.add('saved'); block.style.borderColor = ''; }
+        }
+      }
+    });
+  } else {
+    // Lógica normal para partidos
+    const allPhases = Object.keys(FIXTURE);
+    allPhases.forEach(phase => {
+      FIXTURE[phase].forEach(m => {
+        const hi = document.getElementById('h-' + m.id);
+        const ai = document.getElementById('a-' + m.id);
+        if (hi && ai && hi.value !== '' && ai.value !== '') {
+          pronosticos[currentUser][m.id] = { h: parseInt(hi.value), a: parseInt(ai.value) };
+          const card = document.getElementById('mc-' + m.id);
+          if (card) { card.classList.add('saved'); card.style.borderColor = ''; }
+          count++;
+        }
+      });
+    });
+  }
+
+  // Guardar en LocalStorage y Firebase
+  localStorage.setItem('prodeData_' + currentUser, JSON.stringify(pronosticos[currentUser]));
+  try {
+    await setDoc(doc(db, "pronosticos", currentUser), {
+      nombre: currentUser,
+      pronosticos: pronosticos[currentUser],
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) { console.error("Error Firebase:", error); }
+
+  updateStats();
+  updateTabla();
+  updateMatchSelector();
+  showToast('✅ ' + count + ' datos guardados en esta sección');
+}
+
+// ── REEMPLAZAR UPDATE STATS ──
+function updateStats() {
+  const parts = Object.keys(pronosticos).length;
+  document.getElementById('st-participantes').textContent = parts;
+  let total = 0;
+  Object.values(pronosticos).forEach(p => {
+    Object.keys(p).forEach(k => {
+      if (k === 'extras') {
+        total += Object.keys(p[k]).length; // Sumar cada extra contestado
+      } else {
+        total++; // Sumar cada partido contestado
+      }
+    });
+  });
+  document.getElementById('st-pronosticos').textContent = total;
 }
  
 // ── PHASE ──
@@ -906,16 +1089,66 @@ function updateStats() {
 // ── TABLA ──
 const RESULTADOS_OFICIALES = {};
  
+// ── TABLA DE POSICIONES Y PUNTAJES ──
+// Inicializamos la estructura de resultados oficiales para que acepte extras
+const RESULTADOS_OFICIALES = {
+  extras: {} // Acá irán los resultados oficiales de la CD
+};
+ 
 function calcPuntos(user) {
   let pts=0, exactos=0, parciales=0, errores=0;
   const ups = pronosticos[user] || {};
+  
+  // 1. Cálculo de Partidos Normales
   Object.keys(ups).forEach(id => {
+    if (id === 'extras') return; // Saltamos la llave de extras acá
     if (!RESULTADOS_OFICIALES[id]) return;
-    const p = ups[id]; const r = RESULTADOS_OFICIALES[id];
+    
+    const p = ups[id]; 
+    const r = RESULTADOS_OFICIALES[id];
+    
     if (p.h === r.h && p.a === r.a) { pts += 4; exactos++; }
     else if ((p.h > p.a && r.h > r.a) || (p.h < p.a && r.h < r.a) || (p.h === p.a && r.h === r.a)) { pts += 2; parciales++; }
     else errores++;
   });
+
+  // 2. Cálculo de Pronósticos Extras
+  if (ups.extras && RESULTADOS_OFICIALES.extras) {
+    const pExt = ups.extras;
+    const rExt = RESULTADOS_OFICIALES.extras;
+
+    // Lista de IDs que valen 15 puntos según los Artículos 21 al 32
+    const extras15Pts = [
+      'ext_eq_goleador', 'ext_eq_rojas', 'ext_grande_afuera', 'ext_batacazo',
+      'ext_mejor_jugador', 'ext_mejor_gol', 'ext_mvp_final', 'ext_cant_penales',
+      'ext_goleador', 'ext_valla_menos', 'ext_gol_140', 'ext_subcampeon'
+    ];
+
+    extras15Pts.forEach(extId => {
+      // Verificamos que el usuario haya contestado y que exista un resultado oficial cargado
+      if (pExt[extId] !== undefined && rExt[extId] !== undefined && rExt[extId] !== '') {
+        
+        // Convertimos a String, pasamos a minúsculas y quitamos espacios para que la comparación sea justa
+        const userVal = String(pExt[extId]).trim().toLowerCase();
+        const oficialVal = String(rExt[extId]).trim().toLowerCase();
+        
+        if (userVal === oficialVal) {
+          pts += 15; // ¡Suma 15 puntos por el acierto!
+        }
+      }
+    });
+
+    // 3. Cálculo de Goles de Argentina por fase
+    const argGoles = ['arg_1', 'arg_2', 'arg_3', 'arg_8', 'arg_4', 'arg_S', 'arg_F'];
+    argGoles.forEach(argId => {
+      if (pExt[argId] !== undefined && rExt[argId] !== undefined && rExt[argId] !== '') {
+        if (Number(pExt[argId]) === Number(rExt[argId])) {
+          pts += 5; // PUNTOS PROVISORIOS PARA GOLES DE ARGENTINA
+        }
+      }
+    });
+  }
+
   return { pts, exactos, parciales, errores };
 }
  
