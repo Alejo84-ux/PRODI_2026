@@ -1014,9 +1014,26 @@ function closeLogin() {
 function doLogin() {
   const nombre = document.getElementById('login-nombre').value.trim();
   const codigo = document.getElementById('login-codigo').value.trim().toUpperCase();
-  if (!nombre) { showToast('⚠️ Ingresá tu nombre'); return; }
+  
+  if (!nombre && codigo !== 'ADMIN2026') { showToast('⚠️ Ingresá tu nombre'); return; }
+
+  // 👑 MODO ORGANIZADOR (CD)
+  if (codigo === 'ADMIN2026') {
+    currentUser = 'ORGANIZADOR';
+    localStorage.setItem('prodeUser', currentUser);
+    closeLogin();
+    updateHeaderUser();
+    showSection('resultados', document.querySelectorAll('.hnav-btn')[3]); // Ir a la pestaña Resultados
+    renderAdminPanel(); // Dibujar el panel
+    showToast('👑 Modo Organizador Activado');
+    return;
+  }
+
+  // MODO USUARIO NORMAL
   if (codigo !== 'MUNDIAL26') { showToast('❌ Código incorrecto. Usá: MUNDIAL26'); return; }
+
   currentUser = nombre;
+  localStorage.setItem('prodeUser', currentUser);
   if (!pronosticos[currentUser]) pronosticos[currentUser] = {};
   closeLogin();
   updateHeaderUser();
@@ -1228,7 +1245,78 @@ function renderTodos() {
     tbody.innerHTML = html;
   }
 }
+// ── PANEL DE ORGANIZADOR (CD) ──
+function renderAdminPanel() {
+  const card = document.getElementById('resultados-card');
+  if (!card || currentUser !== 'ORGANIZADOR') return;
 
+  let html = '<div style="padding:20px;">';
+  html += '<h3 style="color:var(--gold); margin-bottom:15px; font-family:\'Bebas Neue\', sans-serif; font-size:24px; text-align:center;">PANEL DE CONTROL DE LA CD</h3>';
+  html += '<p style="text-align:center; color:var(--text2); font-size:12px; margin-bottom:20px;">Cargá los resultados oficiales acá. Se calcularán los puntos automáticamente para todos.</p>';
+
+  // Dibujar Partidos Normales
+  Object.keys(FIXTURE).forEach(phase => {
+    html += `<div style="margin: 20px 0 10px; font-size:14px; font-weight:bold; color:var(--text2); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:4px;">${phase}</div>`;
+    FIXTURE[phase].forEach(m => {
+      const r = RESULTADOS_OFICIALES[m.id] || {h:'', a:''};
+      html += `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; background:var(--bg3); padding:8px; border-radius:8px;">
+          <span style="flex:1; text-align:right; font-size:12px; font-weight:500;">${m.local}</span>
+          <input type="number" min="0" max="20" id="of-h-${m.id}" value="${r.h}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
+          <span style="color:var(--text3); font-size:11px;">VS</span>
+          <input type="number" min="0" max="20" id="of-a-${m.id}" value="${r.a}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
+          <span style="flex:1; font-size:12px; font-weight:500;">${m.visita}</span>
+        </div>
+      `;
+    });
+  });
+
+  // Dibujar Extras (Art. 21 al 32 y Art. 13)
+  html += `<div style="margin: 30px 0 10px; font-size:16px; font-weight:bold; color:var(--gold); text-transform:uppercase; border-bottom:1px solid var(--gold); padding-bottom:4px;">PREDICCIONES EXTRAS Y GOLES</div>`;
+  [...EXTRAS_DATA.arg, ...EXTRAS_DATA.grid].forEach(e => {
+    const val = RESULTADOS_OFICIALES.extras[e.id] || '';
+    html += `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:var(--bg3); padding:8px 12px; border-radius:8px;">
+        <span style="font-size:12px; color:var(--text); font-weight:500;">${e.label}</span>
+        <input type="text" id="of-ext-${e.id}" value="${val}" placeholder="..." style="width:140px; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:6px; font-family:'Inter',sans-serif; font-size:12px; outline:none;">
+      </div>
+    `;
+  });
+
+  html += `<button onclick="saveOficiales()" style="width:100%; padding:14px; margin-top:24px; background:var(--gold); color:#000; border:none; border-radius:8px; font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; cursor:pointer; transition:background 0.2s;">💾 PUBLICAR RESULTADOS OFICIALES</button>`;
+  html += '</div>';
+
+  card.innerHTML = html;
+}
+
+async function saveOficiales() {
+  let oficiales = { extras: {} };
+
+  Object.keys(FIXTURE).forEach(phase => {
+    FIXTURE[phase].forEach(m => {
+      const h = document.getElementById('of-h-'+m.id).value;
+      const a = document.getElementById('of-a-'+m.id).value;
+      if(h !== '' && a !== '') oficiales[m.id] = { h: parseInt(h), a: parseInt(a) };
+    });
+  });
+
+  [...EXTRAS_DATA.arg, ...EXTRAS_DATA.grid].forEach(e => {
+    const val = document.getElementById('of-ext-'+e.id).value;
+    if(val !== '') oficiales.extras[e.id] = val;
+  });
+
+  try {
+    await setDoc(doc(db, "pronosticos", "ORGANIZADOR"), {
+      nombre: "ORGANIZADOR",
+      pronosticos: oficiales,
+      updatedAt: new Date().toISOString()
+    });
+    showToast('✅ Resultados oficiales publicados para todos');
+  } catch (error) {
+    console.error("Error Firebase:", error);
+    showToast('❌ Error de conexión');
+  }
+}
 // ── NAV ──
 function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1261,6 +1349,7 @@ window.renderTodos = renderTodos;
 window.markChanged = markChanged;
   
 // ── FIRESTORE SYNC ──
+// ── FIRESTORE SYNC ──
 onSnapshot(collection(db, "pronosticos"), snapshot => {
   pronosticos = {};
 
@@ -1271,14 +1360,34 @@ onSnapshot(collection(db, "pronosticos"), snapshot => {
     }
   });
 
+  // Interceptar la data del Organizador y cargarla en los Resultados Oficiales
+  if (pronosticos['ORGANIZADOR']) {
+    for (const key in RESULTADOS_OFICIALES) { if (key !== 'extras') delete RESULTADOS_OFICIALES[key]; } // Limpiar viejos
+    Object.assign(RESULTADOS_OFICIALES, pronosticos['ORGANIZADOR']);
+    if (!RESULTADOS_OFICIALES.extras) RESULTADOS_OFICIALES.extras = {};
+    delete pronosticos['ORGANIZADOR']; // Sacarlo de la lista para que no juegue en la tabla
+  }
+
+  // Rescate de localStorage para el usuario normal
+  if (currentUser && currentUser !== 'ORGANIZADOR') {
+    const dataLocal = localStorage.getItem('prodeData_' + currentUser);
+    if (dataLocal && !pronosticos[currentUser]) pronosticos[currentUser] = JSON.parse(dataLocal);
+    loadInputValues();
+  }
+
   updateStats();
   updateTabla();
   updateMatchSelector();
   renderTodos();
+
+  // Si sos el Organizador, refrescar tu panel por si abriste la página en otro lado
+  if (currentUser === 'ORGANIZADOR') renderAdminPanel();
 });
 
 // ── INIT ──
 updateMatchSelector();
+  window.saveOficiales = saveOficiales;
+  if (currentUser === 'ORGANIZADOR') renderAdminPanel();
 </script>
 </body>
 </html>
