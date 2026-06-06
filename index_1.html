@@ -838,20 +838,7 @@ function renderMatches(phase) {
           </div>
         </div>
       </div>
-    `; = `
-      <div class="extras-layout">
-        <div class="extras-col">
-          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--text); margin-bottom:12px;">Goles de <span style="color:#75AADB">Argentina</span></h3>
-          ${argHtml}
-        </div>
-        <div class="extras-col">
-          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--gold); margin-bottom:12px;">Predicciones Generales</h3>
-          <div class="extras-grid">
-            ${gridHtml}
-          </div>
-        </div>
-      </div>
-    `;
+      `;
     loadInputValues();
     return;
   }
@@ -1102,10 +1089,7 @@ function updateStats() {
   Object.values(pronosticos).forEach(p => total += Object.keys(p).length);
   document.getElementById('st-pronosticos').textContent = total;
 }
- 
-// ── TABLA ──
-const RESULTADOS_OFICIALES = {};
- 
+  
 // ── TABLA DE POSICIONES Y PUNTAJES ──
 // Inicializamos la estructura de resultados oficiales para que acepte extras
 const RESULTADOS_OFICIALES = {
@@ -1346,9 +1330,8 @@ window.closeModalOutside = closeModalOutside;
 window.setPhase = setPhase;
 window.savePronosticos = savePronosticos;
 window.renderTodos = renderTodos;
-window.markChanged = markChanged;
+window.markExtraChanged = markExtraChanged;
   
-// ── FIRESTORE SYNC ──
 // ── FIRESTORE SYNC ──
 onSnapshot(collection(db, "pronosticos"), snapshot => {
   pronosticos = {};
