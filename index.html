@@ -596,6 +596,14 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
+  authDomain: "prodi2026-5a7d6.firebaseapp.com",
+  projectId: "prodi2026-5a7d6",
+  storageBucket: "prodi2026-5a7d6.firebasestorage.app",
+  messagingSenderId: "57386316420",
+  appId: "1:57386316420:web:cb25411b444147c6c948d1"
+};
 
     // --- CONFIGURACIÓN E INICIALIZACIÓN ---
    const firebaseConfig = {
@@ -636,8 +644,7 @@
         return { pts, exactos, parciales, errores };
     }
 
-    // --- EXPOSICIÓN GLOBAL (ESTO ARREGLA LOS BOTONES) ---
-    window.calcPuntos = calcPuntos;
+    // --- CORRECCIÓN DE ALCANCE ---
 window.showSection = showSection;
 window.openLogin = openLogin;
 window.closeLogin = closeLogin;
@@ -651,21 +658,10 @@ window.renderTodos = renderTodos;
 window.markExtraChanged = markExtraChanged;
 window.markChanged = markChanged;
 window.saveOficiales = saveOficiales;
+window.calcPuntos = calcPuntos;
 
     // ... (El resto de tus funciones: renderMatches, updateTabla, etc. van aquí abajo) ...
 </script>
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
-  authDomain: "prodi2026-5a7d6.firebaseapp.com",
-  projectId: "prodi2026-5a7d6",
-  storageBucket: "prodi2026-5a7d6.firebasestorage.app",
-  messagingSenderId: "57386316420",
-  appId: "1:57386316420:web:cb25411b444147c6c948d1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
    
 // ── DATA: FIXTURE OFICIAL MUNDIAL 2026 (TUS 104 PARTIDOS) ──
 const FIXTURE = {
