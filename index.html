@@ -1265,21 +1265,6 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
- // --- CORRECCIÓN DE ALCANCE: Exponemos funciones para los botones HTML ---
-  window.showSection = showSection;
-  window.openLogin = openLogin;
-  window.closeLogin = closeLogin;
-  window.doLogin = doLogin;
-  window.openPronosticos = openPronosticos;
-  window.closeModal = closeModal;
-  window.closeModalOutside = closeModalOutside;
-  window.setPhase = setPhase;
-  window.savePronosticos = savePronosticos;
-  window.renderTodos = renderTodos;
-  window.markExtraChanged = markExtraChanged;
-  window.markChanged = markChanged;
-  window.saveOficiales = saveOficiales;
-  window.calcPuntos = calcPuntos;
       
 // ── FIRESTORE SYNC ──
 onSnapshot(collection(db, "pronosticos"), snapshot => {
@@ -1317,6 +1302,21 @@ onSnapshot(collection(db, "pronosticos"), snapshot => {
 updateHeaderUser(); // Para que el botón de usuario persista si refresca
 updateMatchSelector();
 if (currentUser === 'ORGANIZADOR') renderAdminPanel();
+// --- CORRECCIÓN DE ALCANCE: Exponemos funciones para los botones HTML ---
+window.showSection = showSection;
+window.openLogin = openLogin;
+window.closeLogin = closeLogin;
+window.doLogin = doLogin;
+window.openPronosticos = openPronosticos;
+window.closeModal = closeModal;
+window.closeModalOutside = closeModalOutside;
+window.setPhase = setPhase;
+window.savePronosticos = savePronosticos;
+window.renderTodos = renderTodos;
+window.markExtraChanged = markExtraChanged;
+window.markChanged = markChanged;
+window.saveOficiales = saveOficiales;
+window.calcPuntos = calcPuntos;      
 </script>
 </body>
 </html>
