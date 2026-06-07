@@ -1049,20 +1049,73 @@ const RESULTADOS_OFICIALES = {
 };
  
 function calcPuntos(user) {
-  let pts=0, exactos=0, parciales=0, errores=0;
+  let pts = 0, exactos = 0, parciales = 0, errores = 0;
   const ups = pronosticos[user] || {};
   
-  Object.keys(ups).forEach(id => {
-    if (id === 'extras') return;
-    if (!RESULTADOS_OFICIALES[id]) return;
-    
-    const p = ups[id]; 
-    const r = RESULTADOS_OFICIALES[id];
-    
-    if (p.h === r.h && p.a === r.a) { pts += 4; exactos++; }
-    else if ((p.h > p.a && r.h > r.a) || (p.h < p.a && r.h < r.a) || (p.h === p.a && r.h === r.a)) { pts += 2; parciales++; }
-    else errores++;
+  // Función interna para detectar si el partido es de Argentina
+  const esArgentina = (m) => m.local.includes("Argentina") || m.visita.includes("Argentina");
+
+  // Recorremos todas las fases del FIXTURE
+  Object.keys(FIXTURE).forEach(phase => {
+    FIXTURE[phase].forEach(m => {
+      const p = ups[m.id];
+      const r = RESULTADOS_OFICIALES[m.id];
+      if (!p || !r) return;
+
+      const esArg = esArgentina(m);
+
+      if (phase === 'grupos') {
+        // Art 09: Acierto Ganador/Empate (2 pts)
+        if ((p.h > p.a && r.h > r.a) || (p.h < p.a && r.h < r.a) || (p.h === p.a && r.h === r.a)) {
+          pts += 2; parciales++;
+          // Art 10: Pleno (1 pto extra + 1 por cada gol acertado)
+          if (p.h === r.h && p.a === r.a) {
+            pts += 1 + (p.h + p.a); 
+            exactos++;
+          }
+        } else { errores++; }
+
+        // Art 11 y 12: Argentina en grupos
+        if (esArg) {
+          pts += 1; // Art 11
+          if (p.h === r.h && p.a === r.a) pts += 1; // Art 12
+        }
+      } else {
+        // II. Eliminatorias (Playoff)
+        const puntosFase = { 'r32': 5, 'r16': 5, 'cuartos': 7, 'semis': 9, '3RD': 11, 'FINAL': 13 };
+        const ganoLlave = (p.h > p.a && r.h > r.a) || (p.h < p.a && r.h < r.a);
+        
+        // Art 16: Puntos por fase
+        if (ganoLlave) pts += (puntosFase[phase] || 5);
+
+        // Art 17: Pleno eliminatoria + bonus goles
+        if (p.h === r.h && p.a === r.a) {
+          pts += 2 + (p.h + p.a);
+        }
+
+        // Art 18 y 19: Argentina en Eliminatorias
+        if (esArg) {
+          if (phase !== '3RD' && ganoLlave) pts += 1;
+          if (phase === '3RD' && ganoLlave) pts -= 5; 
+          if (phase === 'FINAL' && ganoLlave) pts += 2;
+          if (p.h === r.h && p.a === r.a) pts += 5; 
+        }
+      }
+    });
   });
+
+  // Art 13 y 20: Autoría de goles
+  if (ups.extras && RESULTADOS_OFICIALES.extras) {
+    const pExt = ups.extras;
+    const rExt = RESULTADOS_OFICIALES.extras;
+    ['arg_1', 'arg_2', 'arg_3', 'arg_8', 'arg_4', 'arg_S'].forEach(id => {
+      if (pExt[id] && pExt[id] === rExt[id]) pts += 1;
+    });
+    if (pExt['arg_F'] && pExt['arg_F'] === rExt['arg_F']) pts += 5;
+  }
+
+  return { pts, exactos, parciales, errores };
+}
 
   if (ups.extras && RESULTADOS_OFICIALES.extras) {
     const pExt = ups.extras;
