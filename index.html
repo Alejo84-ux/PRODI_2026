@@ -637,20 +637,20 @@
     }
 
    // --- CORRECCIÓN DE ALCANCE: Exponemos funciones para los botones HTML ---
-window.showSection = showSection;
-window.openLogin = openLogin;
-window.closeLogin = closeLogin;
-window.doLogin = doLogin;
-window.openPronosticos = openPronosticos;
-window.closeModal = closeModal;
-window.closeModalOutside = closeModalOutside;
-window.setPhase = setPhase;
-window.savePronosticos = savePronosticos;
-window.renderTodos = renderTodos;
-window.markExtraChanged = markExtraChanged;
-window.markChanged = markChanged;
-window.saveOficiales = saveOficiales;
-window.calcPuntos = calcPuntos;
+  window.showSection = showSection;
+  window.openLogin = openLogin;
+  window.closeLogin = closeLogin;
+  window.doLogin = doLogin;
+  window.openPronosticos = openPronosticos;
+  window.closeModal = closeModal;
+  window.closeModalOutside = closeModalOutside;
+  window.setPhase = setPhase;
+  window.savePronosticos = savePronosticos;
+  window.renderTodos = renderTodos;
+  window.markExtraChanged = markExtraChanged;
+  window.markChanged = markChanged;
+  window.saveOficiales = saveOficiales;
+  window.calcPuntos = calcPuntos;
 
     // ... (El resto de tus funciones: renderMatches, updateTabla, etc. van aquí abajo) ...
 </script>
@@ -1210,7 +1210,7 @@ function renderAdminPanel() {
       html += `
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; background:var(--bg3); padding:8px; border-radius:8px;">
           <span style="flex:1; text-align:right; font-size:12px; font-weight:500;">${m.local}</span>
-          <input type="number" min="0" max="20" id="of-h-${m.id}" value="${r.h}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
+          <input type="number" min="0" max="20" id="of-h-${m.id}" value="${r ? r.h : ''}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
           <span style="color:var(--text3); font-size:11px;">VS</span>
           <input type="number" min="0" max="20" id="of-a-${m.id}" value="${r.a}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
           <span style="flex:1; font-size:12px; font-weight:500;">${m.visita}</span>
