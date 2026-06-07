@@ -636,23 +636,7 @@
         return { pts, exactos, parciales, errores };
     }
 
-   // --- CORRECCIÓN DE ALCANCE: Exponemos funciones para los botones HTML ---
-  window.showSection = showSection;
-  window.openLogin = openLogin;
-  window.closeLogin = closeLogin;
-  window.doLogin = doLogin;
-  window.openPronosticos = openPronosticos;
-  window.closeModal = closeModal;
-  window.closeModalOutside = closeModalOutside;
-  window.setPhase = setPhase;
-  window.savePronosticos = savePronosticos;
-  window.renderTodos = renderTodos;
-  window.markExtraChanged = markExtraChanged;
-  window.markChanged = markChanged;
-  window.saveOficiales = saveOficiales;
-  window.calcPuntos = calcPuntos;
-
-    // ... (El resto de tus funciones: renderMatches, updateTabla, etc. van aquí abajo) ...
+      // ... (El resto de tus funciones: renderMatches, updateTabla, etc. van aquí abajo) ...
 </script>
    
 // ── DATA: FIXTURE OFICIAL MUNDIAL 2026 (TUS 104 PARTIDOS) ──
@@ -1281,7 +1265,22 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
-  
+ // --- CORRECCIÓN DE ALCANCE: Exponemos funciones para los botones HTML ---
+  window.showSection = showSection;
+  window.openLogin = openLogin;
+  window.closeLogin = closeLogin;
+  window.doLogin = doLogin;
+  window.openPronosticos = openPronosticos;
+  window.closeModal = closeModal;
+  window.closeModalOutside = closeModalOutside;
+  window.setPhase = setPhase;
+  window.savePronosticos = savePronosticos;
+  window.renderTodos = renderTodos;
+  window.markExtraChanged = markExtraChanged;
+  window.markChanged = markChanged;
+  window.saveOficiales = saveOficiales;
+  window.calcPuntos = calcPuntos;
+      
 // ── FIRESTORE SYNC ──
 onSnapshot(collection(db, "pronosticos"), snapshot => {
   pronosticos = {};
