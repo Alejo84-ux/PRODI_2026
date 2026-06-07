@@ -598,7 +598,14 @@
     import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     // --- CONFIGURACIÓN E INICIALIZACIÓN ---
-    const firebaseConfig = { /* ... TU CONFIGURACIÓN ... */ };
+   const firebaseConfig = {
+    apiKey: "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
+    authDomain: "prodi2026-5a7d6.firebaseapp.com",
+    projectId: "prodi2026-5a7d6",
+    storageBucket: "prodi2026-5a7d6.firebasestorage.app",
+    messagingSenderId: "57386316420",
+    appId: "1:57386316420:web:cb25411b444147c6c948d1"
+};
     const db = getFirestore(initializeApp(firebaseConfig));
 
     // --- NUEVO CÁLCULO DE PUNTOS ---
@@ -631,19 +638,19 @@
 
     // --- EXPOSICIÓN GLOBAL (ESTO ARREGLA LOS BOTONES) ---
     window.calcPuntos = calcPuntos;
-    window.showSection = showSection;
-    window.openLogin = openLogin;
-    window.closeLogin = closeLogin;
-    window.doLogin = doLogin;
-    window.openPronosticos = openPronosticos;
-    window.closeModal = closeModal;
-    window.closeModalOutside = closeModalOutside;
-    window.setPhase = setPhase;
-    window.savePronosticos = savePronosticos;
-    window.renderTodos = renderTodos;
-    window.markExtraChanged = markExtraChanged;
-    window.markChanged = markChanged;
-    window.saveOficiales = saveOficiales;
+window.showSection = showSection;
+window.openLogin = openLogin;
+window.closeLogin = closeLogin;
+window.doLogin = doLogin;
+window.openPronosticos = openPronosticos;
+window.closeModal = closeModal;
+window.closeModalOutside = closeModalOutside;
+window.setPhase = setPhase;
+window.savePronosticos = savePronosticos;
+window.renderTodos = renderTodos;
+window.markExtraChanged = markExtraChanged;
+window.markChanged = markChanged;
+window.saveOficiales = saveOficiales;
 
     // ... (El resto de tus funciones: renderMatches, updateTabla, etc. van aquí abajo) ...
 </script>
