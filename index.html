@@ -829,9 +829,9 @@ function matchCard(m) {
           <span class="team-name">${m.local}</span>
         </div>
         <div class="score-inputs">
-          <input type="number" min="0" max="20" class="score-in" id="h-${m.id}" onchange="markChanged('${m.id}')" placeholder="-">
+          <input type="number" min="0" max="20" class="score-in" id="h-${m.id}" onchange="window.markChanged('${m.id}')" placeholder="-">
           <span class="vs-sep">VS</span>
-          <input type="number" min="0" max="20" class="score-in" id="a-${m.id}" onchange="markChanged('${m.id}')" placeholder="-">
+          <input type="number" min="0" max="20" class="score-in" id="a-${m.id}" onchange="window.markChanged('${m.id}')" placeholder="-">
         </div>
         <div class="team-block">
           <span class="team-name">${m.visita}</span>
