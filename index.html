@@ -594,30 +594,59 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-// ── EXPORTACIÓN INMEDIATA (HOISTING) ──
-// Esto hace que los botones del HTML funcionen al instante
-window.showSection = showSection;
-window.openLogin = openLogin;
-window.closeLogin = closeLogin;
-window.doLogin = doLogin;
-window.openPronosticos = openPronosticos;
-window.closeModal = closeModal;
-window.closeModalOutside = closeModalOutside;
-window.setPhase = setPhase;
-window.savePronosticos = savePronosticos;
-window.renderTodos = renderTodos;
-window.markExtraChanged = markExtraChanged;
-window.markChanged = markChanged;
-window.saveOficiales = saveOficiales;
+    // --- CONFIGURACIÓN E INICIALIZACIÓN ---
+    const firebaseConfig = { /* ... TU CONFIGURACIÓN ... */ };
+    const db = getFirestore(initializeApp(firebaseConfig));
+
+    // --- NUEVO CÁLCULO DE PUNTOS ---
+    function calcPuntos(user) {
+        let pts = 0, exactos = 0, parciales = 0, errores = 0;
+        const ups = pronosticos[user] || {};
+        
+        Object.keys(ups).forEach(id => {
+            if (id === 'extras') return;
+            const p = ups[id];
+            const r = RESULTADOS_OFICIALES[id];
+            if (!p || !r) return;
+
+            // Lógica: 4 puntos exacto, 2 puntos ganador/empate
+            if (p.h === r.h && p.a === r.a) { pts += 4; exactos++; }
+            else if ((p.h > p.a && r.h > r.a) || (p.h < p.a && r.h < r.a) || (p.h === p.a && r.h === r.a)) { 
+                pts += 2; parciales++; 
+            }
+            else { errores++; }
+        });
+
+        // Extras (15 pts por acierto)
+        if (ups.extras && RESULTADOS_OFICIALES.extras) {
+            Object.keys(ups.extras).forEach(extId => {
+                if (ups.extras[extId] == RESULTADOS_OFICIALES.extras[extId]) pts += 15;
+            });
+        }
+        return { pts, exactos, parciales, errores };
+    }
+
+    // --- EXPOSICIÓN GLOBAL (ESTO ARREGLA LOS BOTONES) ---
+    window.calcPuntos = calcPuntos;
+    window.showSection = showSection;
+    window.openLogin = openLogin;
+    window.closeLogin = closeLogin;
+    window.doLogin = doLogin;
+    window.openPronosticos = openPronosticos;
+    window.closeModal = closeModal;
+    window.closeModalOutside = closeModalOutside;
+    window.setPhase = setPhase;
+    window.savePronosticos = savePronosticos;
+    window.renderTodos = renderTodos;
+    window.markExtraChanged = markExtraChanged;
+    window.markChanged = markChanged;
+    window.saveOficiales = saveOficiales;
+
+    // ... (El resto de tus funciones: renderMatches, updateTabla, etc. van aquí abajo) ...
+</script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
