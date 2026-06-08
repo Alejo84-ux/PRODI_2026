@@ -875,7 +875,7 @@ function renderMatches(phase) {
     container.innerHTML = Object.entries(groups).map(([g, ms]) => `
       <div class="grupo-block">
         <div class="grupo-label">Grupo ${g}</div>
-        ${ms.map(m => matchCard(m)).join('')}
+        ${ms.map(m => (m)).join('')}
       </div>
     `).join('');
   } else {
@@ -1194,9 +1194,9 @@ function renderAdminPanel() {
       html += `
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; background:var(--bg3); padding:8px; border-radius:8px;">
           <span style="flex:1; text-align:right; font-size:12px; font-weight:500;">${m.local}</span>
-          <input type="number" min="0" max="20" id="of-h-${m.id}" value="${r ? r.h : ''}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
+          <input type="number" min="0" max="20" id="of-h-${m.id}" value="${r.h !== undefined ? r.h : ''}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
           <span style="color:var(--text3); font-size:11px;">VS</span>
-          <input type="number" min="0" max="20" id="of-a-${m.id}" value="${r.a}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
+          <input type="number" min="0" max="20" id="of-a-${m.id}" value="${r.a !== undefined ? r.a : ''}" style="width:36px; text-align:center; background:var(--bg); color:white; border:1px solid var(--border); border-radius:4px; padding:4px; font-family:'Bebas Neue',sans-serif; font-size:16px; outline:none;">
           <span style="flex:1; font-size:12px; font-weight:500;">${m.visita}</span>
         </div>
       `;
@@ -1302,6 +1302,8 @@ onSnapshot(collection(db, "pronosticos"), snapshot => {
 updateHeaderUser(); // Para que el botón de usuario persista si refresca
 updateMatchSelector();
 if (currentUser === 'ORGANIZADOR') renderAdminPanel();
+
+      
 // --- CORRECCIÓN DE ALCANCE: Exponemos funciones para los botones HTML ---
 window.showSection = showSection;
 window.openLogin = openLogin;
@@ -1317,6 +1319,7 @@ window.markExtraChanged = markExtraChanged;
 window.markChanged = markChanged;
 window.saveOficiales = saveOficiales;
 window.calcPuntos = calcPuntos;      
+      
 </script>
 </body>
 </html>
