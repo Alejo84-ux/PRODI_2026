@@ -433,7 +433,7 @@
  
 <!-- HEADER -->
 <header class="site-header">
-  <div class="logo">⚽ <span>PRODE</span> MUNDIAL <span style="color:var(--green-light)">2026</span></div>
+  <div class="logo">⚽ <span>PRODI</span> MUNDIAL <span style="color:var(--green-light)">2026</span></div>
   <nav class="header-nav">
     <button class="hnav-btn active" onclick="showSection('inicio',this)">Inicio</button>
     <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
@@ -448,7 +448,7 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-badge">🏆 FIFA World Cup 2026 · USA · CAN · MEX</div>
-  <h1>PRODE <span class="accent">MUNDIAL</span></h1>
+  <h1>PRODI <span class="accent">MUNDIAL</span></h1>
   <p>Ingresá tus pronósticos para los 104 partidos y competí con tus amigos</p>
   <div class="hero-stats">
     <div class="hero-stat"><div class="hero-stat-val">104</div><div class="hero-stat-lbl">Partidos</div></div>
