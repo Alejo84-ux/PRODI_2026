@@ -161,6 +161,25 @@
   .arg-in{width:140px;text-align:left;font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;outline:none;transition:border-color .15s}
   .arg-in:focus{border-color:var(--green-light)}
 
+/* ── REGLAMENTO ── */
+  .regl-section { margin-bottom: 24px; }
+  .regl-section-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; color:var(--gold); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid rgba(201,162,39,.3); display:flex; align-items:center; gap:8px; }
+  .art-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:8px; transition:border-color .15s; }
+  .art-card:hover { border-color:var(--border-hover); }
+  .art-num { font-family:'Bebas Neue',sans-serif; font-size:13px; color:var(--green-light); letter-spacing:1px; margin-bottom:4px; }
+  .art-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; }
+  .art-body { font-size:13px; color:var(--text2); line-height:1.6; }
+  .art-body strong { color:var(--gold); }
+  .pts-pill { display:inline-block; background:rgba(201,162,39,.15); border:1px solid rgba(201,162,39,.3); color:var(--gold-light); font-family:'Bebas Neue',sans-serif; font-size:15px; border-radius:20px; padding:2px 10px; margin:0 3px; }
+  .pts-pill.green { background:rgba(45,158,92,.15); border-color:rgba(45,158,92,.3); color:#4ade80; }
+  .pts-pill.red { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.2); color:#f87171; }
+  .pts-pill.blue { background:rgba(117,170,219,.15); border-color:rgba(117,170,219,.3); color:#75AADB; }
+  .pts-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+  .pts-table th { background:var(--bg2); color:var(--text3); padding:7px 10px; text-align:left; font-weight:500; text-transform:uppercase; letter-spacing:.5px; }
+  .pts-table td { padding:8px 10px; border-bottom:1px solid var(--border); color:var(--text2); }
+  .pts-table tr:last-child td { border-bottom:none; }
+  .pts-table td:last-child { color:var(--gold-light); font-family:'Bebas Neue',sans-serif; font-size:15px; }
+  
   @media(max-width:520px){
     .hero h1{font-size:36px}
     .team-name{font-size:11px}
@@ -177,6 +196,7 @@
     <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
     <button class="hnav-btn" onclick="showSection('todos',this)">Todos</button>
     <button class="hnav-btn" onclick="showSection('resultados',this)">Resultados</button>
+    <button class="hnav-btn" onclick="showSection('reglamento',this)" style="color:var(--gold)">📋 Reglamento</button>
   </nav>
   <div class="header-user" id="header-user-area">
     <button class="btn-login" onclick="openLogin()">Ingresar</button>
@@ -186,8 +206,7 @@
 <div class="hero">
   <div class="hero-badge">🏆 FIFA World Cup 2026 · USA · CAN · MEX</div>
   <h1>PRODI <span class="accent">MUNDIAL</span></h1>
-  <p>Ingresá tus pronósticos para los 104 partidos y competí con tus amigos</p>
-  <div class="hero-stats">
+    <div class="hero-stats">
     <div class="hero-stat"><div class="hero-stat-val">104</div><div class="hero-stat-lbl">Partidos</div></div>
     <div class="hero-stat"><div class="hero-stat-val">48</div><div class="hero-stat-lbl">Selecciones</div></div>
     <div class="hero-stat"><div class="hero-stat-val">12</div><div class="hero-stat-lbl">Grupos</div></div>
@@ -208,6 +227,45 @@
   ⚽ <strong style="color:var(--gold)">¡Bienvenido al PRODI 2026!</strong> La Cocomision les desea un buen Prodi, que sepan ser amigos de los plenos y gambetear los nulos.
 </div>
   </div>
+<div style="margin-top:16px" class="card">
+      <div class="card-header"><div class="card-title"><div class="dot"></div>Sistema de puntos — Resumen rápido</div>
+        <button onclick="showSection('reglamento',document.querySelectorAll('.hnav-btn')[4])" style="font-size:11px;color:var(--gold);background:transparent;border:1px solid rgba(201,162,39,.3);border-radius:20px;padding:3px 10px;cursor:pointer">Ver reglamento completo →</button>
+      </div>
+      <div style="padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:12px">
+          <div style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:8px">⚽ Grupos</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">
+            Acierto ganador/empate: <strong style="color:#4ade80">2 pts</strong><br>
+            + Pleno (resultado exacto): <strong style="color:#4ade80">+1 pt</strong><br>
+            + Por cada gol acertado: <strong style="color:#4ade80">+1 pt</strong><br>
+            + Partido Argentina acertado: <strong style="color:#75AADB">+1 pt</strong><br>
+            + Pleno Argento: <strong style="color:#75AADB">+1 pt</strong><br>
+            + Autor gol argentino: <strong style="color:#75AADB">+1 pt c/u</strong>
+          </div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:12px">
+          <div style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:8px">🏆 Eliminatorias</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">
+            Octavos: <strong style="color:var(--gold)">5</strong> · Cuartos: <strong style="color:var(--gold)">7</strong> · Semis: <strong style="color:var(--gold)">9</strong><br>
+            3er puesto: <strong style="color:var(--gold)">11</strong> · Final: <strong style="color:var(--gold)">13</strong><br>
+            + Pleno: <strong style="color:#4ade80">+2 pts</strong> + goles<br>
+            + Arg. (no 3°): <strong style="color:#75AADB">+1 pt</strong> (Final: <strong style="color:#75AADB">+2</strong>)<br>
+            + Pleno Argento: <strong style="color:#75AADB">+5 pts</strong><br>
+            ⚠️ Arg. en 3er puesto: <strong style="color:#f87171">−5 pts</strong>
+          </div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:12px">
+          <div style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:8px">🎲 Cláusulas especiales</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">
+            🏅 Último al cierre grupos: <strong style="color:#4ade80">+5 pts</strong><br>
+            ⚠️ Primero al cierre grupos: <strong style="color:#f87171">−5 pts</strong><br>
+            Autor gol Arg. en Final: <strong style="color:#75AADB">+5 pts c/u</strong><br>
+            Predicciones Extras: <strong style="color:var(--gold)">15 pts c/u</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /inicio -->
 
   <div id="tabla" class="section">
     <div class="card">
@@ -249,6 +307,151 @@
       </div>
     </div>
   </div>
+ <!-- ── REGLAMENTO ── -->
+  <div id="reglamento" class="section">
+
+    <!-- HEADER -->
+    <div style="background:linear-gradient(135deg,rgba(201,162,39,.08),rgba(26,107,60,.08));border:1px solid rgba(201,162,39,.2);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px;text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--gold)">📋 REGLAMENTO PRODI 2026</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px">La CoComisión les desea un buen Prodi. Que sepan ser amigos de los plenos y gambetear los nulos.</div>
+    </div>
+
+    <!-- RESUMEN RÁPIDO -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><div class="card-title"><div class="dot"></div>Resumen de puntos — Fase de Grupos</div></div>
+      <div style="padding:14px 18px">
+        <table class="pts-table">
+          <thead><tr><th>Situación</th><th>Pts</th></tr></thead>
+          <tbody>
+            <tr><td>Acertar ganador o empate</td><td>2</td></tr>
+            <tr><td>+ Resultado exacto (pleno)</td><td>+1</td></tr>
+            <tr><td>+ Por cada gol acertado en pleno</td><td>+1 c/u</td></tr>
+            <tr><td>+ Partido de Argentina acertado</td><td>+1</td></tr>
+            <tr><td>+ Pleno Argento (resultado exacto Argentina)</td><td>+1</td></tr>
+            <tr><td>+ Por cada autor de gol argentino acertado</td><td>+1 c/u</td></tr>
+            <tr><td>🏅 Bonus: Último al cierre de grupos</td><td>+5</td></tr>
+            <tr><td>⚠️ Penalidad: Primero al cierre de grupos</td><td>−5</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><div class="card-title"><div class="dot"></div>Resumen de puntos — Fase Eliminatoria</div></div>
+      <div style="padding:14px 18px">
+        <table class="pts-table">
+          <thead><tr><th>Instancia</th><th>Acierto ganador</th><th>+Pleno</th><th>+Gol c/u</th><th>+Arg.</th><th>+Pleno Arg.</th></tr></thead>
+          <tbody>
+            <tr><td>Octavos (R32 + R16)</td><td>5</td><td>+2</td><td>+1</td><td>+1</td><td>+5</td></tr>
+            <tr><td>Cuartos</td><td>7</td><td>+2</td><td>+1</td><td>+1</td><td>+5</td></tr>
+            <tr><td>Semis</td><td>9</td><td>+2</td><td>+1</td><td>+1</td><td>+5</td></tr>
+            <tr><td>3er puesto</td><td>11</td><td>+2</td><td>+1</td><td style="color:#f87171">−5 si Argentina</td><td>+5</td></tr>
+            <tr><td>Final</td><td>13</td><td>+2</td><td>+1</td><td>+2</td><td>+5</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px;font-size:12px;color:var(--text3)">* En la Final: autor de gol argentino acertado vale <strong style="color:var(--gold)">5 pts</strong> cada uno.</div>
+      </div>
+    </div>
+
+    <!-- ARTÍCULOS COMPLETOS -->
+    <div class="regl-section">
+      <div class="regl-section-title">⚽ I — Fase de Grupos (48 partidos)</div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 09</div>
+        <div class="art-title">Acierto</div>
+        <div class="art-body">Se otorgarán <span class="pts-pill green">2 pts</span> por partido si se acertase <strong>Ganador o Empate</strong>.</div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 10</div>
+        <div class="art-title">Acierto pleno</div>
+        <div class="art-body">Se otorgará <span class="pts-pill green">+1 pt</span> si se acertase el <strong>resultado exacto (pleno)</strong>. De haber pleno, se otorgará <span class="pts-pill green">+1 pt extra por cada gol acertado</span>.<br><br>
+        <em style="color:var(--text3)">Ejemplo: pronosticás 3-1 y termina 3-1 → 2 (acierto) + 1 (pleno) + 4 (4 goles acertados) = 7 pts</em></div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 11</div>
+        <div class="art-title">Acierto en partido de Argentina</div>
+        <div class="art-body">Se otorgará <span class="pts-pill blue">+1 pt extra</span> por <strong>partido de Argentina acertado</strong> (ganador o empate).</div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 12</div>
+        <div class="art-title">Acierto pleno partido de Argentina</div>
+        <div class="art-body">Se otorgará <span class="pts-pill blue">+1 pt extra</span> si se acertase el <strong>resultado exacto en partido de Argentina (Pleno Argento)</strong>.</div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 13</div>
+        <div class="art-title">Acierto en autoría de gol argentino</div>
+        <div class="art-body">Se otorgará <span class="pts-pill blue">+1 pt extra</span> por <strong>cada acierto en la autoría de un gol nacional</strong>. (Se carga en la sección 🌟 Extras del pronóstico.)</div>
+      </div>
+
+      <div class="art-card" style="border-color:rgba(201,162,39,.3)">
+        <div class="art-num">Art. 14</div>
+        <div class="art-title">Cláusula en favor del peor 🏅</div>
+        <div class="art-body">Se otorgarán <span class="pts-pill">+5 pts</span> a la persona que estuviere <strong>último al cierre de grupos</strong>.</div>
+      </div>
+
+      <div class="art-card" style="border-color:rgba(239,68,68,.2)">
+        <div class="art-num">Art. 15</div>
+        <div class="art-title">Cláusula contra el mejor ⚠️</div>
+        <div class="art-body">Se le restarán <span class="pts-pill red">−5 pts</span> a la persona que estuviere <strong>primero al cierre de grupos</strong>.</div>
+      </div>
+    </div>
+
+    <div class="regl-section">
+      <div class="regl-section-title">🏆 II — Fase Eliminatoria (Playoff)</div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 16</div>
+        <div class="art-title">Acierto en el equipo que gane la llave</div>
+        <div class="art-body">Por acertar el <strong>equipo ganador</strong> (el que pase a la siguiente fase):
+          <table class="pts-table" style="margin-top:8px">
+            <tr><td>Octavos de final</td><td>5 pts</td></tr>
+            <tr><td>Cuartos de final</td><td>7 pts</td></tr>
+            <tr><td>Semifinales</td><td>9 pts</td></tr>
+            <tr><td>Tercer puesto</td><td>11 pts</td></tr>
+            <tr><td>Final</td><td>13 pts</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 17</div>
+        <div class="art-title">Acierto pleno en fase eliminatoria</div>
+        <div class="art-body">En todas las instancias, se otorgarán <span class="pts-pill green">+2 pts</span> si se acertase el <strong>resultado exacto (pleno) en los 90' o 120'</strong>. De haber pleno, se otorgará <span class="pts-pill green">+1 pt por cada gol acertado</span>.</div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 18</div>
+        <div class="art-title">Acierto en partido de Argentina — Fase eliminatoria</div>
+        <div class="art-body">
+          Cada acierto en el equipo ganador de Argentina suma <span class="pts-pill blue">+1 pt extra</span>, <strong>excepto en el tercer puesto</strong>.<br><br>
+          Quien ubique a Argentina en el <strong>tercer puesto</strong>, <span class="pts-pill red">pierde 5 pts</span>.<br><br>
+          En el <strong>partido final</strong>, el acierto en favor de Argentina suma <span class="pts-pill blue">+2 pts extra</span>.
+        </div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 19</div>
+        <div class="art-title">Acierto pleno en partido de Argentina — Fase eliminatoria</div>
+        <div class="art-body">Se otorgarán <span class="pts-pill blue">+5 pts extra</span> si se acertase el <strong>resultado exacto (Pleno Argento)</strong> en cualquier partido eliminatorio de Argentina.</div>
+      </div>
+
+      <div class="art-card">
+        <div class="art-num">Art. 20</div>
+        <div class="art-title">Acierto en autoría del gol argentino — Fase eliminatoria</div>
+        <div class="art-body">
+          Se otorgará <span class="pts-pill blue">+1 pt extra</span> por cada acierto en la autoría de un gol nacional.<br><br>
+          <strong>En el partido final</strong>, se otorgarán <span class="pts-pill blue">+5 pts extra</span> por cada autor de gol argentino acertado.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /reglamento -->
+
 </main>
 
 <button class="open-pronos-btn" onclick="openPronosticos()">
@@ -303,7 +506,9 @@
 // ══════════════════════════════════════════
 //  FIREBASE CONFIG
 // ══════════════════════════════════════════
-const firebaseConfig = {
+var db = null;
+try {
+  var firebaseConfig = {
   apiKey:            "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
   authDomain:        "prodi2026-5a7d6.firebaseapp.com",
   projectId:         "prodi2026-5a7d6",
@@ -313,6 +518,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+} catch(e) {
+  console.warn('Firebase no disponible, modo local activo:', e.message);
+}
 
 // ══════════════════════════════════════════
 //  FIXTURE COMPLETO
@@ -827,7 +1035,13 @@ db.collection('pronosticos').onSnapshot(function(snapshot){
   updateStats(); updateTabla(); updateMatchSelector(); renderTodos();
   if(currentUser==='ORGANIZADOR')renderAdminPanel();
 });
-
+} else {
+  // Modo local: cargar desde localStorage
+  if(currentUser&&currentUser!=='ORGANIZADOR'){
+    var local=localStorage.getItem('prodeData_'+currentUser);
+    if(local){try{pronosticos[currentUser]=JSON.parse(local);}catch(e){}}
+  }
+  updateStats(); updateTabla(); updateMatchSelector();
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
