@@ -303,7 +303,7 @@
 // ══════════════════════════════════════════
 //  FIREBASE CONFIG
 // ══════════════════════════════════════════
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey:            "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
   authDomain:        "prodi2026-5a7d6.firebaseapp.com",
   projectId:         "prodi2026-5a7d6",
@@ -317,7 +317,7 @@ const db = firebase.firestore();
 // ══════════════════════════════════════════
 //  FIXTURE COMPLETO
 // ══════════════════════════════════════════
-const FIXTURE = {
+var FIXTURE = {
   grupos: [
     {id:'A1',grupo:'A',local:'México 🇲🇽',         visita:'Sudáfrica 🇿🇦',       fecha:'11 Jun',hora:'16:00 ARG',sede:'Azteca, Ciudad de México'},
     {id:'A2',grupo:'A',local:'Corea del Sur 🇰🇷',   visita:'Rep. Checa 🇨🇿',       fecha:'11 Jun',hora:'23:00 ARG',sede:'Akron, Zapopan'},
@@ -436,11 +436,8 @@ const FIXTURE = {
   ]
 };
 
-const EXTRAS_DATA = {
-  arg:[
-    {id:'arg_1',label:'1° Partido'},{id:'arg_2',label:'2° Partido'},{id:'arg_3',label:'3° Partido'},
-    {id:'arg_8',label:'Octavos'},{id:'arg_4',label:'Cuartos'},{id:'arg_S',label:'Semis'},{id:'arg_F',label:'Final'}
-  ],
+var EXTRAS_DATA = {
+  arg:[], // poblado dinámicamente por ARG_PARTIDOS abajo
   grid:[
     {id:'ext_eq_goleador',  label:'Equipo más Goleador'},
     {id:'ext_eq_rojas',     label:'Equipo más Rojas'},
@@ -456,6 +453,19 @@ const EXTRAS_DATA = {
     {id:'ext_subcampeon',   label:'Sub-campeón'}
   ]
 };
+
+var ARG_PARTIDOS = [
+  {key:'1',   label:'Grupo 1er Partido'},
+  {key:'2',   label:'Grupo 2do Partido'},
+  {key:'3',   label:'Grupo 3er Partido'},
+  {key:'R32', label:'Ronda 32'},
+  {key:'R16', label:'Octavos'},
+  {key:'QF',  label:'Cuartos'},
+  {key:'SF',  label:'Semis'},
+  {key:'3RD', label:'3er Puesto'},
+  {key:'F',   label:'Final ⭐'}
+];
+var MAX_GOLES_ARG = 5;
 
 // Llenar EXTRAS_DATA.arg con hasta 5 autores por partido
 ARG_PARTIDOS.forEach(function(p){
@@ -1050,7 +1060,7 @@ function doLogin(){
     currentUser='ORGANIZADOR';
     localStorage.setItem('prodeUser',currentUser);
     closeLogin(); updateHeaderUser();
-    showSection('resultados',document.querySelectorAll('.hnav-btn')[3]);
+    showSection('resultados', document.querySelector('.hnav-btn[onclick*="resultados"]'));
     renderAdminPanel();
     showToast('👑 Modo Organizador Activado');
     return;
