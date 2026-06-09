@@ -226,6 +226,7 @@
    <div style="margin-top:16px;padding:16px;background:var(--bg2);border:1px solid rgba(201,162,39,.2);border-radius:var(--radius);color:var(--text2);font-size:13px;line-height:1.6">
   ⚽ <strong style="color:var(--gold)">¡Bienvenido al PRODI 2026!</strong> La Cocomision les desea un buen Prodi, que sepan ser amigos de los plenos y gambetear los nulos.
 </div>
+    
     <div style="margin-top:16px" class="card">
       <div class="card-header"><div class="card-title"><div class="dot"></div>Sistema de puntos — Resumen rápido</div>
         <button onclick="showSection('reglamento',document.querySelectorAll('.hnav-btn')[4])" style="font-size:11px;color:var(--gold);background:transparent;border:1px solid rgba(201,162,39,.3);border-radius:20px;padding:3px 10px;cursor:pointer">Ver reglamento completo →</button>
