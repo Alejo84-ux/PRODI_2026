@@ -1,41 +1,4 @@
-.site-header{background:linear-gradient(180deg,#0a1f0f 0%,var(--bg) 100%);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:60px}
-  .logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;position:relative;padding:6px 10px;border-radius:8px;transition:background .15s}
-  .logo:hover{background:rgba(201,162,39,.08)}
-  .logo span{color:var(--text)}
-  .menu-arrow{font-size:14px;color:var(--text3);margin-left:2px;transition:transform .2s;display:inline-block}
-  .menu-arrow.open{transform:rotate(180deg)}
-
-  /* ── DROPDOWN ── */
-  .nav-dropdown{
-    display:none;
-    position:absolute;
-    top:60px; left:0;
-    width:220px;
-    background:var(--bg2);
-    border:1px solid var(--border);
-    border-top:none;
-    border-radius:0 0 var(--radius-lg) var(--radius-lg);
-    box-shadow:0 12px 32px rgba(0,0,0,.5);
-    z-index:500;
-    overflow:hidden;
-    animation:dropDown .18s ease;
-  }
-  .nav-dropdown.open{display:block}
-  @keyframes dropDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-  .nav-drop-btn{
-    display:block;width:100%;padding:13px 20px;
-    background:transparent;border:none;border-bottom:1px solid var(--border);
-    color:var(--text2);font-family:'Inter',sans-serif;font-size:14px;
-    text-align:left;cursor:pointer;transition:all .12s;
-  }
-  .nav-drop-btn:last-child{border-bottom:none}
-  .nav-drop-btn:hover{background:var(--bg3);color:var(--text)}
-  .nav-drop-btn.active{background:var(--green-dark);color:#fff;border-left:3px solid var(--green-light)}
-  .nav-drop-btn.regl{color:var(--gold)}
-  .nav-drop-btn.regl:hover{background:rgba(201,162,39,.08)}
-  .nav-drop-btn.regl.active{background:rgba(201,162,39,.1);color:var(--gold-light);border-left-color:var(--gold)}
-
-  .header-user{display:flex;align-items:center;gap:10px}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -61,13 +24,22 @@
   body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
   .site-header{background:linear-gradient(180deg,#0a1f0f 0%,var(--bg) 100%);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:60px}
-  .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--gold);display:flex;align-items:center;gap:10px}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;position:relative;padding:6px 10px;border-radius:8px;transition:background .15s}
+  .logo:hover{background:rgba(201,162,39,.08)}
   .logo span{color:var(--text)}
-  .header-nav{display:flex;gap:4px}
-  .hnav-btn{padding:6px 14px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
-  .hnav-btn:hover{background:var(--bg3);color:var(--text)}
-  .hnav-btn.active{background:var(--green-mid);color:#fff}
-  .header-user { display:flex; align-items:center; gap:10px; margin-right: 20px; } /* Ajusta el margen según prefieras */
+  .menu-arrow{font-size:13px;color:var(--text3);margin-left:4px;transition:transform .2s;display:inline-block;line-height:1}
+  .menu-arrow.open{transform:rotate(180deg)}
+  .nav-dropdown{display:none;position:absolute;top:60px;left:0;width:220px;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);box-shadow:0 12px 32px rgba(0,0,0,.6);z-index:500;overflow:hidden;animation:dropDown .18s ease}
+  .nav-dropdown.open{display:block}
+  @keyframes dropDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  .nav-drop-btn{display:block;width:100%;padding:13px 20px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-family:'Inter',sans-serif;font-size:14px;text-align:left;cursor:pointer;transition:all .12s}
+  .nav-drop-btn:last-child{border-bottom:none}
+  .nav-drop-btn:hover{background:var(--bg3);color:var(--text)}
+  .nav-drop-btn.active{background:var(--green-dark);color:#fff;border-left:3px solid var(--green-light);padding-left:17px}
+  .nav-drop-btn.regl{color:var(--gold)}
+  .nav-drop-btn.regl:hover{background:rgba(201,162,39,.08)}
+  .nav-drop-btn.regl.active{background:rgba(201,162,39,.1);color:var(--gold-light);border-left-color:var(--gold)}
+  .header-user{display:flex;align-items:center;gap:10px}
   .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;cursor:pointer}
   .btn-login{padding:6px 16px;border-radius:8px;background:var(--green-mid);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;font-weight:500;transition:background .15s}
   .btn-login:hover{background:var(--green-light)}
@@ -229,13 +201,10 @@
 <body>
 
 <header class="site-header">
-  <!-- LOGO / TRIGGER DEL MENÚ -->
-  <div class="logo" id="menu-trigger" onclick="toggleMenu()" role="button" tabindex="0" aria-label="Menú principal">
+  <div class="logo" id="menu-trigger" onclick="toggleMenu()">
     ⚽ <span>PRODI</span> MUNDIAL <span style="color:var(--green-light)">2026</span>
     <span class="menu-arrow" id="menu-arrow">▾</span>
   </div>
-
-  <!-- DROPDOWN MENÚ -->
   <div class="nav-dropdown" id="nav-dropdown">
     <button class="nav-drop-btn active" id="navbtn-inicio"     onclick="navGo('inicio',this)">🏠 Inicio</button>
     <button class="nav-drop-btn"        id="navbtn-tabla"      onclick="navGo('tabla',this)">🏆 Tabla</button>
@@ -243,7 +212,6 @@
     <button class="nav-drop-btn"        id="navbtn-resultados" onclick="navGo('resultados',this)">⚽ Resultados</button>
     <button class="nav-drop-btn regl"   id="navbtn-reglamento" onclick="navGo('reglamento',this)">📋 Reglamento</button>
   </div>
-
   <div class="header-user" id="header-user-area">
     <button class="btn-login" onclick="openLogin()">Ingresar</button>
   </div>
