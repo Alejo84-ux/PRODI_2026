@@ -24,21 +24,42 @@
   body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
  .site-header {
-    height: auto; /* Dejamos que el header crezca según el contenido */
-    min-height: 60px;
-    padding: 10px 1rem;
-    flex-wrap: wrap; /* ¡La clave! Permite que los elementos pasen a otra línea */
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
 }
 
-.header-nav {
+.header-top {
     display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    white-space: nowrap;
-    width: 100%; /* Ahora ocupará todo el ancho disponible */
-    order: 2;    /* Lo fuerza a ir a la segunda fila */
-    padding-bottom: 5px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* En PC (pantallas grandes), todo en una fila */
+@media (min-width: 768px) {
+    .site-header { flex-direction: row; }
+    .header-nav { overflow-x: visible; }
+}
+
+/* En móviles, permitimos scroll en el nav */
+@media (max-width: 767px) {
+    .header-actions { 
+        width: 100%; 
+        margin-top: 10px;
+    }
+    .header-nav {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+    }
 }
 
 /* Oculta la barra de scroll en Chrome/Safari */
@@ -212,16 +233,20 @@
 <body>
 
 <header class="site-header">
-  <div class="logo">⚽ <span>PRODI</span> MUNDIAL <span style="color:var(--green-light)">2026</span></div>
-  <nav class="header-nav">
-    <button class="hnav-btn active" onclick="showSection('inicio',this)">Inicio</button>
-    <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
-    <button class="hnav-btn" onclick="showSection('todos',this)">Todos</button>
-    <button class="hnav-btn" onclick="showSection('resultados',this)">Resultados</button>
-    <button class="hnav-btn" onclick="showSection('reglamento',this)" style="color:var(--gold)">📋 Reglamento</button>
-  </nav>
-  <div class="header-user" id="header-user-area">
-    <button class="btn-login" onclick="openLogin()">Ingresar</button>
+  <div class="header-top">
+    <div class="logo">⚽ <span>PRODE</span> MUNDIAL <span style="color:var(--green-light)">2026</span></div>
+    
+    <div class="header-actions">
+        <nav class="header-nav">
+          <button class="hnav-btn" onclick="showSection('inicio',this)">Inicio</button>
+          <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
+          <button class="hnav-btn" onclick="showSection('todos',this)">Todos</button>
+          <button class="hnav-btn" onclick="showSection('resultados',this)">Resultados</button>
+        </nav>
+        <div class="header-user" id="header-user-area">
+          <button class="btn-login" onclick="openLogin()">Ingresar</button>
+        </div>
+    </div>
   </div>
 </header>
 
