@@ -23,44 +23,23 @@
   html{scroll-behavior:smooth}
   body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
- .site-header {
-    /* Mantenemos tus propiedades y agregamos control de desbordamiento */
-    background: linear-gradient(180deg, #0a1f0f 0%, var(--bg) 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1rem; /* Un poco menos de padding para ganar espacio en celular */
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    height: 60px;
-    overflow-x: hidden; /* Evita que el header genere scroll en toda la página */
-}
-
-.header-nav {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;      /* Habilita el scroll horizontal solo aquí */
-    white-space: nowrap;   /* Evita que los botones se rompan en dos líneas */
-    flex: 3;               /* Ocupa el espacio disponible */
-    margin: 0 10px;        /* Un respiro entre logo y botones */
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-    scrollbar-width: none; /* Oculta scrollbar en Firefox */
-    padding: 0 10px; /* Esto da aire a los extremos del scroll */
-}
-
-/* Oculta la barra de scroll en Chrome/Safari */
-.header-nav::-webkit-scrollbar {
-    display: none;
-}
-
-.header-user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-right: 0; /* Quitamos el margen fijo que te puede romper el centrado */
-    flex-shrink: 0;  /* Asegura que el botón de login no se achique */
-}
+  .site-header{background:linear-gradient(180deg,#0a1f0f 0%,var(--bg) 100%);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:60px}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;position:relative;padding:6px 10px;border-radius:8px;transition:background .15s}
+  .logo:hover{background:rgba(201,162,39,.08)}
+  .logo span{color:var(--text)}
+  .menu-arrow{font-size:13px;color:var(--text3);margin-left:4px;transition:transform .2s;display:inline-block;line-height:1}
+  .menu-arrow.open{transform:rotate(180deg)}
+  .nav-dropdown{display:none;position:absolute;top:60px;left:0;width:220px;background:var(--bg2);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);box-shadow:0 12px 32px rgba(0,0,0,.6);z-index:500;overflow:hidden;animation:dropDown .18s ease}
+  .nav-dropdown.open{display:block}
+  @keyframes dropDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  .nav-drop-btn{display:block;width:100%;padding:13px 20px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-family:'Inter',sans-serif;font-size:14px;text-align:left;cursor:pointer;transition:all .12s}
+  .nav-drop-btn:last-child{border-bottom:none}
+  .nav-drop-btn:hover{background:var(--bg3);color:var(--text)}
+  .nav-drop-btn.active{background:var(--green-dark);color:#fff;border-left:3px solid var(--green-light);padding-left:17px}
+  .nav-drop-btn.regl{color:var(--gold)}
+  .nav-drop-btn.regl:hover{background:rgba(201,162,39,.08)}
+  .nav-drop-btn.regl.active{background:rgba(201,162,39,.1);color:var(--gold-light);border-left-color:var(--gold)}
+  .header-user{display:flex;align-items:center;gap:10px}
   .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;cursor:pointer}
   .btn-login{padding:6px 16px;border-radius:8px;background:var(--green-mid);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;font-weight:500;transition:background .15s}
   .btn-login:hover{background:var(--green-light)}
@@ -210,6 +189,12 @@
   .pts-table tr:last-child td { border-bottom:none; }
   .pts-table td:last-child { color:var(--gold-light); font-family:'Bebas Neue',sans-serif; font-size:15px; }
 
+  
+
+  /* ── DATALIST dark mode ── */
+  input[list]::-webkit-calendar-picker-indicator { filter: invert(0.8); cursor:pointer; }
+  .arg-in:focus { border-color: var(--green-light); background: var(--bg2); }
+
   @media(max-width:520px){
     .hero h1{font-size:36px}
     .team-name{font-size:11px}
@@ -219,15 +204,22 @@
 </head>
 <body>
 
+<!-- Datalist plantel Argentina (reutilizado en todos los inputs de gol) -->
+<datalist id="dl-arg-squad">
+</datalist>
+
 <header class="site-header">
-  <div class="logo">⚽ <span>PRODI</span> MUNDIAL <span style="color:var(--green-light)">2026</span></div>
-  <nav class="header-nav">
-    <button class="hnav-btn active" onclick="showSection('inicio',this)">Inicio</button>
-    <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
-    <button class="hnav-btn" onclick="showSection('todos',this)">Todos</button>
-    <button class="hnav-btn" onclick="showSection('resultados',this)">Resultados</button>
-    <button class="hnav-btn" onclick="showSection('reglamento',this)" style="color:var(--gold)">📋 Reglamento</button>
-  </nav>
+  <div class="logo" id="menu-trigger" onclick="toggleMenu()">
+    ⚽ <span>PRODI</span> MUNDIAL <span style="color:var(--green-light)">2026</span>
+    <span class="menu-arrow" id="menu-arrow">▾</span>
+  </div>
+  <div class="nav-dropdown" id="nav-dropdown">
+    <button class="nav-drop-btn active" id="navbtn-inicio"     onclick="navGo('inicio',this)">🏠 Inicio</button>
+    <button class="nav-drop-btn"        id="navbtn-tabla"      onclick="navGo('tabla',this)">🏆 Tabla</button>
+    <button class="nav-drop-btn"        id="navbtn-todos"      onclick="navGo('todos',this)">👥 Todos</button>
+    <button class="nav-drop-btn"        id="navbtn-resultados" onclick="navGo('resultados',this)">⚽ Resultados</button>
+    <button class="nav-drop-btn regl"   id="navbtn-reglamento" onclick="navGo('reglamento',this)">📋 Reglamento</button>
+  </div>
   <div class="header-user" id="header-user-area">
     <button class="btn-login" onclick="openLogin()">Ingresar</button>
   </div>
@@ -236,7 +228,8 @@
 <div class="hero">
   <div class="hero-badge">🏆 FIFA World Cup 2026 · USA · CAN · MEX</div>
   <h1>PRODI <span class="accent">MUNDIAL</span></h1>
-   <div class="hero-stats">
+  <p>Ingresá tus pronósticos para los 104 partidos y competí con tus amigos</p>
+  <div class="hero-stats">
     <div class="hero-stat"><div class="hero-stat-val">104</div><div class="hero-stat-lbl">Partidos</div></div>
     <div class="hero-stat"><div class="hero-stat-val">48</div><div class="hero-stat-lbl">Selecciones</div></div>
     <div class="hero-stat"><div class="hero-stat-val">12</div><div class="hero-stat-lbl">Grupos</div></div>
@@ -259,7 +252,7 @@
     
     <div style="margin-top:16px" class="card">
       <div class="card-header"><div class="card-title"><div class="dot"></div>Sistema de puntos — Resumen rápido</div>
-        <button onclick="showSection('reglamento',document.querySelectorAll('.hnav-btn')[4])" style="font-size:11px;color:var(--gold);background:transparent;border:1px solid rgba(201,162,39,.3);border-radius:20px;padding:3px 10px;cursor:pointer">Ver reglamento completo →</button>
+        <button onclick="navGo('reglamento',document.getElementById('navbtn-reglamento'))" style="font-size:11px;color:var(--gold);background:transparent;border:1px solid rgba(201,162,39,.3);border-radius:20px;padding:3px 10px;cursor:pointer">Ver reglamento completo →</button>
       </div>
       <div style="padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
         <div style="background:var(--bg3);border-radius:var(--radius);padding:12px">
@@ -296,6 +289,8 @@
       </div>
     </div>
   </div><!-- /inicio -->
+
+  
 
   <div id="tabla" class="section">
     <div class="card">
@@ -337,7 +332,6 @@
       </div>
     </div>
   </div>
-  <!-- ── REGLAMENTO ── -->
   <div id="reglamento" class="section">
 
     <!-- HEADER -->
@@ -482,6 +476,7 @@
 
   </div><!-- /reglamento -->
 
+
 </main>
 
 <button class="open-pronos-btn" onclick="openPronosticos()">
@@ -536,26 +531,21 @@
 // ══════════════════════════════════════════
 //  FIREBASE CONFIG
 // ══════════════════════════════════════════
-var db = null;
-try {
-  var firebaseConfig = {
-    apiKey:            "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
-    authDomain:        "prodi2026-5a7d6.firebaseapp.com",
-    projectId:         "prodi2026-5a7d6",
-    storageBucket:     "prodi2026-5a7d6.firebasestorage.app",
-    messagingSenderId: "57386316420",
-    appId:             "1:57386316420:web:cb25411b444147c6c948d1"
-  };
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-} catch(e) {
-  console.warn('Firebase no disponible, modo local activo:', e.message);
-}
+var firebaseConfig = {
+  apiKey:            "AIzaSyAJ8bSAb5JrEKJmAfUm7fTPakhHHxlMefg",
+  authDomain:        "prodi2026-5a7d6.firebaseapp.com",
+  projectId:         "prodi2026-5a7d6",
+  storageBucket:     "prodi2026-5a7d6.firebasestorage.app",
+  messagingSenderId: "57386316420",
+  appId:             "1:57386316420:web:cb25411b444147c6c948d1"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // ══════════════════════════════════════════
 //  FIXTURE COMPLETO
 // ══════════════════════════════════════════
-const FIXTURE = {
+var FIXTURE = {
   grupos: [
     {id:'A1',grupo:'A',local:'México 🇲🇽',         visita:'Sudáfrica 🇿🇦',       fecha:'11 Jun',hora:'16:00 ARG',sede:'Azteca, Ciudad de México'},
     {id:'A2',grupo:'A',local:'Corea del Sur 🇰🇷',   visita:'Rep. Checa 🇨🇿',       fecha:'11 Jun',hora:'23:00 ARG',sede:'Akron, Zapopan'},
@@ -576,10 +566,10 @@ const FIXTURE = {
     {id:'C5',grupo:'C',local:'Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿',         visita:'Brasil 🇧🇷',           fecha:'24 Jun',hora:'20:00 ARG',sede:'Hard Rock, Miami'},
     {id:'C6',grupo:'C',local:'Marruecos 🇲🇦',       visita:'Haití 🇭🇹',             fecha:'24 Jun',hora:'20:00 ARG',sede:'Mercedes-Benz, Atlanta'},
     {id:'D1',grupo:'D',local:'Estados Unidos 🇺🇸', visita:'Paraguay 🇵🇾',         fecha:'12 Jun',hora:'22:00 ARG',sede:'SoFi, Inglewood'},
-    {id:'D2',grupo:'D',local:'Australia 🇦🇺',       visita:'Turquía 🏳️',   fecha:'14 Jun',hora:'01:00 ARG',sede:'BC Place, Vancouver'},
-    {id:'D3',grupo:'D',local:'Turquía 🏳️', visita:'Paraguay 🇵🇾',         fecha:'19 Jun',hora:'01:00 ARG',sede:"Levi's, Santa Clara"},
+    {id:'D2',grupo:'D',local:'Australia 🇦🇺',       visita:'Rep. Europeo C 🏳️',   fecha:'14 Jun',hora:'01:00 ARG',sede:'BC Place, Vancouver'},
+    {id:'D3',grupo:'D',local:'Rep. Europeo C 🏳️', visita:'Paraguay 🇵🇾',         fecha:'19 Jun',hora:'01:00 ARG',sede:"Levi's, Santa Clara"},
     {id:'D4',grupo:'D',local:'Estados Unidos 🇺🇸', visita:'Australia 🇦🇺',       fecha:'19 Jun',hora:'17:00 ARG',sede:'Lumen Field, Seattle'},
-    {id:'D5',grupo:'D',local:'Turquía 🏳️', visita:'Estados Unidos 🇺🇸', fecha:'25 Jun',hora:'00:00 ARG',sede:'SoFi, Inglewood'},
+    {id:'D5',grupo:'D',local:'Rep. Europeo C 🏳️', visita:'Estados Unidos 🇺🇸', fecha:'25 Jun',hora:'00:00 ARG',sede:'SoFi, Inglewood'},
     {id:'D6',grupo:'D',local:'Paraguay 🇵🇾',       visita:'Australia 🇦🇺',       fecha:'25 Jun',hora:'00:00 ARG',sede:"Levi's, Santa Clara"},
     {id:'E1',grupo:'E',local:'Alemania 🇩🇪',       visita:'Curazao 🇨🇼',         fecha:'14 Jun',hora:'15:00 ARG',sede:'NRG, Houston'},
     {id:'E2',grupo:'E',local:'Costa de Marfil 🇨🇮',visita:'Ecuador 🇪🇨',         fecha:'14 Jun',hora:'21:00 ARG',sede:'Lincoln Financial, Filadelfia'},
@@ -588,10 +578,10 @@ const FIXTURE = {
     {id:'E5',grupo:'E',local:'Ecuador 🇪🇨',         visita:'Alemania 🇩🇪',       fecha:'25 Jun',hora:'18:00 ARG',sede:'MetLife, East Rutherford'},
     {id:'E6',grupo:'E',local:'Curazao 🇨🇼',         visita:'Costa de Marfil 🇨🇮', fecha:'25 Jun',hora:'18:00 ARG',sede:'Lincoln Financial, Filadelfia'},
     {id:'F1',grupo:'F',local:'Países Bajos 🇳🇱',   visita:'Japón 🇯🇵',           fecha:'14 Jun',hora:'18:00 ARG',sede:'AT&T, Arlington'},
-    {id:'F2',grupo:'F',local:'Suecia 🏳️',       visita:'Túnez 🇹🇳',           fecha:'15 Jun',hora:'00:00 ARG',sede:'BBVA, Guadalupe'},
-    {id:'F3',grupo:'F',local:'Países Bajos 🇳🇱',   visita:'Suecia 🏳️', fecha:'20 Jun',hora:'15:00 ARG',sede:'NRG, Houston'},
+    {id:'F2',grupo:'F',local:'Rep. Europeo B 🏳️', visita:'Túnez 🇹🇳',           fecha:'15 Jun',hora:'00:00 ARG',sede:'BBVA, Guadalupe'},
+    {id:'F3',grupo:'F',local:'Países Bajos 🇳🇱',   visita:'Rep. Europeo B 🏳️', fecha:'20 Jun',hora:'15:00 ARG',sede:'NRG, Houston'},
     {id:'F4',grupo:'F',local:'Túnez 🇹🇳',           visita:'Japón 🇯🇵',           fecha:'20 Jun',hora:'02:00 ARG',sede:'BBVA, Guadalupe'},
-    {id:'F5',grupo:'F',local:'Japón 🇯🇵',           visita:'Suecia 🏳️', fecha:'25 Jun',hora:'21:00 ARG',sede:'AT&T, Arlington'},
+    {id:'F5',grupo:'F',local:'Japón 🇯🇵',           visita:'Rep. Europeo B 🏳️', fecha:'25 Jun',hora:'21:00 ARG',sede:'AT&T, Arlington'},
     {id:'F6',grupo:'F',local:'Túnez 🇹🇳',           visita:'Países Bajos 🇳🇱',   fecha:'25 Jun',hora:'21:00 ARG',sede:'Arrowhead, Kansas City'},
     {id:'G1',grupo:'G',local:'Bélgica 🇧🇪',         visita:'Egipto 🇪🇬',           fecha:'15 Jun',hora:'17:00 ARG',sede:'Lumen Field, Seattle'},
     {id:'G2',grupo:'G',local:'Irán 🇮🇷',             visita:'Nueva Zelanda 🇳🇿',   fecha:'15 Jun',hora:'23:00 ARG',sede:'SoFi, Inglewood'},
@@ -606,23 +596,23 @@ const FIXTURE = {
     {id:'H5',grupo:'H',local:'Uruguay 🇺🇾',           visita:'España 🇪🇸',           fecha:'21 Jun',hora:'22:00 ARG',sede:'BBVA, Guadalajara'},
     {id:'H6',grupo:'H',local:'Cabo Verde 🇨🇻',       visita:'Arabia Saudita 🇸🇦', fecha:'21 Jun',hora:'22:00 ARG',sede:'NRG, Houston'},
     {id:'I1',grupo:'I',local:'Francia 🇫🇷',           visita:'Senegal 🇸🇳',         fecha:'16 Jun',hora:'17:00 ARG',sede:'MetLife, East Rutherford'},
-    {id:'I2',grupo:'I',local:'Iraq 🏳️',            visita:'Noruega 🇳🇴',          fecha:'16 Jun',hora:'20:00 ARG',sede:'Gillette, Foxborough'},
-    {id:'I3',grupo:'I',local:'Francia 🇫🇷',           visita:'Iraq 🏳️',          fecha:'22 Jun',hora:'19:00 ARG',sede:'Lincoln Financial, Filadelfia'},
+    {id:'I2',grupo:'I',local:'Rep. Repechaje 2 🏳️',visita:'Noruega 🇳🇴',         fecha:'16 Jun',hora:'20:00 ARG',sede:'Gillette, Foxborough'},
+    {id:'I3',grupo:'I',local:'Francia 🇫🇷',           visita:'Rep. Repechaje 2 🏳️',fecha:'22 Jun',hora:'19:00 ARG',sede:'Lincoln Financial, Filadelfia'},
     {id:'I4',grupo:'I',local:'Noruega 🇳🇴',           visita:'Senegal 🇸🇳',         fecha:'22 Jun',hora:'22:00 ARG',sede:'MetLife, East Rutherford'},
     {id:'I5',grupo:'I',local:'Noruega 🇳🇴',           visita:'Francia 🇫🇷',         fecha:'22 Jun',hora:'17:00 ARG',sede:'Gillette, Foxborough'},
-    {id:'I6',grupo:'I',local:'Senegal 🇸🇳',           visita:'Iraq 🏳️',        fecha:'26 Jun',hora:'17:00 ARG',sede:'BMO Field, Toronto'},
+    {id:'I6',grupo:'I',local:'Senegal 🇸🇳',           visita:'Rep. Repechaje 2 🏳️',fecha:'26 Jun',hora:'17:00 ARG',sede:'BMO Field, Toronto'},
     {id:'J1',grupo:'J',local:'Argentina 🇦🇷',       visita:'Argelia 🇩🇿',         fecha:'16 Jun',hora:'23:00 ARG',sede:'Arrowhead, Kansas City'},
     {id:'J2',grupo:'J',local:'Austria 🇦🇹',           visita:'Jordania 🇯🇴',         fecha:'17 Jun',hora:'02:00 ARG',sede:"Levi's, Santa Clara"},
     {id:'J3',grupo:'J',local:'Argentina 🇦🇷',       visita:'Austria 🇦🇹',           fecha:'22 Jun',hora:'15:00 ARG',sede:'AT&T, Arlington'},
     {id:'J4',grupo:'J',local:'Jordania 🇯🇴',         visita:'Argelia 🇩🇿',         fecha:'23 Jun',hora:'01:00 ARG',sede:"Levi's, Santa Clara"},
     {id:'J5',grupo:'J',local:'Jordania 🇯🇴',         visita:'Argentina 🇦🇷',       fecha:'27 Jun',hora:'00:00 ARG',sede:'AT&T, Arlington'},
     {id:'J6',grupo:'J',local:'Argelia 🇩🇿',         visita:'Austria 🇦🇹',           fecha:'27 Jun',hora:'00:00 ARG',sede:'Arrowhead, Kansas City'},
-    {id:'K1',grupo:'K',local:'Portugal 🇵🇹',       visita:'RD Congo 🏳️',       fecha:'17 Jun',hora:'15:00 ARG',sede:'NRG, Houston'},
+    {id:'K1',grupo:'K',local:'Portugal 🇵🇹',       visita:'Rep. Repechaje 1 🏳️', fecha:'17 Jun',hora:'15:00 ARG',sede:'NRG, Houston'},
     {id:'K2',grupo:'K',local:'Uzbekistán 🇺🇿',     visita:'Colombia 🇨🇴',         fecha:'18 Jun',hora:'00:00 ARG',sede:'Azteca, México'},
     {id:'K3',grupo:'K',local:'Portugal 🇵🇹',       visita:'Uzbekistán 🇺🇿',       fecha:'23 Jun',hora:'15:00 ARG',sede:'NRG, Houston'},
-    {id:'K4',grupo:'K',local:'Colombia 🇨🇴',       visita:'RD Congo 🏳️',       fecha:'24 Jun',hora:'00:00 ARG',sede:'Akron, Zapopan'},
+    {id:'K4',grupo:'K',local:'Colombia 🇨🇴',       visita:'Rep. Repechaje 1 🏳️', fecha:'24 Jun',hora:'00:00 ARG',sede:'Akron, Zapopan'},
     {id:'K5',grupo:'K',local:'Colombia 🇨🇴',       visita:'Portugal 🇵🇹',         fecha:'27 Jun',hora:'21:30 ARG',sede:'Hard Rock, Miami'},
-    {id:'K6',grupo:'K',local:'RD Congo 🏳️',      visita:'Uzbekistán 🇺🇿',    fecha:'27 Jun',hora:'21:30 ARG',sede:'Mercedes-Benz, Atlanta'},
+    {id:'K6',grupo:'K',local:'Rep. Repechaje 1 🏳️',visita:'Uzbekistán 🇺🇿',    fecha:'27 Jun',hora:'21:30 ARG',sede:'Mercedes-Benz, Atlanta'},
     {id:'L1',grupo:'L',local:'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿',     visita:'Croacia 🇭🇷',         fecha:'17 Jun',hora:'18:00 ARG',sede:'AT&T, Arlington'},
     {id:'L2',grupo:'L',local:'Ghana 🇬🇭',           visita:'Panamá 🇵🇦',           fecha:'17 Jun',hora:'21:00 ARG',sede:'BMO Field, Toronto'},
     {id:'L3',grupo:'L',local:'Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿',     visita:'Ghana 🇬🇭',           fecha:'23 Jun',hora:'18:00 ARG',sede:'Gillette, Foxborough'},
@@ -674,11 +664,8 @@ const FIXTURE = {
   ]
 };
 
-const EXTRAS_DATA = {
-  arg:[
-    {id:'arg_1',label:'1° Partido'},{id:'arg_2',label:'2° Partido'},{id:'arg_3',label:'3° Partido'},
-    {id:'arg_8',label:'Octavos'},{id:'arg_4',label:'Cuartos'},{id:'arg_S',label:'Semis'},{id:'arg_F',label:'Final'}
-  ],
+var EXTRAS_DATA = {
+  arg:[], // poblado dinámicamente por ARG_PARTIDOS abajo
   grid:[
     {id:'ext_eq_goleador',  label:'Equipo más Goleador'},
     {id:'ext_eq_rojas',     label:'Equipo más Rojas'},
@@ -694,6 +681,41 @@ const EXTRAS_DATA = {
     {id:'ext_subcampeon',   label:'Sub-campeón'}
   ]
 };
+
+// Plantel Argentina — para autocompletar autores de gol
+var ARG_SQUAD = [
+  // Arqueros
+  'Emiliano Martínez','Walter Benítez','Gerónimo Rulli',
+  // Defensores
+  'Gonzalo Montiel','Nahuel Molina','Lisandro Martínez','Nicolás Otamendi',
+  'Cristian Romero','Nicolás Tagliafico','Facundo Medina','Valentín Barco',
+  // Mediocampistas
+  'Giovani Lo Celso','Leandro Paredes','Rodrigo De Paul','Exequiel Palacios',
+  'Enzo Fernández','Alexis Mac Allister',
+  // Delanteros
+  'Lionel Messi','Lautaro Martínez','Julián Álvarez','Nicolás González',
+  'Thiago Almada','Giuliano Simeone','Nicolás Paz','José Manuel López'
+];
+
+var ARG_PARTIDOS = [
+  {key:'1',   label:'Grupo 1er Partido'},
+  {key:'2',   label:'Grupo 2do Partido'},
+  {key:'3',   label:'Grupo 3er Partido'},
+  {key:'R32', label:'Ronda 32'},
+  {key:'R16', label:'Octavos'},
+  {key:'QF',  label:'Cuartos'},
+  {key:'SF',  label:'Semis'},
+  {key:'3RD', label:'3er Puesto'},
+  {key:'F',   label:'Final ⭐'}
+];
+var MAX_GOLES_ARG = 5;
+
+// Llenar EXTRAS_DATA.arg con hasta 5 autores por partido
+ARG_PARTIDOS.forEach(function(p){
+  for(var i=1;i<=MAX_GOLES_ARG;i++){
+    EXTRAS_DATA.arg.push({id:'arg_'+p.key+'_'+i, partido:p.key, label:p.label+' — Gol '+i, pts: (p.key==='F'?5:1)});
+  }
+});
 
 // ══════════════════════════════════════════
 //  STATE
@@ -754,18 +776,69 @@ function renderMatches(phase){
 }
 
 function renderExtras(container){
-  var argHtml=EXTRAS_DATA.arg.map(function(e){
-    return '<div class="arg-row"><span class="arg-label">'+e.label+'</span>'+
-      '<input type="text" class="arg-in" id="'+e.id+'" placeholder="Ej: Messi" onchange="markExtraChanged(\''+e.id+'\')"></div>';
-  }).join('');
-  var gridHtml=EXTRAS_DATA.grid.map(function(e){
-    return '<div class="extra-block" id="eb-'+e.id+'"><label class="extra-label">'+e.label+'</label>'+
-      '<input type="'+(e.type||'text')+'" class="extra-in" id="'+e.id+'" placeholder="..." onchange="markExtraChanged(\''+e.id+'\')"></div>';
-  }).join('');
-  container.innerHTML='<div class="extras-layout">'+
-    '<div class="extras-col"><h3 style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--text);margin-bottom:12px;">Autor Gol <span style="color:#75AADB">Argentina</span></h3>'+argHtml+'</div>'+
-    '<div class="extras-col"><h3 style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--gold);margin-bottom:12px;">Predicciones Generales</h3><div class="extras-grid">'+gridHtml+'</div></div>'+
-  '</div>';
+  // Construir HTML de autores de gol argentino agrupado por partido
+  var argByPartido={};
+  ARG_PARTIDOS.forEach(function(p){ argByPartido[p.key]=[]; });
+  EXTRAS_DATA.arg.forEach(function(e){ if(argByPartido[e.partido]) argByPartido[e.partido].push(e); });
+
+  var argSections='';
+  ARG_PARTIDOS.forEach(function(p){
+    var isFinal=(p.key==='F');
+    var color=isFinal?'var(--gold)':'#75AADB';
+    var icon=isFinal?'&#11088; ':'&#127462;&#127479; ';
+    var nota=isFinal?'(Art.20 &mdash; +5pts c/u)':'(Art.13 &mdash; +1pt c/u)';
+    var golesRows='';
+    var lista=argByPartido[p.key]||[];
+    for(var gi=0;gi<lista.length;gi++){
+      var e=lista[gi];
+      var n=e.id.split('_').pop();
+      var pts=isFinal?'+5pts':'+1pt';
+      var ptsColor=isFinal?'var(--gold)':'var(--text3)';
+      golesRows+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+        +'<span style="font-size:11px;color:var(--text3);min-width:36px">Gol '+n+'</span>'
+        +'<input type="text" class="arg-in" style="flex:1" id="'+e.id+'" list="dl-arg-squad" placeholder="Escribí o elegí jugador...">'
+        +'<span style="font-size:10px;color:'+ptsColor+';background:rgba(128,128,128,.1);padding:2px 6px;border-radius:10px">'+pts+'</span>'
+        +'</div>';
+    }
+    argSections+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px">'
+      +'<div style="font-size:12px;font-weight:600;color:'+color+';margin-bottom:8px">'+icon+p.label
+      +' <span style="font-size:10px;font-weight:400;color:var(--text3)">'+nota+'</span></div>'
+      +golesRows
+      +'</div>';
+  });
+
+  var gridHtml='';
+  for(var gi2=0;gi2<EXTRAS_DATA.grid.length;gi2++){
+    var eg=EXTRAS_DATA.grid[gi2];
+    var tp=eg.type||'text';
+    gridHtml+='<div class="extra-block" id="eb-'+eg.id+'">'
+      +'<label class="extra-label">'+eg.label+'</label>'
+      +'<input type="'+tp+'" class="extra-in" id="'+eg.id+'" placeholder="...">'
+      +'</div>';
+  }
+
+  container.innerHTML='<div class="extras-layout">'
+    +'<div class="extras-col" style="min-width:280px">'
+      +'<h3 style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--text);margin-bottom:6px">&#127462;&#127479; Autores Gol <span style="color:#75AADB">Argentina</span></h3>'
+      +'<p style="font-size:11px;color:var(--text3);margin-bottom:12px">Hasta '+MAX_GOLES_ARG+' goles por partido. Dej&aacute; vac&iacute;os los que no se usen.</p>'
+      +argSections
+    +'</div>'
+    +'<div class="extras-col">'
+      +'<h3 style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--gold);margin-bottom:14px">&#127919; Predicciones Generales</h3>'
+      +'<div class="extras-grid">'+gridHtml+'</div>'
+    +'</div>'
+  +'</div>';
+
+  // Agregar onchange via JS para evitar problemas de comillas anidadas
+  EXTRAS_DATA.arg.forEach(function(e){
+    var el=document.getElementById(e.id);
+    if(el) el.onchange=function(){ markExtraChanged(e.id); };
+  });
+  EXTRAS_DATA.grid.forEach(function(e){
+    var el=document.getElementById(e.id);
+    if(el) el.onchange=function(){ markExtraChanged(e.id); };
+  });
+
   loadInputValues();
 }
 
@@ -831,19 +904,15 @@ function savePronosticos(){
   }
 
   localStorage.setItem('prodeData_'+currentUser,JSON.stringify(pronosticos[currentUser]));
-  if(db){
-    db.collection('pronosticos').doc(currentUser).set({
-      nombre:currentUser,
-      pronosticos:pronosticos[currentUser],
-      updatedAt:new Date().toISOString()
-    }).then(function(){
-      showToast('✅ '+count+' datos guardados');
-    }).catch(function(err){
-      showToast('⚠️ Guardado local OK — Firebase: '+err.message);
-    });
-  } else {
-    showToast('✅ '+count+' datos guardados (local)');
-  }
+  db.collection('pronosticos').doc(currentUser).set({
+    nombre:currentUser,
+    pronosticos:pronosticos[currentUser],
+    updatedAt:new Date().toISOString()
+  }).then(function(){
+    showToast('✅ '+count+' datos guardados');
+  }).catch(function(err){
+    showToast('⚠️ Guardado local OK — Firebase: '+err.message);
+  });
   updateStats(); updateTabla(); updateMatchSelector();
 }
 
@@ -854,35 +923,131 @@ function renderAdminPanel(){
   var card=document.getElementById('resultados-card');
   if(!card||currentUser!=='ORGANIZADOR')return;
   var html='<div style="padding:20px">';
-  html+='<h3 style="color:var(--gold);margin-bottom:15px;font-family:\'Bebas Neue\',sans-serif;font-size:24px;text-align:center">PANEL DE CONTROL</h3>';
+  html+='<h3 style="color:var(--gold);margin-bottom:15px;font-family:Bebas Neue,sans-serif;font-size:24px;text-align:center">PANEL DE CONTROL</h3>';
   Object.keys(FIXTURE).forEach(function(phase){
     html+='<div style="margin:20px 0 10px;font-size:14px;font-weight:bold;color:var(--text2);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px">'+phase+'</div>';
     FIXTURE[phase].forEach(function(m){
       var r=RESULTADOS_OFICIALES[m.id]||{h:'',a:''};
       html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--bg3);padding:8px;border-radius:8px">'+
         '<span style="flex:1;text-align:right;font-size:12px;font-weight:500">'+m.local+'</span>'+
-        '<input type="number" min="0" max="20" id="of-h-'+m.id+'" value="'+r.h+'" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:\'Bebas Neue\',sans-serif;font-size:16px;outline:none">'+
+        '<input type="number" min="0" max="20" id="of-h-'+m.id+'" value="'+r.h+'" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:Bebas Neue,sans-serif;font-size:16px;outline:none">'+
         '<span style="color:var(--text3);font-size:11px">VS</span>'+
-        '<input type="number" min="0" max="20" id="of-a-'+m.id+'" value="'+r.a+'" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:\'Bebas Neue\',sans-serif;font-size:16px;outline:none">'+
+        '<input type="number" min="0" max="20" id="of-a-'+m.id+'" value="'+r.a+'" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:Bebas Neue,sans-serif;font-size:16px;outline:none">'+
         '<span style="flex:1;font-size:12px;font-weight:500">'+m.visita+'</span>'+
       '</div>';
     });
   });
   html+='<div style="margin:30px 0 10px;font-size:16px;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--gold);padding-bottom:4px">EXTRAS</div>';
-  EXTRAS_DATA.arg.concat(EXTRAS_DATA.grid).forEach(function(e){
+  // Autores de gol argentino con datalist
+  EXTRAS_DATA.arg.forEach(function(e){
+    var val=RESULTADOS_OFICIALES.extras[e.id]||'';
+    var isFinal=(e.partido==='F');
+    var pts=isFinal?'+5pts':'+1pt';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--bg3);padding:8px 12px;border-radius:8px">'+
+      '<span style="font-size:12px;color:'+(isFinal?'var(--gold)':'#75AADB')+';font-weight:500">'+e.label+' <span style="font-size:10px;color:var(--text3)">'+pts+'</span></span>'+
+      '<input type="text" id="of-ext-'+e.id+'" value="'+val+'" list="dl-arg-squad" placeholder="Elegí jugador..." style="width:180px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:Inter,sans-serif;font-size:12px;outline:none">'+
+    '</div>';
+  });
+  // Predicciones generales (sin datalist)
+  EXTRAS_DATA.grid.forEach(function(e){
     var val=RESULTADOS_OFICIALES.extras[e.id]||'';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;background:var(--bg3);padding:8px 12px;border-radius:8px">'+
       '<span style="font-size:12px;color:var(--text);font-weight:500">'+e.label+'</span>'+
-      '<input type="text" id="of-ext-'+e.id+'" value="'+val+'" placeholder="..." style="width:140px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:\'Inter\',sans-serif;font-size:12px;outline:none">'+
+      '<input type="text" id="of-ext-'+e.id+'" value="'+val+'" placeholder="..." style="width:140px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:Inter,sans-serif;font-size:12px;outline:none">'+
     '</div>';
   });
-  html+='<button onclick="saveOficiales()" style="width:100%;padding:14px;margin-top:24px;background:var(--gold);color:#000;border:none;border-radius:8px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:1px;cursor:pointer">💾 PUBLICAR RESULTADOS</button>';
+  // Sección: partidos de Argentina en fase eliminatoria
+  html+='<div style="margin:30px 0 10px;font-size:16px;font-weight:bold;color:#75AADB;border-bottom:1px solid rgba(117,170,219,.3);padding-bottom:4px">🇦🇷 PARTIDOS ARGENTINA — FASE ELIMINATORIA</div>';
+  html+='<p style="font-size:12px;color:var(--text3);margin-bottom:12px">Marcá en qué partidos jugó Argentina (para calcular bonus/penalidades Arts. 18-20)</p>';
+  var argPartidos = RESULTADOS_OFICIALES.argPartidos || [];
+  var elimPhases = ['r32','r16','cuartos','semis','final'];
+  elimPhases.forEach(function(ph){
+    if(!FIXTURE[ph])return;
+    FIXTURE[ph].forEach(function(m){
+      var checked = argPartidos.indexOf(m.id)>=0 ? 'checked' : '';
+      var is3rd = m.id==='3RD';
+      html+='<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:8px;margin-bottom:6px;cursor:pointer;border:1px solid var(--border);">'+
+        '<input type="checkbox" id="argp-'+m.id+'" '+checked+' style="width:16px;height:16px;accent-color:#75AADB">'+
+        '<span style="font-size:12px;flex:1">'+m.local+' vs '+m.visita+' <span style="color:var(--text3)">('+m.fecha+')</span></span>'+
+        (is3rd?'<span style="font-size:10px;color:#f87171;background:rgba(248,113,113,.1);padding:2px 6px;border-radius:10px">⚠️ Si marcás esto: −5pts a quienes pronostiquen Argentina aquí</span>':'')+
+      '</label>';
+    });
+  });
+
+  // Sección: bonus cierre de grupos Arts. 14 & 15
+  html+='<div style="margin:30px 0 10px;font-size:16px;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--gold);padding-bottom:4px">⚡ CLÁUSULAS CIERRE DE GRUPOS (Arts. 14 & 15)</div>';
+  var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
+  var allUsers = Object.keys(pronosticos);
+
+  if(!allUsers.length){
+    html+='<p style="font-size:12px;color:var(--text3);padding:12px">Aún no hay participantes registrados.</p>';
+  } else {
+    // Calcular posiciones actuales para mostrar quién está 1° y último
+    var tempRows = allUsers.map(function(u){ return {u:u, pts:calcPuntos(u).pts}; });
+    tempRows.sort(function(a,b){return b.pts-a.pts;});
+    var leader = tempRows[0].u;
+    var last   = tempRows[tempRows.length-1].u;
+
+    html+='<div style="background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:10px;">';
+    html+='<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Posición actual al cerrar grupos. El botón aplica +5 al último y −5 al primero <strong style="color:var(--gold)">una sola vez</strong>.</p>';
+    html+='<div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">';
+    html+='<div style="flex:1;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:12px;min-width:160px">';
+    html+='<div style="font-size:11px;color:#f87171;font-weight:600;margin-bottom:4px">⚠️ Art. 15 — Líder (−5 pts)</div>';
+    html+='<div style="font-size:16px;font-weight:600;color:var(--text)">'+leader+'</div>';
+    html+='<div style="font-size:12px;color:var(--text3)">'+tempRows[0].pts+' pts actuales</div></div>';
+    html+='<div style="flex:1;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:12px;min-width:160px">';
+    html+='<div style="font-size:11px;color:#4ade80;font-weight:600;margin-bottom:4px">🏅 Art. 14 — Último (+5 pts)</div>';
+    html+='<div style="font-size:16px;font-weight:600;color:var(--text)">'+last+'</div>';
+    html+='<div style="font-size:12px;color:var(--text3)">'+tempRows[tempRows.length-1].pts+' pts actuales</div></div>';
+    html+='</div>';
+
+    var yaaplicado = (bonusCierre[leader]!=null || bonusCierre[last]!=null);
+    if(yaaplicado){
+      html+='<div style="padding:10px 14px;background:rgba(45,158,92,.1);border:1px solid rgba(45,158,92,.3);border-radius:8px;font-size:12px;color:#4ade80">✅ Cláusulas ya aplicadas. Para revertir, publicá resultados nuevamente con el botón principal.</div>';
+    } else {
+      html+='<button onclick="aplicarCierre('+JSON.stringify(leader)+','+JSON.stringify(last)+')" style="width:100%;padding:12px;background:rgba(201,162,39,.15);border:1px solid var(--gold);border-radius:8px;font-size:18px;letter-spacing:1px;cursor:pointer;color:var(--gold)">&#9889; APLICAR CL&#193;USULAS DE CIERRE</button>';
+    }
+    html+='</div>';
+  }
+
+  var btnStyle='width:100%;padding:14px;margin-top:24px;background:var(--gold);color:#000;border:none;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:1px;cursor:pointer';
+  html+='<button onclick="saveOficiales()" style="'+btnStyle+'">&#128190; PUBLICAR RESULTADOS</button>';
   html+='</div>';
   card.innerHTML=html;
 }
 
+// Art. 14 & 15 — aplicar bonus cierre de grupos
+function aplicarCierre(leader, last){
+  if(!confirm('Aplicar clausulas de cierre?  +5 pts a '+last+',  -5 pts a '+leader+'.')) return;
+  var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
+  bonusCierre[last]   = (bonusCierre[last]   || 0) + 5;
+  bonusCierre[leader] = (bonusCierre[leader] || 0) - 5;
+  RESULTADOS_OFICIALES.bonusCierre = bonusCierre;
+  // Guardar en Firebase
+  db.collection('pronosticos').doc('ORGANIZADOR').update({
+    'pronosticos.bonusCierre': bonusCierre,
+    updatedAt: new Date().toISOString()
+  }).then(function(){
+    showToast('⚡ Cláusulas aplicadas: +5 a '+last+', −5 a '+leader);
+    updateTabla();
+    renderAdminPanel();
+  }).catch(function(err){
+    // Si falla update, intentar set completo
+    var oficiales = Object.assign({}, RESULTADOS_OFICIALES);
+    oficiales.bonusCierre = bonusCierre;
+    db.collection('pronosticos').doc('ORGANIZADOR').set({
+      nombre:'ORGANIZADOR', pronosticos:oficiales, updatedAt:new Date().toISOString()
+    }).then(function(){
+      showToast('⚡ Cláusulas aplicadas');
+      updateTabla(); renderAdminPanel();
+    }).catch(function(e){ showToast('❌ Error: '+e.message); });
+  });
+}
+
 function saveOficiales(){
-  var oficiales={extras:{}};
+  var oficiales={extras:{}, bonusCierre: RESULTADOS_OFICIALES.bonusCierre||{}};
+
+  // Resultados de partidos
   Object.keys(FIXTURE).forEach(function(phase){
     FIXTURE[phase].forEach(function(m){
       var h=document.getElementById('of-h-'+m.id);
@@ -890,55 +1055,66 @@ function saveOficiales(){
       if(h&&a&&h.value!==''&&a.value!=='')oficiales[m.id]={h:parseInt(h.value),a:parseInt(a.value)};
     });
   });
+
+  // Extras (autores de gol + predicciones generales)
   EXTRAS_DATA.arg.concat(EXTRAS_DATA.grid).forEach(function(e){
     var el=document.getElementById('of-ext-'+e.id);
     if(el&&el.value.trim()!=='')oficiales.extras[e.id]=el.value.trim();
   });
-  if(db){
-    db.collection('pronosticos').doc('ORGANIZADOR').set({
-      nombre:'ORGANIZADOR',pronosticos:oficiales,updatedAt:new Date().toISOString()
-    }).then(function(){
-      RESULTADOS_OFICIALES=Object.assign({extras:{}},oficiales);
-      updateTabla(); updateStats();
-      showToast('✅ Resultados publicados');
-    }).catch(function(err){showToast('❌ Error: '+err.message);});
-  } else {
-    RESULTADOS_OFICIALES=Object.assign({extras:{}},oficiales);
+
+  // Partidos de Argentina en eliminatoria (checkboxes)
+  var argPartidos=[];
+  var elimPhases=['r32','r16','cuartos','semis','final'];
+  elimPhases.forEach(function(ph){
+    if(!FIXTURE[ph])return;
+    FIXTURE[ph].forEach(function(m){
+      var cb=document.getElementById('argp-'+m.id);
+      if(cb&&cb.checked) argPartidos.push(m.id);
+    });
+  });
+  oficiales.argPartidos = argPartidos;
+
+  db.collection('pronosticos').doc('ORGANIZADOR').set({
+    nombre:'ORGANIZADOR', pronosticos:oficiales, updatedAt:new Date().toISOString()
+  }).then(function(){
+    RESULTADOS_OFICIALES = Object.assign({extras:{},bonusCierre:{},argPartidos:[]}, oficiales);
     updateTabla(); updateStats();
-    showToast('✅ Resultados guardados (local)');
-  }
+    showToast('✅ Resultados publicados');
+  }).catch(function(err){showToast('❌ Error: '+err.message);});
 }
 
 // ══════════════════════════════════════════
-//  PUNTOS — Sistema completo Arts. 9 al 20
+//  PUNTOS — Sistema Arts. 9 al 20
 // ══════════════════════════════════════════
 
-// IDs de partidos de Argentina
-var ARG_IDS = ['J1','J3','J5','R32-12','R32-14','QF-1','QF-2','QF-3','QF-4','SF-1','SF-2','3RD','FINAL'];
-
-// Puntos base por fase eliminatoria (Art. 16)
-var ELIM_PTS = {
-  r32:5, r16:5, cuartos:7, semis:9, '3RD':11, 'FINAL':13
+// IDs de partidos de Argentina por fase
+var ARG_GRUPOS  = ['J1','J3','J5'];
+var ARG_ELIM    = {
+  r32:   ['R32-12','R32-14'],
+  r16:   ['R16-5','R16-6','R16-7','R16-8'],
+  cuartos:['QF-1','QF-2','QF-3','QF-4'],
+  semis: ['SF-1','SF-2'],
+  final: ['FINAL'],
+  tercer:['3RD']
 };
 
 function getPhaseOf(id){
   var phases=Object.keys(FIXTURE);
   for(var i=0;i<phases.length;i++){
-    var ph=phases[i];
-    for(var j=0;j<FIXTURE[ph].length;j++){
-      if(FIXTURE[ph][j].id===id)return ph;
+    for(var j=0;j<FIXTURE[phases[i]].length;j++){
+      if(FIXTURE[phases[i]][j].id===id)return phases[i];
     }
   }
   return null;
 }
 
-function isArgMatch(id){
-  return ARG_IDS.indexOf(id)>=0;
-}
-
-function aciertoGanador(p,r){
-  // true si acertó ganador o empate
-  return (p.h>p.a&&r.h>r.a)||(p.h<p.a&&r.h<r.a)||(p.h===p.a&&r.h===r.a);
+function isArgMatch(id, phase){
+  // Los partidos de arg de grupos los conocemos
+  if(ARG_GRUPOS.indexOf(id)>=0) return true;
+  // En eliminatorias: si RESULTADOS_OFICIALES marca que Argentina jugó ese partido
+  // Se indica via RESULTADOS_OFICIALES.argPartidos = ['R32-12', 'QF-3', ...]
+  var argElim = RESULTADOS_OFICIALES.argPartidos || [];
+  return argElim.indexOf(id)>=0;
 }
 
 function calcPuntos(user){
@@ -948,104 +1124,80 @@ function calcPuntos(user){
   Object.keys(ups).forEach(function(id){
     if(id==='extras')return;
     var p=ups[id], r=RESULTADOS_OFICIALES[id];
-    if(!p||!r)return;
+    if(!p||!r||r.h===''||r.a==='')return;
 
     var phase=getPhaseOf(id);
-    var isGrupos=phase==='grupos';
-    var isArg=isArgMatch(id);
-    var esPleno=(p.h===r.h&&p.a===r.a);
-    var esAcierto=aciertoGanador(p,r);
-    var ganador_acertado = esAcierto; // acierto en ganador o empate
+    var isGrupos=(phase==='grupos');
+    var esArg=isArgMatch(id, phase);
+    var esPleno=(p.h===r.h && p.a===r.a);
+    var esAcierto=(p.h>p.a&&r.h>r.a)||(p.h<p.a&&r.h<r.a)||(p.h===p.a&&r.h===r.a);
 
     if(isGrupos){
-      // Art. 09 — 2 pts por acierto ganador/empate
-      if(ganador_acertado){
+      // Art. 09 — 2pts acierto
+      if(esAcierto){
         pts+=2; parciales++;
-        // Art. 10 — +1 pleno, +1 por cada gol
-        if(esPleno){
-          pts+=1; // pleno
-          pts+=(r.h+r.a); // goles acertados
-          exactos++;
-        }
-        // Art. 11 — +1 si es partido Argentina acertado
-        if(isArg) pts+=1;
-        // Art. 12 — +1 si es pleno argento
-        if(isArg&&esPleno) pts+=1;
-      } else {
-        errores++;
-      }
+        // Art. 10 — +1 pleno +1 x gol
+        if(esPleno){ pts+=1; pts+=(r.h+r.a); exactos++; }
+        // Art. 11 — +1 arg acertado
+        if(esArg) pts+=1;
+        // Art. 12 — +1 pleno argento
+        if(esArg&&esPleno) pts+=1;
+      } else { errores++; }
 
     } else {
-      // FASE ELIMINATORIA
-      var basePts=0;
-      if(phase==='r32'||phase==='r16') basePts=5;
-      else if(phase==='cuartos') basePts=7;
-      else if(phase==='semis') basePts=9;
-      else if(id==='3RD') basePts=11;
-      else if(id==='FINAL') basePts=13;
+      // Art. 16 — puntos base eliminatoria
+      var base=0;
+      if(id==='FINAL') base=13;
+      else if(id==='3RD') base=11;
+      else if(phase==='semis') base=9;
+      else if(phase==='cuartos') base=7;
+      else base=5; // r32 y r16
 
-      if(ganador_acertado){
-        // Art. 16 — puntos base por fase
-        pts+=basePts; parciales++;
-        // Art. 17 — +2 pleno, +goles
-        if(esPleno){
-          pts+=2;
-          pts+=(r.h+r.a);
-          exactos++;
-        }
+      if(esAcierto){
+        pts+=base; parciales++;
+        // Art. 17 — +2 pleno +1 x gol
+        if(esPleno){ pts+=2; pts+=(r.h+r.a); exactos++; }
         // Art. 18 — bonus Argentina
-        if(isArg){
-          if(id==='FINAL') pts+=2;       // final: +2
-          else if(id!=='3RD') pts+=1;    // otras instancias: +1 (excepto 3er puesto)
+        if(esArg){
+          if(id==='FINAL') pts+=2;
+          else if(id!=='3RD') pts+=1;
         }
-        // Art. 19 — pleno argento eliminatoria: +5
-        if(isArg&&esPleno) pts+=5;
+        // Art. 19 — pleno argento elim: +5
+        if(esArg&&esPleno) pts+=5;
       } else {
         errores++;
-        // Art. 18 — poner Argentina en 3er puesto: -5
-        if(id==='3RD'&&isArg){
-          // Si el usuario pronosticó a Argentina llegando al 3er puesto
-          // (es decir la tiene como local o visita en ese partido)
-          // Nota: como la estructura es "Per. SF X", lo manejamos via extras
-          // Esta penalidad la aplica el organizador manualmente por ahora
+        // Art. 18 — penalidad: pronosticó Argentina en 3er puesto
+        // Se detecta: el 3RD está jugado, Argentina jugó ese partido, y el usuario acertó el partido de ARG en semis
+        // Implementado automáticamente: si el org marca argPartidos y incluye '3RD'
+        if(id==='3RD' && esArg && RESULTADOS_OFICIALES['3RD']){
+          // Si Argentina está en el 3rd pero el usuario NO acertó el resultado, igual pierde 5
+          // (según art. ubica a Argentina en tal instancia)
+          // Esto se aplica si el usuario pronosticó la semi de Argentina correctamente
+          pts-=5;
         }
       }
     }
   });
 
   // ── EXTRAS ──
-  var pExt=(ups.extras||{}),rExt=(RESULTADOS_OFICIALES.extras||{});
+  var pExt=(ups.extras||{}), rExt=(RESULTADOS_OFICIALES.extras||{});
 
-  // Predicciones generales (15 pts c/u)
+  // Predicciones generales: 15pts c/u
   EXTRAS_DATA.grid.forEach(function(e){
     if(pExt[e.id]&&rExt[e.id]){
-      var uv=String(pExt[e.id]).trim().toLowerCase();
-      var rv=String(rExt[e.id]).trim().toLowerCase();
-      if(uv===rv) pts+=15;
+      if(String(pExt[e.id]).trim().toLowerCase()===String(rExt[e.id]).trim().toLowerCase()) pts+=15;
     }
   });
 
-  // Art. 13 / Art. 20 — Autores de gol argentino
-  // arg_1..arg_3 = fase de grupos (+1 cada uno)
-  // arg_8 = octavos (+1), arg_4 = cuartos (+1), arg_S = semis (+1)
-  // arg_F = final (+5 cada uno según Art. 20)
-  var argGolPts={arg_1:1,arg_2:1,arg_3:1,arg_8:1,arg_4:1,arg_S:1,arg_F:5};
-  Object.keys(argGolPts).forEach(function(k){
-    if(pExt[k]&&rExt[k]){
-      var uv=String(pExt[k]).trim().toLowerCase();
-      var rv=String(rExt[k]).trim().toLowerCase();
-      if(uv===rv) pts+=argGolPts[k];
+  // Autores gol argentino (Arts. 13/20) — hasta 5 por partido
+  EXTRAS_DATA.arg.forEach(function(e){
+    if(pExt[e.id]&&rExt[e.id]){
+      if(String(pExt[e.id]).trim().toLowerCase()===String(rExt[e.id]).trim().toLowerCase()) pts+=e.pts;
     }
   });
 
-  return{pts:pts,exactos:exactos,parciales:parciales,errores:errores};
-}
-
-// Art. 14 & 15 — Bonus/Penalidad cierre de grupos (lo aplica el organizador)
-// Se registra en RESULTADOS_OFICIALES.bonusCierre = { usuario: pts }
-function aplicarBonusCierre(){
-  var bonus=RESULTADOS_OFICIALES.bonusCierre||{};
-  return bonus; // { nombre: +5 o -5 }
+  // Art. 14/15 bonus cierre grupos (se aplica en updateTabla)
+  return{pts:pts, exactos:exactos, parciales:parciales, errores:errores};
 }
 
 // ══════════════════════════════════════════
@@ -1055,18 +1207,25 @@ function updateTabla(){
   var tbody=document.getElementById('tabla-body');
   var users=Object.keys(pronosticos);
   if(!users.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Aún no hay datos. ¡Cargá tus pronósticos!</td></tr>';return;}
-  var bonus=aplicarBonusCierre();
+
+  var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
+
   var rows=users.map(function(u){
     var r=Object.assign({u:u},calcPuntos(u));
-    r.pts+=(bonus[u]||0); // Art. 14 & 15
+    r.pts += (bonusCierre[u] || 0); // Art. 14 & 15
+    r.bonus = bonusCierre[u] || 0;
     return r;
   });
   rows.sort(function(a,b){return b.pts-a.pts||b.exactos-a.exactos;});
   tbody.innerHTML=rows.map(function(r,i){
     var rank=i===0?'<span class="rank-gold">🥇</span>':i===1?'<span class="rank-silver">🥈</span>':i===2?'<span class="rank-bronze">🥉</span>':'<span class="rank-num">'+(i+1)+'</span>';
-    var bonusUser=bonus[r.u]||0;
-    var bonusBadge=bonusUser>0?'<span style="font-size:10px;color:#4ade80;margin-left:4px">+'+bonusUser+'🏅</span>':bonusUser<0?'<span style="font-size:10px;color:#f87171;margin-left:4px">'+bonusUser+'⚠️</span>':'';
-    return '<tr><td>'+rank+'</td><td><div class="player-cell"><div class="avatar">'+ini(r.u)+'</div>'+r.u+bonusBadge+'</div></td><td>'+r.exactos+'</td><td>'+r.parciales+'</td><td>'+r.errores+'</td><td><span class="pts-big">'+r.pts+'</span></td></tr>';
+    var bonusBadge='';
+    if(r.bonus>0) bonusBadge='<span style="font-size:10px;color:#4ade80;margin-left:6px;background:rgba(74,222,128,.1);padding:1px 6px;border-radius:10px">+'+r.bonus+' 🏅</span>';
+    if(r.bonus<0) bonusBadge='<span style="font-size:10px;color:#f87171;margin-left:6px;background:rgba(248,113,113,.1);padding:1px 6px;border-radius:10px">'+r.bonus+' ⚠️</span>';
+    return '<tr><td>'+rank+'</td>'+
+      '<td><div class="player-cell"><div class="avatar">'+ini(r.u)+'</div>'+r.u+bonusBadge+'</div></td>'+
+      '<td>'+r.exactos+'</td><td>'+r.parciales+'</td><td>'+r.errores+'</td>'+
+      '<td><span class="pts-big">'+r.pts+'</span></td></tr>';
   }).join('');
 }
 
@@ -1117,13 +1276,39 @@ function renderTodos(){
 // ══════════════════════════════════════════
 //  NAV
 // ══════════════════════════════════════════
-function showSection(id,btn){
+// ── NAV DROPDOWN ──
+function toggleMenu(){
+  var dd=document.getElementById('nav-dropdown');
+  var arrow=document.getElementById('menu-arrow');
+  dd.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function navGo(id, btn){
+  // Close dropdown
+  document.getElementById('nav-dropdown').classList.remove('open');
+  document.getElementById('menu-arrow').classList.remove('open');
+  // Activate section
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-  document.querySelectorAll('.hnav-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.nav-drop-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById(id).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(id==='tabla')updateTabla();
-  if(id==='todos'){updateMatchSelector();renderTodos();}
+  if(btn) btn.classList.add('active');
+  if(id==='tabla') updateTabla();
+  if(id==='todos'){ updateMatchSelector(); renderTodos(); }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e){
+  var trigger=document.getElementById('menu-trigger');
+  var dd=document.getElementById('nav-dropdown');
+  if(dd && trigger && !trigger.contains(e.target) && !dd.contains(e.target)){
+    dd.classList.remove('open');
+    document.getElementById('menu-arrow').classList.remove('open');
+  }
+});
+
+function showSection(id,btn){
+  navGo(id, document.getElementById('navbtn-'+id));
 }
 
 // ══════════════════════════════════════════
@@ -1155,7 +1340,7 @@ function doLogin(){
     currentUser='ORGANIZADOR';
     localStorage.setItem('prodeUser',currentUser);
     closeLogin(); updateHeaderUser();
-    showSection('resultados',document.querySelectorAll('.hnav-btn')[3]);
+    navGo('resultados', document.getElementById('navbtn-resultados'));
     renderAdminPanel();
     showToast('👑 Modo Organizador Activado');
     return;
@@ -1180,38 +1365,43 @@ function updateHeaderUser(){
 // ══════════════════════════════════════════
 //  FIRESTORE SYNC EN TIEMPO REAL
 // ══════════════════════════════════════════
-if(db){
-  db.collection('pronosticos').onSnapshot(function(snapshot){
-    pronosticos={};
-    snapshot.forEach(function(snap){
-      var d=snap.data();
-      if(d.nombre==='ORGANIZADOR'){
-        RESULTADOS_OFICIALES=Object.assign({extras:{}},d.pronosticos||{});
-        if(!RESULTADOS_OFICIALES.extras)RESULTADOS_OFICIALES.extras={};
-      } else if(d.nombre&&d.pronosticos){
-        pronosticos[d.nombre]=d.pronosticos;
-      }
-    });
-    if(currentUser&&currentUser!=='ORGANIZADOR'){
-      var local=localStorage.getItem('prodeData_'+currentUser);
-      if(local&&!pronosticos[currentUser]){try{pronosticos[currentUser]=JSON.parse(local);}catch(e){}}
-      loadInputValues();
+db.collection('pronosticos').onSnapshot(function(snapshot){
+  pronosticos={};
+  snapshot.forEach(function(snap){
+    var d=snap.data();
+    if(d.nombre==='ORGANIZADOR'){
+      RESULTADOS_OFICIALES=Object.assign({extras:{},bonusCierre:{},argPartidos:[]},d.pronosticos||{});
+      if(!RESULTADOS_OFICIALES.extras)RESULTADOS_OFICIALES.extras={};
+      if(!RESULTADOS_OFICIALES.bonusCierre)RESULTADOS_OFICIALES.bonusCierre={};
+      if(!RESULTADOS_OFICIALES.argPartidos)RESULTADOS_OFICIALES.argPartidos=[];
+    } else if(d.nombre&&d.pronosticos){
+      pronosticos[d.nombre]=d.pronosticos;
     }
-    updateStats(); updateTabla(); updateMatchSelector(); renderTodos();
-    if(currentUser==='ORGANIZADOR')renderAdminPanel();
   });
-} else {
-  // Modo local: cargar desde localStorage
   if(currentUser&&currentUser!=='ORGANIZADOR'){
     var local=localStorage.getItem('prodeData_'+currentUser);
-    if(local){try{pronosticos[currentUser]=JSON.parse(local);}catch(e){}}
+    if(local&&!pronosticos[currentUser]){try{pronosticos[currentUser]=JSON.parse(local);}catch(e){}}
+    loadInputValues();
   }
-  updateStats(); updateTabla(); updateMatchSelector();
-}
+  updateStats(); updateTabla(); updateMatchSelector(); renderTodos();
+  if(currentUser==='ORGANIZADOR')renderAdminPanel();
+});
 
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+// Populate datalist with Argentina squad
+(function(){
+  var dl = document.getElementById('dl-arg-squad');
+  if(dl){
+    ARG_SQUAD.forEach(function(name){
+      var opt = document.createElement('option');
+      opt.value = name;
+      dl.appendChild(opt);
+    });
+  }
+})();
+
 updateHeaderUser();
 updateMatchSelector();
 if(currentUser==='ORGANIZADOR')renderAdminPanel();
