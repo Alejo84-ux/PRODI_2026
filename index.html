@@ -24,29 +24,21 @@
   body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
  .site-header {
-    /* Mantenemos tus propiedades y agregamos control de desbordamiento */
-    background: linear-gradient(180deg, #0a1f0f 0%, var(--bg) 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1rem; /* Un poco menos de padding para ganar espacio en celular */
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    height: 60px;
-    overflow-x: hidden; /* Evita que el header genere scroll en toda la página */
+    height: auto; /* Dejamos que el header crezca según el contenido */
+    min-height: 60px;
+    padding: 10px 1rem;
+    flex-wrap: wrap; /* ¡La clave! Permite que los elementos pasen a otra línea */
+    gap: 10px;
 }
 
 .header-nav {
     display: flex;
     gap: 4px;
-    overflow-x: auto;      /* Habilita el scroll horizontal solo aquí */
-    white-space: nowrap;   /* Evita que los botones se rompan en dos líneas */
-    flex: 1;               /* Ocupa el espacio disponible */
-    margin: 0 10px;        /* Un respiro entre logo y botones */
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-    scrollbar-width: none; /* Oculta scrollbar en Firefox */
-    padding: 0 10px; /* Esto da aire a los extremos del scroll */
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%; /* Ahora ocupará todo el ancho disponible */
+    order: 2;    /* Lo fuerza a ir a la segunda fila */
+    padding-bottom: 5px;
 }
 
 /* Oculta la barra de scroll en Chrome/Safari */
