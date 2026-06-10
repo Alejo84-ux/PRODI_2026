@@ -39,8 +39,8 @@
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
-    width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    width: 100%;
+    gap: 20px; /* Aumenta este número para que haya más aire entre el menú y el botón */
 }
 
 /* En PC (pantallas grandes), todo en una fila */
@@ -74,7 +74,17 @@
     flex-shrink: 0;  /* Asegura que el botón de login no se achique */
 }
   .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;cursor:pointer}
-  .btn-login{padding:6px 16px;border-radius:8px;background:var(--green-mid);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;font-weight:500;transition:background .15s}
+  .btn-login {
+    padding: 6px 16px; 
+    border-radius: 8px; 
+    background: var(--green-mid); 
+    color: #fff; 
+    border: none; 
+    font-family: 'Inter', sans-serif; 
+    font-size: 13px; 
+    cursor: pointer; 
+    margin-left: auto; /* <--- AGREGÁ ESTA LÍNEA AQUÍ */
+}
   .btn-login:hover{background:var(--green-light)}
 
   .hero{background:linear-gradient(135deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.65) 100%),url('fondo.jpg') center/cover no-repeat;border-bottom:1px solid var(--border);padding:3rem 1.5rem 2rem;text-align:center;position:relative;overflow:hidden}
