@@ -24,41 +24,29 @@
   body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
  .site-header {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 20px;
-}
-
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.header-actions {
+    /* Mantenemos tus propiedades y agregamos control de desbordamiento */
+    background: linear-gradient(180deg, #0a1f0f 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1rem; /* Un poco menos de padding para ganar espacio en celular */
+    position: sticky;
+    top: 0;
+    z-index: 100;
     display: flex;
     align-items: center;
-    width: 100%;
-    gap: 20px; /* Aumenta este número para que haya más aire entre el menú y el botón */
+    height: 60px;
+    overflow-x: hidden; /* Evita que el header genere scroll en toda la página */
 }
 
-/* En PC (pantallas grandes), todo en una fila */
-@media (min-width: 768px) {
-    .site-header { flex-direction: row; }
-    .header-nav { overflow-x: visible; }
-}
-
-/* En móviles, permitimos scroll en el nav */
-@media (max-width: 767px) {
-    .header-actions { 
-        width: 100%; 
-        margin-top: 10px;
-    }
-    .header-nav {
+.header-nav {
     display: flex;
-    flex-grow: 1; /* Esto hace que el menú "empuje" todo lo que sigue hacia la derecha */
-}
+    gap: 4px;
+    overflow-x: auto;      /* Habilita el scroll horizontal solo aquí */
+    white-space: nowrap;   /* Evita que los botones se rompan en dos líneas */
+    flex: 1;               /* Ocupa el espacio disponible */
+    margin: 0 10px;        /* Un respiro entre logo y botones */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    scrollbar-width: none; /* Oculta scrollbar en Firefox */
+    padding: 0 10px; /* Esto da aire a los extremos del scroll */
 }
 
 /* Oculta la barra de scroll en Chrome/Safari */
@@ -74,17 +62,7 @@
     flex-shrink: 0;  /* Asegura que el botón de login no se achique */
 }
   .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;cursor:pointer}
-  .btn-login {
-    padding: 6px 16px; 
-    border-radius: 8px; 
-    background: var(--green-mid); 
-    color: #fff; 
-    border: none; 
-    font-family: 'Inter', sans-serif; 
-    font-size: 13px; 
-    cursor: pointer; 
-    margin-left: auto; /* <--- AGREGÁ ESTA LÍNEA AQUÍ */
-}
+  .btn-login{padding:6px 16px;border-radius:8px;background:var(--green-mid);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;font-weight:500;transition:background .15s}
   .btn-login:hover{background:var(--green-light)}
 
   .hero{background:linear-gradient(135deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.65) 100%),url('fondo.jpg') center/cover no-repeat;border-bottom:1px solid var(--border);padding:3rem 1.5rem 2rem;text-align:center;position:relative;overflow:hidden}
@@ -242,18 +220,17 @@
 <body>
 
 <header class="site-header">
-    <div class="logo">...</div>
-    
-    <div class="header-actions">
-        <nav class="header-nav">
-            <button>Inicio</button>
-            <button>Tabla</button>
-            </nav>
-        
-        <div class="header-user">
-            <button class="btn-login">Ingresar</button>
-        </div>
-    </div>
+  <div class="logo">⚽ <span>PRODI</span> MUNDIAL <span style="color:var(--green-light)">2026</span></div>
+  <nav class="header-nav">
+    <button class="hnav-btn active" onclick="showSection('inicio',this)">Inicio</button>
+    <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
+    <button class="hnav-btn" onclick="showSection('todos',this)">Todos</button>
+    <button class="hnav-btn" onclick="showSection('resultados',this)">Resultados</button>
+    <button class="hnav-btn" onclick="showSection('reglamento',this)" style="color:var(--gold)">📋 Reglamento</button>
+  </nav>
+  <div class="header-user" id="header-user-area">
+    <button class="btn-login" onclick="openLogin()">Ingresar</button>
+  </div>
 </header>
 
 <div class="hero">
