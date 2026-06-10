@@ -40,6 +40,7 @@
     display: flex;
     align-items: center;
     gap: 15px;
+    width: 100%; /* Asegura que ocupe todo el ancho disponible */
 }
 
 /* En PC (pantallas grandes), todo en una fila */
@@ -55,11 +56,9 @@
         margin-top: 10px;
     }
     .header-nav {
-        display: flex;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-    }
+    display: flex;
+    flex-grow: 1; /* Esto hace que el menú "empuje" todo lo que sigue hacia la derecha */
+}
 }
 
 /* Oculta la barra de scroll en Chrome/Safari */
@@ -233,20 +232,18 @@
 <body>
 
 <header class="site-header">
-  <div class="header-top">
-     
-   <div class="header-actions">
+    <div class="logo">...</div>
+    
+    <div class="header-actions">
         <nav class="header-nav">
-          <button class="hnav-btn" onclick="showSection('inicio',this)">Inicio</button>
-          <button class="hnav-btn" onclick="showSection('tabla',this)">Tabla</button>
-          <button class="hnav-btn" onclick="showSection('todos',this)">Todos</button>
-          <button class="hnav-btn" onclick="showSection('resultados',this)">Resultados</button>
-        </nav>
-        <div class="header-user" id="header-user-area">
-          <button class="btn-login" onclick="openLogin()">Ingresar</button>
+            <button>Inicio</button>
+            <button>Tabla</button>
+            </nav>
+        
+        <div class="header-user">
+            <button class="btn-login">Ingresar</button>
         </div>
     </div>
-  </div>
 </header>
 
 <div class="hero">
