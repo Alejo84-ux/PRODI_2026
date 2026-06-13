@@ -1540,7 +1540,7 @@ db.collection('pronosticos').onSnapshot(function(snapshot){
 var COCOMUNICADOS = [
   {
     fecha: 'Viernes 12 de Junio de 2026',
-    </strong> La Cocomisión les cocomunica que hasta las 22 hs del día de hoy, Viernes 12 de Junio de 2026, quedan abiertas las Prodicciones Extras para aquellos que no llegaron a completarlas. La Cocomisión le hace observar a sus participantes que esta excepción no debe ser coconfundida con tibieza. Se tomó nota de aquellos que no cumplieron a tiempo, y la Cocomisíon se reserva el derecho ser implacable a futuro.'
+    texto: '\u{1F965} \x3Cstrong\x3ECocomunicado\x3C/strong\x3E La Cocomisi\xF3n les cocomunica que hasta las 22 hs del d\xEDa de hoy, Viernes 12 de Junio de 2026, quedan abiertas las Prodicciones Extras para aquellos que no llegaron a completarlas. La Cocomisi\xF3n le hace observar a sus participantes que esta excepci\xF3n no debe ser coconfundida con tibieza. Se tom\xF3 nota de aquellos que no cumplieron a tiempo, y la Cocomisi\xF3n se reserva el derecho ser implacable a futuro.'
   }
 ];
 
@@ -1553,17 +1553,17 @@ function renderCocomunicados(){
   }
   var items = COCOMUNICADOS.map(function(c, i){
     return '<div class="coco-item">' +
-      '<div class="coco-icon">&#129381;</div>' +
+      '<div class="coco-icon">\u{1F965}</div>' +
       '<div class="coco-body">' +
         '<div class="coco-fecha">' + c.fecha + '</div>' +
-        '<div class="coco-texto">' + c.texto.replace(/^&#129381;\s*/,'') + '</div>' +
+        '<div class="coco-texto">' + c.texto.replace(/^\u{1F965}\s*/u,'') + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
   container.innerHTML =
     '<div class="coco-panel">' +
       '<div class="coco-header">' +
-        '<span style="font-size:22px">&#129381;</span>' +
+        '<span style="font-size:22px">\u{1F965}</span>' +
         '<span class="coco-header-title">Cocomunicados</span>' +
         '<span class="coco-header-sub">' + COCOMUNICADOS.length + ' comunicado' + (COCOMUNICADOS.length !== 1 ? 's' : '') + '</span>' +
       '</div>' +
