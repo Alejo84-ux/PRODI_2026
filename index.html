@@ -1091,6 +1091,46 @@ function renderAdminPanel(){
   html+='</div>';
   card.innerHTML=html;
   
+  // ── SANCIONES ──
+  var sanciones = RESULTADOS_OFICIALES.sanciones || [];
+  html += '<div style="margin:30px 0 10px;font-size:16px;font-weight:bold;color:#f87171;border-bottom:1px solid rgba(248,113,113,.4);padding-bottom:4px">&#9888;&#65039; SANCIONES</div>';
+  html += '<p style="font-size:12px;color:var(--text3);margin-bottom:12px">Descontá puntos a un participante por infracción al reglamento. Quedan registradas y son visibles en la tabla.</p>';
+
+  if(sanciones.length){
+    sanciones.forEach(function(s,idx){
+      html += '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px">'
+        + '<div style="flex:1">'
+          + '<div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:2px">&#8209;'+s.puntos+' pts &rarr; '+s.usuario+'</div>'
+          + '<div style="font-size:12px;color:var(--text2);line-height:1.5">'+s.motivo+'</div>'
+          + '<div style="font-size:10px;color:var(--text3);margin-top:3px">'+s.fecha+'</div>'
+        + '</div>'
+        + '<button onclick="deleteSancion('+idx+')" title="Eliminar sanción" style="flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">&#10005;</button>'
+      + '</div>';
+    });
+  } else {
+    html += '<div style="font-size:12px;color:var(--text3);padding:8px 0 12px">Sin sanciones registradas.</div>';
+  }
+
+  html += '<div style="background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:14px;margin-top:4px">'
+    + '<div style="font-size:11px;color:#f87171;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Nueva sanción</div>'
+    + '<div style="display:flex;gap:8px;margin-bottom:8px">'
+      + '<div style="flex:1">'
+        + '<label style="font-size:10px;color:var(--text3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Participante</label>'
+        + '<select id="sancion-usuario" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:9px 10px;font-size:13px">'
+        + '<option value="">— Elegí —</option>'
+        + Object.keys(pronosticos).map(function(u){ return '<option value="'+u+'">'+u+'</option>'; }).join('')
+        + '</select>'
+      + '</div>'
+      + '<div style="width:90px">'
+        + '<label style="font-size:10px;color:var(--text3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Puntos</label>'
+        + '<input id="sancion-puntos" type="number" min="1" max="999" placeholder="ej: 5" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:9px 10px;font-size:13px;text-align:center">'
+      + '</div>'
+    + '</div>'
+    + '<label style="font-size:10px;color:var(--text3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Motivo / infracción</label>'
+    + '<textarea id="sancion-motivo" placeholder="Describi brevemente la infracción..." rows="2" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:9px 10px;font-size:13px;outline:none;resize:vertical;line-height:1.5"></textarea>'
+    + '<button onclick="addSancion()" style="margin-top:8px;width:100%;padding:10px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;color:#f87171">&#9888; APLICAR SANCIÓN</button>'
+  + '</div>';
+
   // ── COCOMUNICADOS ──
   html += '<div style="margin:30px 0 10px;font-size:16px;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--gold);padding-bottom:4px">\u{1F965} COCOMUNICADOS</div>';
   html += '<p style="font-size:12px;color:var(--text3);margin-bottom:12px">Escribi un comunicado y se mostrará en el panel principal para todos los participantes.</p>';
@@ -1363,6 +1403,12 @@ function calcPuntos(user){
     if(pExt[e.id]&&rExt[e.id]){
       if(String(pExt[e.id]).trim().toLowerCase()===String(rExt[e.id]).trim().toLowerCase()) pts+=e.pts;
     }
+  });
+
+  // Sanciones del organizador
+  var sanciones = RESULTADOS_OFICIALES.sanciones || [];
+  sanciones.forEach(function(s){
+    if(s.usuario === user) pts -= (parseInt(s.puntos,10)||0);
   });
 
   // Art. 14/15 bonus cierre grupos (se aplica en updateTabla)
@@ -1720,6 +1766,56 @@ function deleteCoco(idx){
     showToast('\u{1F5D1}\uFE0F Comunicado eliminado');
     renderCocomunicados();
     renderAdminPanel();
+  });
+}
+
+// ══════════════════════════════════════════
+//  SANCIONES
+// ══════════════════════════════════════════
+function addSancion(){
+  var usuario = document.getElementById('sancion-usuario').value;
+  var puntos  = parseInt(document.getElementById('sancion-puntos').value, 10);
+  var motivo  = document.getElementById('sancion-motivo').value.trim();
+  if(!usuario){ showToast('\u26A0\uFE0F Elegí un participante'); return; }
+  if(!puntos || puntos < 1){ showToast('\u26A0\uFE0F Ingresá una cantidad válida de puntos'); return; }
+  if(!motivo){ showToast('\u26A0\uFE0F Escribí el motivo de la sanción'); return; }
+  if(!confirm('¿Aplicar sanción de -'+puntos+' pts a '+usuario+'?')) return;
+
+  var sanciones = (RESULTADOS_OFICIALES.sanciones || []).slice();
+  sanciones.push({
+    usuario: usuario,
+    puntos:  puntos,
+    motivo:  motivo,
+    fecha:   _cocoFechaHoy()
+  });
+  RESULTADOS_OFICIALES.sanciones = sanciones;
+  _saveSancionesToFirebase(sanciones, function(){
+    showToast('\u26A0\uFE0F Sanción aplicada a ' + usuario);
+    updateTabla(); renderMiniTabla(); renderAdminPanel();
+  });
+}
+
+function deleteSancion(idx){
+  if(!confirm('¿Eliminar esta sanción?')) return;
+  var sanciones = (RESULTADOS_OFICIALES.sanciones || []).slice();
+  sanciones.splice(idx, 1);
+  RESULTADOS_OFICIALES.sanciones = sanciones;
+  _saveSancionesToFirebase(sanciones, function(){
+    showToast('\u{1F5D1}\uFE0F Sanción eliminada');
+    updateTabla(); renderMiniTabla(); renderAdminPanel();
+  });
+}
+
+function _saveSancionesToFirebase(sanciones, cb){
+  db.collection('pronosticos').doc('ORGANIZADOR').update({
+    'pronosticos.sanciones': sanciones,
+    updatedAt: new Date().toISOString()
+  }).then(cb).catch(function(){
+    var oficiales = Object.assign({}, RESULTADOS_OFICIALES);
+    oficiales.sanciones = sanciones;
+    db.collection('pronosticos').doc('ORGANIZADOR').set({
+      nombre:'ORGANIZADOR', pronosticos: oficiales, updatedAt: new Date().toISOString()
+    }).then(cb).catch(function(err){ showToast('\u274C Error: '+err.message); });
   });
 }
 
