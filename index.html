@@ -1389,14 +1389,29 @@ function updateMatchSelector(){
   var sel=document.getElementById('match-selector');
   if(!sel)return;
   var cur=sel.value;
-  sel.innerHTML='<option value="">— Seleccioná un partido —</option>';
+  sel.innerHTML='<option value="">\u2014 Seleccion\u00e1 un partido \u2014</option>';
+  var todos=[];
   Object.keys(FIXTURE).forEach(function(phase){
-    FIXTURE[phase].forEach(function(m){
-      var opt=document.createElement('option');
-      opt.value=m.id;
-      opt.textContent=(m.local+' vs '+m.visita+' ('+m.fecha+')');
-      sel.appendChild(opt);
-    });
+    FIXTURE[phase].forEach(function(m){ todos.push(m); });
+  });
+  var MESES={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12,
+             Ene:1,Abr:4,Ago:8,Dic:12};
+  function toSortKey(m){
+    if(!m.fecha||!m.hora) return 9999999;
+    var fp=m.fecha.trim().split(' ');
+    var day=parseInt(fp[0],10)||0;
+    var mon=MESES[fp[1]]||0;
+    var hp=m.hora.replace(/\s*ARG/,'').split(':');
+    var hh=parseInt(hp[0],10)||0;
+    var mm=parseInt(hp[1],10)||0;
+    return mon*1000000 + day*10000 + hh*100 + mm;
+  }
+  todos.sort(function(a,b){ return toSortKey(a)-toSortKey(b); });
+  todos.forEach(function(m){
+    var opt=document.createElement('option');
+    opt.value=m.id;
+    opt.textContent=m.fecha+' '+m.hora+' \u2014 '+m.local+' vs '+m.visita;
+    sel.appendChild(opt);
   });
   if(cur)sel.value=cur;
 }
