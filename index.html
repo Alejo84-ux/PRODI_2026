@@ -964,6 +964,56 @@ function savePronosticos(){
     });
   }
 
+  // ── DETECCIÓN DE MODIFICACIÓN SOBRE RESULTADO YA CARGADO ──
+  if(currentUser !== 'ORGANIZADOR'){
+    var alertas = [];
+    if(currentPhase === 'extras'){
+      EXTRAS_DATA.arg.concat(EXTRAS_DATA.grid).forEach(function(e){
+        var ofic = RESULTADOS_OFICIALES.extras && RESULTADOS_OFICIALES.extras[e.id];
+        if(!ofic) return; // sin resultado oficial, no aplica
+        var anterior = pronosticos[currentUser] && pronosticos[currentUser].extras && pronosticos[currentUser].extras[e.id];
+        var nuevo = document.getElementById(e.id) ? document.getElementById(e.id).value.trim() : null;
+        if(anterior && nuevo && anterior !== nuevo){
+          alertas.push({ campo: e.label, de: anterior, a: nuevo });
+        }
+      });
+    } else {
+      Object.keys(FIXTURE).forEach(function(phase){
+        FIXTURE[phase].forEach(function(m){
+          var ofic = RESULTADOS_OFICIALES[m.id];
+          if(!ofic || ofic.h === '' || ofic.h === undefined) return;
+          var anterior = pronosticos[currentUser] && pronosticos[currentUser][m.id];
+          var hi = document.getElementById('h-'+m.id);
+          var ai = document.getElementById('a-'+m.id);
+          if(!anterior || !hi || !ai) return;
+          var nh = parseInt(hi.value), na = parseInt(ai.value);
+          if(!isNaN(nh) && !isNaN(na) && (anterior.h !== nh || anterior.a !== na)){
+            alertas.push({ campo: m.local+' vs '+m.visita+' ('+m.fecha+')', de: anterior.h+'-'+anterior.a, a: nh+'-'+na });
+          }
+        });
+      });
+    }
+    if(alertas.length){
+      var listaAlertas = (RESULTADOS_OFICIALES.alertas || []).slice();
+      alertas.forEach(function(a){
+        listaAlertas.unshift({
+          usuario: currentUser,
+          campo:   a.campo,
+          de:      a.de,
+          a:       a.a,
+          fecha:   new Date().toLocaleString('es-AR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
+        });
+      });
+      // Guardar alertas en Firebase (máximo 50)
+      listaAlertas = listaAlertas.slice(0, 50);
+      RESULTADOS_OFICIALES.alertas = listaAlertas;
+      db.collection('pronosticos').doc('ORGANIZADOR').update({
+        'pronosticos.alertas': listaAlertas,
+        updatedAt: new Date().toISOString()
+      }).catch(function(){});
+    }
+  }
+
   localStorage.setItem('prodeData_'+currentUser,JSON.stringify(pronosticos[currentUser]));
   db.collection('pronosticos').doc(currentUser).set({
     nombre:currentUser,
@@ -985,6 +1035,36 @@ function renderAdminPanel(){
   if(!card||currentUser!=='ORGANIZADOR')return;
   var html='<div style="padding:20px">';
   html+='<h3 style="color:var(--gold);margin-bottom:15px;font-family:Bebas Neue,sans-serif;font-size:24px;text-align:center">PANEL DE CONTROL</h3>';
+
+  // ── ALERTAS DE MODIFICACIÓN ──
+  var alertas = RESULTADOS_OFICIALES.alertas || [];
+  var alertaBg   = alertas.length ? 'rgba(251,191,36,.07)' : 'var(--bg2)';
+  var alertaBord = alertas.length ? 'rgba(251,191,36,.4)'  : 'var(--border)';
+  html += '<div style="background:'+alertaBg+';border:1px solid '+alertaBord+';border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:24px">';
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:'+(alertas.length?'12px':'0')+'">'
+    + '<span style="font-size:20px">🚨</span>'
+    + '<span style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:1px;color:#fbbf24">MODIFICACIONES SOSPECHOSAS</span>';
+  if(alertas.length){
+    html += '<span style="margin-left:auto;background:#fbbf24;color:#000;font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px">'+alertas.length+'</span>'
+      + '<button onclick="clearAlertas()" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">Limpiar</button>';
+  }
+  html += '</div>';
+  if(!alertas.length){
+    html += '<div style="font-size:12px;color:var(--text3)">Sin modificaciones detectadas.</div>';
+  } else {
+    alertas.forEach(function(a, idx){
+      html += '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.15);border-radius:8px;padding:10px 12px;margin-bottom:6px">'
+        + '<div style="flex:1">'
+          + '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:3px">⚠️ '+a.usuario+'</div>'
+          + '<div style="font-size:12px;color:var(--text2);line-height:1.5"><span style="color:var(--text3)">Campo:</span> '+a.campo+'</div>'
+          + '<div style="font-size:12px;color:var(--text2)"><span style="color:#f87171">Antes: '+a.de+'</span> &rarr; <span style="color:var(--green-light)">Ahora: '+a.a+'</span></div>'
+          + '<div style="font-size:10px;color:var(--text3);margin-top:3px">'+a.fecha+'</div>'
+        + '</div>'
+        + '<button onclick="deleteAlerta('+idx+')" style="flex-shrink:0;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">✕</button>'
+      + '</div>';
+    });
+  }
+  html += '</div>';
 
   // ── BLOQUEO DE PRONÓSTICOS ──
   var isLocked = pronosticosBloqueados;
@@ -1897,6 +1977,29 @@ function deleteCoco(idx){
     renderCocomunicados();
     renderAdminPanel();
   });
+}
+
+// ══════════════════════════════════════════
+//  ALERTAS
+// ══════════════════════════════════════════
+function _saveAlertas(lista){
+  RESULTADOS_OFICIALES.alertas = lista;
+  db.collection('pronosticos').doc('ORGANIZADOR').update({
+    'pronosticos.alertas': lista,
+    updatedAt: new Date().toISOString()
+  }).then(function(){ renderAdminPanel(); })
+    .catch(function(e){ showToast('\u274C Error: '+e.message); });
+}
+
+function clearAlertas(){
+  if(!confirm('\u00bfLimpiar todas las alertas?')) return;
+  _saveAlertas([]);
+}
+
+function deleteAlerta(idx){
+  var lista = (RESULTADOS_OFICIALES.alertas || []).slice();
+  lista.splice(idx, 1);
+  _saveAlertas(lista);
 }
 
 // ══════════════════════════════════════════
