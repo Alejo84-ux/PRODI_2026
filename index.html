@@ -246,6 +246,42 @@
     .team-name{font-size:11px}
     .header-nav .hnav-btn{padding:6px 8px;font-size:12px}
   }
+
+  /* ── DESGLOSE MODAL ── */
+  .desglose-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.78);backdrop-filter:blur(5px);overflow-y:auto;padding:1rem}
+  .desglose-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+  .desglose-modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:680px;margin:auto;animation:slideUp .22s ease}
+  .desglose-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--bg2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;z-index:10}
+  .desglose-avatar{width:42px;height:42px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;border:2px solid var(--green-light)}
+  .desglose-title{flex:1}
+  .desglose-title h2{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);line-height:1}
+  .desglose-title p{font-size:12px;color:var(--text3);margin-top:2px}
+  .desglose-body{padding:18px 20px}
+  .desglose-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--text3);margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+  .desglose-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:4px;font-size:12px;transition:background .12s}
+  .desglose-row:hover{background:rgba(255,255,255,.03)}
+  .desglose-row.exact{background:rgba(45,158,92,.07);border:1px solid rgba(45,158,92,.2)}
+  .desglose-row.parcial{background:rgba(117,170,219,.06);border:1px solid rgba(117,170,219,.15)}
+  .desglose-row.error{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.1)}
+  .desglose-row.skip{opacity:.45}
+  .desglose-match-name{flex:1;color:var(--text2);line-height:1.3}
+  .desglose-pred{font-weight:600;color:var(--gold-light);min-width:34px;text-align:center;font-size:13px}
+  .desglose-vs{color:var(--text3);font-size:10px}
+  .desglose-oficial{color:var(--text3);min-width:34px;text-align:center;font-size:12px}
+  .desglose-pts{font-family:'Bebas Neue',sans-serif;font-size:18px;min-width:32px;text-align:right;line-height:1}
+  .desglose-pts.green{color:#4ade80}
+  .desglose-pts.red{color:#f87171}
+  .desglose-pts.blue{color:#75AADB}
+  .desglose-pts.gray{color:var(--text3)}
+  .desglose-icons{font-size:11px;min-width:60px;text-align:right;color:var(--text3)}
+  .desglose-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:14px}
+  .desglose-sum-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+  .desglose-sum-val{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1}
+  .desglose-sum-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  /* Clickable tabla row */
+  .tabla tr.clickable-row{cursor:pointer}
+  .tabla tr.clickable-row:hover td{background:rgba(201,162,39,.06)!important}
+  .tabla tr.clickable-row td:nth-child(2) .player-name{text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(201,162,39,.4)}
 </style>
 </head>
 <body>
@@ -603,6 +639,22 @@
     <button class="btn-save" onclick="doLogin()" style="margin-top:4px">ENTRAR AL GRUPO</button>
     <button onclick="closeLogin()" style="margin-top:10px;width:100%;padding:8px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">Cancelar</button>
     <p style="margin-top:16px;font-size:11px;color:var(--text3)">Código de ingreso: <strong style="color:var(--gold)">MUNDIAL26</strong></p>
+  </div>
+</div>
+
+<!-- ── MODAL DESGLOSE DE PUNTOS ── -->
+<div class="desglose-overlay" id="desglose-overlay" onclick="closeDesgloseOutside(event)">
+  <div class="desglose-modal">
+    <div class="desglose-header">
+      <div class="desglose-avatar" id="desglose-avatar">?</div>
+      <div class="desglose-title">
+        <h2 id="desglose-nombre">Jugador</h2>
+        <p id="desglose-subtitle">Desglose de puntos</p>
+      </div>
+      <button class="modal-close" onclick="closeDesglose()">✕</button>
+    </div>
+    <div class="desglose-body" id="desglose-body">
+    </div>
   </div>
 </div>
 
@@ -1718,7 +1770,8 @@ function updateTabla(){
         arrow = '<span title="Baj\u00f3 '+Math.abs(diff)+' lugar'+(Math.abs(diff)>1?'es':'')+'" style="color:#f87171;font-size:12px;margin-left:5px;font-weight:700">▼'+Math.abs(diff)+'</span>';
     }
 
-    return '<tr><td style="width:36px;text-align:center">'+rank+'</td>'+
+    var safeU = r.u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<tr class="clickable-row" onclick="verDesglose(\''+safeU+'\')">'+'<td style="width:36px;text-align:center">'+rank+'</td>'+
       '<td><div class="player-cell"><div class="avatar">'+ini(r.u)+'</div><span class="player-name">'+r.u+'</span>'+arrow+bonusBadge+'</div></td>'+
       '<td style="width:54px;text-align:center"><span class="pts-big">'+r.pts+'</span></td>'+
       '<td style="width:42px;text-align:center" class="stat-cell">'+r.exactos+'</td>'+
@@ -2356,6 +2409,247 @@ document.addEventListener('DOMContentLoaded', function(){
   renderCocomunicados();
   if(currentUser==='ORGANIZADOR') renderAdminPanel();
 });
+// ══════════════════════════════════════════
+//  DESGLOSE DE PUNTOS
+// ══════════════════════════════════════════
+function closeDesglose(){
+  document.getElementById('desglose-overlay').classList.remove('open');
+}
+function closeDesgloseOutside(e){
+  if(e.target===document.getElementById('desglose-overlay')) closeDesglose();
+}
+
+function verDesglose(user){
+  var ov = document.getElementById('desglose-overlay');
+  var body = document.getElementById('desglose-body');
+  document.getElementById('desglose-avatar').textContent = ini(user);
+  document.getElementById('desglose-nombre').textContent = user;
+
+  var ups = pronosticos[user] || {};
+  var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
+  var ptsTotal = 0;
+  var exactosTotal = 0;
+  var parcialesTotal = 0;
+  var erroresTotal = 0;
+
+  // ── Construir filas por fase ──
+  var seccionesHtml = '';
+  var faseLabels = {
+    grupos:'⚽ Fase de Grupos',
+    r32:'⚔️ Ronda de 32',
+    r16:'🔥 Octavos de Final',
+    cuartos:'💥 Cuartos de Final',
+    semis:'⚡ Semifinales',
+    final:'🏆 Final / 3er Puesto'
+  };
+
+  var faseOrden = ['grupos','r32','r16','cuartos','semis','final'];
+  faseOrden.forEach(function(phase){
+    if(!FIXTURE[phase]) return;
+    var filas = '';
+    var fasePts = 0;
+    var hayResultado = false;
+
+    FIXTURE[phase].forEach(function(m){
+      var p = ups[m.id];
+      var r = RESULTADOS_OFICIALES[m.id];
+      var esArg = isArgMatch(m.id, phase);
+
+      // Fila sin pronóstico
+      if(!p){
+        filas += '<div class="desglose-row skip">'
+          + '<span class="desglose-match-name">'+m.local+' <span style="color:var(--text3);font-size:10px">vs</span> '+m.visita+'</span>'
+          + '<span style="font-size:11px;color:var(--text3);font-style:italic">Sin pronóstico</span>'
+          + '<span class="desglose-pts gray">—</span>'
+          + '</div>';
+        return;
+      }
+
+      var predText = p.h+'–'+p.a;
+      var oficialText = (r && r.h !== '' && r.h !== undefined && r.h !== null) ? r.h+'–'+r.a : '?';
+
+      if(!r || r.h === '' || r.h === undefined){
+        // Partido sin resultado aún
+        filas += '<div class="desglose-row">'
+          + '<span class="desglose-match-name">'+m.local+' <span style="color:var(--text3);font-size:10px">vs</span> '+m.visita+'</span>'
+          + '<span class="desglose-pred">'+predText+'</span>'
+          + '<span class="desglose-vs">→</span>'
+          + '<span style="font-size:11px;color:var(--text3)">Sin resultado</span>'
+          + '<span class="desglose-pts gray">—</span>'
+          + '</div>';
+        return;
+      }
+
+      hayResultado = true;
+      var isGrupos = (phase === 'grupos');
+      var ph=parseInt(p.h,10), pa=parseInt(p.a,10), rh=parseInt(r.h,10), ra=parseInt(r.a,10);
+      var esPleno = (ph === rh && pa === ra);
+      var esAcierto = (ph>pa && rh>ra)||(ph<pa && rh<ra)||(ph===pa && rh===ra);
+      var matchPts = 0;
+      var badges = [];
+      var rowClass = '';
+
+      if(esAcierto){
+        if(isGrupos){
+          matchPts += 2; badges.push('+2 acierto');
+          if(esPleno){ matchPts += 1; matchPts += (rh+ra); badges.push('+1 pleno'); badges.push('+'+(rh+ra)+' goles'); }
+          if(esArg){ matchPts += 1; badges.push('+1 🇦🇷'); }
+          if(esArg && esPleno){ matchPts += 1; badges.push('+1 pleno🇦🇷'); }
+        } else {
+          var base = 5;
+          if(m.id==='FINAL') base=13;
+          else if(m.id==='3RD') base=11;
+          else if(phase==='semis') base=9;
+          else if(phase==='cuartos') base=7;
+          matchPts += base; badges.push('+'+base+' acierto');
+          if(esPleno){ matchPts += 2; matchPts += (rh+ra); badges.push('+2 pleno'); badges.push('+'+(rh+ra)+' goles'); }
+          if(esArg){
+            if(m.id==='FINAL'){ matchPts+=2; badges.push('+2 🇦🇷'); }
+            else if(m.id!=='3RD'){ matchPts+=1; badges.push('+1 🇦🇷'); }
+          }
+          if(esArg && esPleno){ matchPts+=5; badges.push('+5 pleno🇦🇷'); }
+        }
+        rowClass = esPleno ? 'exact' : 'parcial';
+        if(esPleno) exactosTotal++; else parcialesTotal++;
+      } else {
+        rowClass = 'error';
+        erroresTotal++;
+        if(m.id==='3RD' && esArg && RESULTADOS_OFICIALES['3RD']){
+          matchPts -= 5; badges.push('−5 🇦🇷❌');
+        }
+      }
+
+      fasePts += matchPts;
+      ptsTotal += matchPts;
+
+      var ptsColor = matchPts > 0 ? 'green' : matchPts < 0 ? 'red' : 'gray';
+      var ptsPrefix = matchPts > 0 ? '+' : '';
+
+      filas += '<div class="desglose-row '+rowClass+'">'
+        + '<span class="desglose-match-name">'+m.local+' <span style="color:var(--text3);font-size:10px">vs</span> '+m.visita+'</span>'
+        + '<span class="desglose-pred">'+predText+'</span>'
+        + '<span class="desglose-vs">→</span>'
+        + '<span class="desglose-oficial">'+oficialText+'</span>'
+        + '<span style="font-size:10px;color:var(--text3);flex:1;text-align:right;padding-right:8px">'+badges.join(' ')+'</span>'
+        + '<span class="desglose-pts '+ptsColor+'">'+ptsPrefix+matchPts+'</span>'
+        + '</div>';
+    });
+
+    if(filas){
+      seccionesHtml += '<div class="desglose-section-title">'+
+        (faseLabels[phase]||phase)+
+        (hayResultado ? ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+fasePts+' pts</span>' : '')+
+        '</div>' + filas;
+    }
+  });
+
+  // ── EXTRAS ──
+  var pExt = ups.extras || {};
+  var rExt = RESULTADOS_OFICIALES.extras || {};
+  var extPts = 0;
+  var extFilas = '';
+
+  // Predicciones generales (15pts)
+  EXTRAS_DATA.grid.forEach(function(e){
+    var pred = pExt[e.id] || '';
+    var ofic = rExt[e.id] || '';
+    if(!pred){ return; }
+    var match = ofic && pred.trim().toLowerCase() === ofic.trim().toLowerCase();
+    var pts = match ? 15 : 0;
+    extPts += pts;
+    ptsTotal += pts;
+    var rowClass = match ? 'exact' : (ofic ? 'error' : '');
+    var ptsColor = match ? 'green' : 'gray';
+    extFilas += '<div class="desglose-row '+rowClass+'">'
+      + '<span class="desglose-match-name">'+e.label+'</span>'
+      + '<span style="font-size:11px;color:var(--gold-light);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pred+'</span>'
+      + (ofic ? '<span class="desglose-vs">→</span><span style="font-size:11px;color:var(--text3)">'+ofic+'</span>' : '')
+      + '<span class="desglose-pts '+ptsColor+'">'+(match?'+15':'—')+'</span>'
+      + '</div>';
+  });
+
+  // Autores gol Argentina
+  EXTRAS_DATA.arg.forEach(function(e){
+    var pred = pExt[e.id] || '';
+    var ofic = rExt[e.id] || '';
+    if(!pred){ return; }
+    var match = ofic && pred.trim().toLowerCase() === ofic.trim().toLowerCase();
+    var pts = match ? e.pts : 0;
+    extPts += pts;
+    ptsTotal += pts;
+    var rowClass = match ? 'exact' : (ofic ? 'error' : '');
+    var ptsColor = match ? (e.pts>=5?'green':'blue') : 'gray';
+    var ptsPrefix = match ? '+' : '';
+    extFilas += '<div class="desglose-row '+rowClass+'">'
+      + '<span class="desglose-match-name" style="font-size:11px">'+e.label+'</span>'
+      + '<span style="font-size:11px;color:var(--gold-light);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pred+'</span>'
+      + (ofic ? '<span class="desglose-vs">→</span><span style="font-size:11px;color:var(--text3)">'+ofic+'</span>' : '')
+      + '<span class="desglose-pts '+ptsColor+'">'+(match?ptsPrefix+pts:'—')+'</span>'
+      + '</div>';
+  });
+
+  if(extFilas){
+    seccionesHtml += '<div class="desglose-section-title">🎯 Extras'
+      + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+extPts+' pts</span>'
+      + '</div>' + extFilas;
+  }
+
+  // ── SANCIONES / BONIFICACIONES ──
+  var sanciones = RESULTADOS_OFICIALES.sanciones || [];
+  var sanFilas = '';
+  var sanPts = 0;
+  sanciones.filter(function(s){ return s.usuario === user; }).forEach(function(s){
+    var tipo = s.tipo || 'sancion';
+    var p = parseInt(s.puntos,10) || 0;
+    if(tipo==='sancion'){ sanPts -= p; ptsTotal -= p; }
+    else if(tipo==='bonificacion'){ sanPts += p; ptsTotal += p; }
+    var icon = tipo==='sancion'?'🚫':tipo==='bonificacion'?'🎁':'⚠️';
+    var ptsTxt = tipo==='sancion'?'−'+p:tipo==='bonificacion'?'+'+p:'';
+    var ptsColor = tipo==='sancion'?'red':tipo==='bonificacion'?'green':'gray';
+    sanFilas += '<div class="desglose-row '+(tipo==='sancion'?'error':tipo==='bonificacion'?'parcial':'')+'">'
+      + '<span style="font-size:16px">'+icon+'</span>'
+      + '<span class="desglose-match-name" style="font-size:12px">'+s.motivo+'</span>'
+      + '<span style="font-size:10px;color:var(--text3)">'+s.fecha+'</span>'
+      + '<span class="desglose-pts '+ptsColor+'">'+ptsTxt+'</span>'
+      + '</div>';
+  });
+  if(sanFilas){
+    seccionesHtml += '<div class="desglose-section-title">⚖️ Sanciones / Bonos'
+      + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+sanPts+' pts</span>'
+      + '</div>' + sanFilas;
+  }
+
+  // ── BONUS CIERRE ──
+  var bc = bonusCierre[user] || 0;
+  if(bc !== 0){
+    ptsTotal += bc;
+    var bcColor = bc>0?'green':'red';
+    var bcIcon = bc>0?'🏅':'⚠️';
+    seccionesHtml += '<div class="desglose-section-title">⚡ Cláusulas de Cierre'
+      + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+(bc>0?'+':'')+bc+' pts</span>'
+      + '</div>'
+      + '<div class="desglose-row '+(bc>0?'parcial':'error')+'">'
+        + '<span style="font-size:16px">'+bcIcon+'</span>'
+        + '<span class="desglose-match-name">Cláusula Arts. 14/15 — cierre de grupos</span>'
+        + '<span class="desglose-pts '+bcColor+'">'+(bc>0?'+':'')+bc+'</span>'
+        + '</div>';
+  }
+
+  // ── RESUMEN TOTAL ──
+  document.getElementById('desglose-subtitle').textContent =
+    exactosTotal+' plenos · '+parcialesTotal+' aciertos · '+erroresTotal+' errores';
+
+  var summaryHtml = '<div class="desglose-summary">'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:var(--green-light)">'+ptsTotal+'</div><div class="desglose-sum-lbl">Puntos Totales</div></div>'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:var(--gold)">'+exactosTotal+'</div><div class="desglose-sum-lbl">✅ Plenos</div></div>'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:#75AADB">'+parcialesTotal+'</div><div class="desglose-sum-lbl">〜 Aciertos</div></div>'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:#f87171">'+erroresTotal+'</div><div class="desglose-sum-lbl">✗ Errores</div></div>'
+    + '</div>'
+    + '<p style="font-size:11px;color:var(--text3);margin-bottom:4px">👇 Hacé clic en cualquier fila para ver detalles. <span style="color:rgba(45,158,92,.7)">Verde = pleno</span> · <span style="color:rgba(117,170,219,.7)">Azul = acierto</span> · <span style="color:rgba(248,113,113,.7)">Rojo = error</span></p>';
+
+  body.innerHTML = summaryHtml + seccionesHtml;
+  ov.classList.add('open');
+}
 </script>
 </body>
 </html>
