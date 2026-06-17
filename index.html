@@ -347,14 +347,45 @@
     <div class="card">
       <div class="card-header">
         <div class="card-title"><div class="dot"></div>Pronósticos de todos</div>
-        <select id="match-selector" onchange="renderTodos()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 10px;font-family:'Inter',sans-serif;font-size:12px;outline:none">
-          <option value="">— Seleccioná un partido —</option>
-          <option value="__extras__">🥥 Predicciones Extras</option>
-        </select>
       </div>
+
+      <!-- Acordeones de selección de partido -->
+      <div style="padding:12px 14px 0">
+
+        <!-- Extras -->
+        <div style="margin-bottom:8px">
+          <button onclick="seleccionarPartido('__extras__')" id="btn-__extras__"
+            style="width:100%;text-align:left;background:var(--bg3);border:1px solid var(--border);color:var(--gold);border-radius:8px;padding:10px 14px;font-size:13px;cursor:pointer;font-weight:600">
+            🥥 Predicciones Extras
+          </button>
+        </div>
+
+        <!-- Jugados -->
+        <div style="margin-bottom:8px">
+          <div onclick="toggleTodosAcc('jugados')" style="display:flex;align-items:center;gap:8px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;cursor:pointer;user-select:none">
+            <span style="font-size:15px">✅</span>
+            <span id="acc-todos-header-jugados" style="font-size:13px;font-weight:600;color:#4ade80;flex:1">Partidos jugados</span>
+            <span id="acc-todos-arrow-jugados" style="color:var(--text3);font-size:12px">▸</span>
+          </div>
+          <div id="acc-todos-jugados" style="display:none;margin-top:4px;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto;padding-right:2px"></div>
+        </div>
+
+        <!-- A jugar -->
+        <div style="margin-bottom:12px">
+          <div onclick="toggleTodosAcc('proximos')" style="display:flex;align-items:center;gap:8px;background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);border-radius:8px;padding:10px 14px;cursor:pointer;user-select:none">
+            <span style="font-size:15px">🕐</span>
+            <span id="acc-todos-header-proximos" style="font-size:13px;font-weight:600;color:var(--gold);flex:1">Próximos partidos</span>
+            <span id="acc-todos-arrow-proximos" style="color:var(--text3);font-size:12px">▾</span>
+          </div>
+          <div id="acc-todos-proximos" style="display:flex;margin-top:4px;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto;padding-right:2px"></div>
+        </div>
+
+      </div>
+
+      <!-- Tabla resultado -->
       <div class="tabla-wrap">
         <table class="tabla">
-          <thead><tr><th>Jugador</th><th>Pronóstico</th><th>Resultado oficial</th></tr></thead>
+          <thead><tr id="todos-thead-tr"><th>Jugador</th><th>Pronóstico</th><th>Resultado oficial</th></tr></thead>
           <tbody id="todos-body"><tr><td colspan="3" style="text-align:center;color:var(--text3);padding:32px">Seleccioná un partido</td></tr></tbody>
         </table>
       </div>
@@ -1689,18 +1720,38 @@ function updateStats(){
 }
 
 // ══════════════════════════════════════════
-//  TODOS
+//  TODOS — acordeón jugados / próximos
 // ══════════════════════════════════════════
-function updateMatchSelector(){
-  var sel=document.getElementById('match-selector');
-  if(!sel)return;
-  var cur=sel.value;
-  sel.innerHTML='<option value="">\u2014 Seleccion\u00e1 un partido \u2014</option>'
-    + '<option value="__extras__">\uD83E\uDD65 Predicciones Extras</option>';
-  var todos=[];
-  Object.keys(FIXTURE).forEach(function(phase){
-    FIXTURE[phase].forEach(function(m){ todos.push(m); });
+var todosAccOpen = { jugados: false, proximos: true };
+var selectedPartidoId = '';
+
+function toggleTodosAcc(key){
+  todosAccOpen[key] = !todosAccOpen[key];
+  var body  = document.getElementById('acc-todos-'+key);
+  var arrow = document.getElementById('acc-todos-arrow-'+key);
+  if(!body) return;
+  body.style.display  = todosAccOpen[key] ? 'flex' : 'none';
+  arrow.textContent   = todosAccOpen[key] ? '▾' : '▸';
+}
+
+function seleccionarPartido(id){
+  selectedPartidoId = id;
+  // Resaltar botón activo
+  document.querySelectorAll('.btn-partido').forEach(function(b){
+    b.style.background = 'var(--bg3)';
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--text2)';
   });
+  var btn = document.getElementById('btn-'+id);
+  if(btn){
+    btn.style.background  = 'rgba(201,162,39,.12)';
+    btn.style.borderColor = 'rgba(201,162,39,.4)';
+    btn.style.color       = 'var(--gold)';
+  }
+  renderTodos();
+}
+
+function updateMatchSelector(){
   var MESES={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12,
              Ene:1,Abr:4,Ago:8,Dic:12};
   function toSortKey(m){
@@ -1713,20 +1764,56 @@ function updateMatchSelector(){
     var mm=parseInt(hp[1],10)||0;
     return mon*1000000 + day*10000 + hh*100 + mm;
   }
-  todos.sort(function(a,b){ return toSortKey(a)-toSortKey(b); });
-  todos.forEach(function(m){
-    var opt=document.createElement('option');
-    opt.value=m.id;
-    opt.textContent=m.fecha+' '+m.hora+' \u2014 '+m.local+' vs '+m.visita;
-    sel.appendChild(opt);
+
+  var todos=[];
+  Object.keys(FIXTURE).forEach(function(phase){
+    FIXTURE[phase].forEach(function(m){ todos.push(m); });
   });
-  if(cur)sel.value=cur;
+  todos.sort(function(a,b){ return toSortKey(a)-toSortKey(b); });
+
+  var jugados  = todos.filter(function(m){ return RESULTADOS_OFICIALES[m.id] && RESULTADOS_OFICIALES[m.id].h !== ''; });
+  var proximos = todos.filter(function(m){ return !RESULTADOS_OFICIALES[m.id] || RESULTADOS_OFICIALES[m.id].h === ''; });
+
+  function makeBtn(m){
+    var ofic = RESULTADOS_OFICIALES[m.id];
+    var res  = ofic ? ' <span style="font-size:11px;color:#4ade80;font-weight:700">'+ofic.h+'-'+ofic.a+'</span>' : '';
+    var isSelected = selectedPartidoId === m.id;
+    var bg    = isSelected ? 'rgba(201,162,39,.12)' : 'var(--bg3)';
+    var bord  = isSelected ? 'rgba(201,162,39,.4)'  : 'var(--border)';
+    var col   = isSelected ? 'var(--gold)'           : 'var(--text2)';
+    return '<button id="btn-'+m.id+'" class="btn-partido" onclick="seleccionarPartido(\''+m.id+'\')"'
+      + ' style="width:100%;text-align:left;background:'+bg+';border:1px solid '+bord+';color:'+col+';border-radius:8px;padding:9px 12px;font-size:12px;cursor:pointer;line-height:1.4">'
+      + '<span style="color:var(--text3);font-size:11px">'+m.fecha+' '+m.hora+'</span><br>'
+      + m.local+' vs '+m.visita + res
+    + '</button>';
+  }
+
+  var jugadosEl  = document.getElementById('acc-todos-jugados');
+  var proximosEl = document.getElementById('acc-todos-proximos');
+  if(!jugadosEl||!proximosEl) return;
+
+  jugadosEl.innerHTML  = jugados.length  ? jugados.map(makeBtn).join('')  : '<div style="padding:8px 12px;font-size:12px;color:var(--text3)">Aún no hay partidos jugados.</div>';
+  proximosEl.innerHTML = proximos.length ? proximos.map(makeBtn).join('') : '<div style="padding:8px 12px;font-size:12px;color:var(--text3)">No hay partidos pendientes.</div>';
+
+  // Aplicar estado de acordeones
+  jugadosEl.style.display  = todosAccOpen.jugados  ? 'flex' : 'none';
+  proximosEl.style.display = todosAccOpen.proximos ? 'flex' : 'none';
+  document.getElementById('acc-todos-arrow-jugados').textContent  = todosAccOpen.jugados  ? '▾' : '▸';
+  document.getElementById('acc-todos-arrow-proximos').textContent = todosAccOpen.proximos ? '▾' : '▸';
+
+  // Actualizar badge de conteo
+  var jugadosHeader = document.querySelector('[onclick="toggleTodosAcc(\'jugados\')"] span.acc-count-jugados');
+  // Update counts in headers
+  var hJug = document.getElementById('acc-todos-header-jugados');
+  var hPrx = document.getElementById('acc-todos-header-proximos');
+  if(hJug) hJug.textContent = 'Partidos jugados ('+jugados.length+')';
+  if(hPrx) hPrx.textContent = 'Próximos partidos ('+proximos.length+')';
 }
 
 function renderTodos(){
-  var id=document.getElementById('match-selector').value;
+  var id = selectedPartidoId;
   var tbody=document.getElementById('todos-body');
-  var thead=document.querySelector('#todos .tabla thead tr');
+  var thead=document.getElementById('todos-thead-tr');
 
   if(!id){
     thead.innerHTML='<th>Jugador</th><th>Pronóstico</th><th>Resultado oficial</th>';
