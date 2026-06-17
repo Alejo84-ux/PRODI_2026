@@ -322,7 +322,7 @@
             🏅 Último al cierre grupos: <strong style="color:#4ade80">+5 pts</strong><br>
             ⚠️ Primero al cierre grupos: <strong style="color:#f87171">−5 pts</strong><br>
             Autor gol Arg. en Final: <strong style="color:#75AADB">+5 pts c/u</strong><br>
-            Prodicciones Extras: <strong style="color:var(--gold)">15 pts c/u</strong>
+            Predicciones Extras: <strong style="color:var(--gold)">15 pts c/u</strong>
           </div>
         </div>
       </div>
@@ -356,7 +356,7 @@
         <div style="margin-bottom:8px">
           <button onclick="seleccionarPartido('__extras__')" id="btn-__extras__"
             style="width:100%;text-align:left;background:var(--bg3);border:1px solid var(--border);color:var(--gold);border-radius:8px;padding:10px 14px;font-size:13px;cursor:pointer;font-weight:600">
-            🥥 Prodicciones Extras
+            🥥 Predicciones Extras
           </button>
         </div>
 
@@ -1488,6 +1488,22 @@ function aplicarCierre(leader, last){
 }
 
 function saveOficiales(){
+  // Capturar ranking actual ANTES de publicar para que las flechas funcionen
+  var users = Object.keys(pronosticos);
+  if(users.length){
+    var bonusCierreSnap = RESULTADOS_OFICIALES.bonusCierre || {};
+    var snap = users.map(function(u){
+      var r = Object.assign({u:u}, calcPuntos(u));
+      r.pts += (bonusCierreSnap[u] || 0);
+      return r;
+    });
+    snap.sort(function(a,b){ return b.pts-a.pts || b.exactos-a.exactos; });
+    var newPrev = {};
+    snap.forEach(function(r, i){ newPrev[r.u] = i + 1; });
+    prevRanking = newPrev;
+    tablaFirstLoad = false;
+    try { localStorage.setItem('prodi_prevRanking', JSON.stringify(newPrev)); } catch(e){}
+  }
   // Preservar siempre el estado de bloqueo — NO debe cambiar al publicar resultados
   var oficiales={
     extras:{},
@@ -1662,7 +1678,13 @@ function calcPuntos(user){
 // ══════════════════════════════════════════
 //  TABLA
 // ══════════════════════════════════════════
-var prevRanking = {}; // { usuario: posicion_anterior }
+
+// Cargamos el ranking previo de localStorage (persiste entre recargas)
+var prevRanking = {};
+try { prevRanking = JSON.parse(localStorage.getItem('prodi_prevRanking') || '{}'); } catch(e){}
+
+// Flag para saber si es la primera carga (no mostrar flechas todavía)
+var tablaFirstLoad = true;
 
 function updateTabla(){
   var tbody=document.getElementById('tabla-body');
@@ -1686,14 +1708,14 @@ function updateTabla(){
     if(r.bonus>0) bonusBadge='<span style="font-size:10px;color:#4ade80;margin-left:6px;background:rgba(74,222,128,.1);padding:1px 6px;border-radius:10px">+'+r.bonus+' 🏅</span>';
     if(r.bonus<0) bonusBadge='<span style="font-size:10px;color:#f87171;margin-left:6px;background:rgba(248,113,113,.1);padding:1px 6px;border-radius:10px">'+r.bonus+' ⚠️</span>';
 
-    // Flecha de posición
+    // Flecha de posición — solo si NO es la primera carga
     var arrow = '';
-    if(prevRanking[r.u] !== undefined){
+    if(!tablaFirstLoad && prevRanking[r.u] !== undefined){
       var diff = prevRanking[r.u] - pos; // positivo = subió, negativo = bajó
       if(diff > 0)
-        arrow = '<span title="Subió '+diff+' lugar'+(diff>1?'es':'')+'" style="color:#4ade80;font-size:13px;margin-left:5px">▲</span>';
+        arrow = '<span title="Sub\u00ed '+diff+' lugar'+(diff>1?'es':'')+'" style="color:#4ade80;font-size:12px;margin-left:5px;font-weight:700">▲'+diff+'</span>';
       else if(diff < 0)
-        arrow = '<span title="Bajó '+Math.abs(diff)+' lugar'+(Math.abs(diff)>1?'es':'')+'" style="color:#f87171;font-size:13px;margin-left:5px">▼</span>';
+        arrow = '<span title="Baj\u00f3 '+Math.abs(diff)+' lugar'+(Math.abs(diff)>1?'es':'')+'" style="color:#f87171;font-size:12px;margin-left:5px;font-weight:700">▼'+Math.abs(diff)+'</span>';
     }
 
     return '<tr><td style="width:36px;text-align:center">'+rank+'</td>'+
@@ -1704,8 +1726,20 @@ function updateTabla(){
       '<td style="width:42px;text-align:center" class="stat-cell">'+r.errores+'</td></tr>';
   }).join('');
 
-  // Guardar posiciones actuales para la próxima actualización
-  rows.forEach(function(r, i){ prevRanking[r.u] = i + 1; });
+  if(tablaFirstLoad){
+    // Primera carga: guardar posiciones como base y no mostrar flechas
+    tablaFirstLoad = false;
+    var snapshot = {};
+    rows.forEach(function(r, i){ snapshot[r.u] = i + 1; });
+    prevRanking = snapshot;
+    try { localStorage.setItem('prodi_prevRanking', JSON.stringify(snapshot)); } catch(e){}
+  } else {
+    // Actualizaciones siguientes: guardar nuevas posiciones como próximo "previo"
+    var snapshot = {};
+    rows.forEach(function(r, i){ snapshot[r.u] = i + 1; });
+    try { localStorage.setItem('prodi_prevRanking', JSON.stringify(snapshot)); } catch(e){}
+    // No pisamos prevRanking hasta el próximo ciclo — lo hacemos en el PRÓXIMO updateTabla
+  }
 }
 
 function updateStats(){
