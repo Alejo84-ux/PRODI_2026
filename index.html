@@ -899,16 +899,39 @@ function renderMatches(phase){
   if(phase==='extras'){renderExtras(container);return;}
   var matches=FIXTURE[phase]; if(!matches)return;
   if(phase==='grupos'){
-    var groups={};
-    matches.forEach(function(m){if(!groups[m.grupo])groups[m.grupo]=[];groups[m.grupo].push(m);});
-    container.innerHTML=Object.keys(groups).map(function(g){
-      return '<div class="grupo-block"><div class="grupo-label">Grupo '+g+'</div>'+groups[g].map(matchCard).join('')+'</div>';
+    // Ordenar por fecha y hora
+    var meses={'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12};
+    function fechaSort(m){
+      var parts=m.fecha.split(' ');
+      var dia=parseInt(parts[0],10)||1;
+      var mes=meses[parts[1]]||6;
+      var horaParts=m.hora.split(':');
+      var hh=parseInt(horaParts[0],10)||0;
+      var mm=parseInt((horaParts[1]||'0').replace(/[^0-9]/g,''),10)||0;
+      // 00:xx y 01:xx se tratan como madrugada (+24h para que caigan después de la noche anterior)
+      if(hh<3) hh+=24;
+      return mes*10000+dia*100+hh+mm/60;
+    }
+    var sorted=matches.slice().sort(function(a,b){ return fechaSort(a)-fechaSort(b); });
+    // Agrupar por fecha para mostrar separadores
+    var byFecha={};
+    var fechaOrden=[];
+    sorted.forEach(function(m){
+      if(!byFecha[m.fecha]){byFecha[m.fecha]=[];fechaOrden.push(m.fecha);}
+      byFecha[m.fecha].push(m);
+    });
+    container.innerHTML=fechaOrden.map(function(f){
+      return '<div class="grupo-block">'
+        +'<div class="grupo-label" style="font-size:13px;letter-spacing:.5px">📅 '+f+'</div>'
+        +byFecha[f].map(matchCard).join('')
+        +'</div>';
     }).join('');
   } else {
     container.innerHTML=matches.map(matchCard).join('');
   }
   loadInputValues();
 }
+
 
 function renderExtras(container){
   // Construir HTML de autores de gol argentino agrupado por partido
@@ -2450,7 +2473,16 @@ function verDesglose(user){
     var fasePts = 0;
     var hayResultado = false;
 
-    FIXTURE[phase].forEach(function(m){
+    var _phaseMs = FIXTURE[phase].slice();
+    if(phase==='grupos'){
+      var _mo2={'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12};
+      _phaseMs.sort(function(a,b){
+        function _k(m){var pts=m.fecha.split(' '),d=+pts[0]||1,mo=_mo2[pts[1]]||6,hp=m.hora.split(':'),hh=+hp[0]||0,mm=+(hp[1]||'0').replace(/[^0-9]/g,'')||0;if(hh<3)hh+=24;return mo*10000+d*100+hh+mm/60;}
+        return _k(a)-_k(b);
+      });
+    }
+
+    _phaseMs.forEach(function(m){
       var p = ups[m.id];
       var r = RESULTADOS_OFICIALES[m.id];
       var esArg = isArgMatch(m.id, phase);
