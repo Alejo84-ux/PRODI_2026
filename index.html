@@ -255,6 +255,42 @@
     .team-name{font-size:11px}
     .header-nav .hnav-btn{padding:6px 8px;font-size:12px}
   }
+
+  /* ── DESGLOSE MODAL ── */
+  .desglose-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.78);backdrop-filter:blur(5px);overflow-y:auto;padding:1rem}
+  .desglose-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+  .desglose-modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:680px;margin:auto;animation:slideUp .22s ease}
+  .desglose-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--bg2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;z-index:10}
+  .desglose-avatar{width:42px;height:42px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;border:2px solid var(--green-light)}
+  .desglose-title{flex:1}
+  .desglose-title h2{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);line-height:1}
+  .desglose-title p{font-size:12px;color:var(--text3);margin-top:2px}
+  .desglose-body{padding:18px 20px}
+  .desglose-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--text3);margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+  .desglose-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:4px;font-size:12px;transition:background .12s}
+  .desglose-row:hover{background:rgba(255,255,255,.03)}
+  .desglose-row.exact{background:rgba(45,158,92,.07);border:1px solid rgba(45,158,92,.2)}
+  .desglose-row.parcial{background:rgba(117,170,219,.06);border:1px solid rgba(117,170,219,.15)}
+  .desglose-row.error{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.1)}
+  .desglose-row.skip{opacity:.45}
+  .desglose-match-name{flex:1;color:var(--text2);line-height:1.3}
+  .desglose-pred{font-weight:600;color:var(--gold-light);min-width:34px;text-align:center;font-size:13px}
+  .desglose-vs{color:var(--text3);font-size:10px}
+  .desglose-oficial{color:var(--text3);min-width:34px;text-align:center;font-size:12px}
+  .desglose-pts{font-family:'Bebas Neue',sans-serif;font-size:18px;min-width:32px;text-align:right;line-height:1}
+  .desglose-pts.green{color:#4ade80}
+  .desglose-pts.red{color:#f87171}
+  .desglose-pts.blue{color:#75AADB}
+  .desglose-pts.gray{color:var(--text3)}
+  .desglose-icons{font-size:11px;min-width:60px;text-align:right;color:var(--text3)}
+  .desglose-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:14px}
+  .desglose-sum-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+  .desglose-sum-val{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1}
+  .desglose-sum-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  /* Clickable tabla row */
+  .tabla tr.clickable-row{cursor:pointer}
+  .tabla tr.clickable-row:hover td{background:rgba(201,162,39,.06)!important}
+  .tabla tr.clickable-row td:nth-child(2) .player-name{text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(201,162,39,.4)}
 </style>
 </head>
 <body>
@@ -617,6 +653,22 @@
   </div>
 </div>
 
+<!-- ── MODAL DESGLOSE DE PUNTOS ── -->
+<div class="desglose-overlay" id="desglose-overlay" onclick="closeDesgloseOutside(event)">
+  <div class="desglose-modal">
+    <div class="desglose-header">
+      <div class="desglose-avatar" id="desglose-avatar">?</div>
+      <div class="desglose-title">
+        <h2 id="desglose-nombre">Jugador</h2>
+        <p id="desglose-subtitle">Desglose de puntos</p>
+      </div>
+      <button class="modal-close" onclick="closeDesglose()">✕</button>
+    </div>
+    <div class="desglose-body" id="desglose-body">
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -864,16 +916,39 @@ function renderMatches(phase){
   if(phase==='extras'){renderExtras(container);return;}
   var matches=FIXTURE[phase]; if(!matches)return;
   if(phase==='grupos'){
-    var groups={};
-    matches.forEach(function(m){if(!groups[m.grupo])groups[m.grupo]=[];groups[m.grupo].push(m);});
-    container.innerHTML=Object.keys(groups).map(function(g){
-      return '<div class="grupo-block"><div class="grupo-label">Grupo '+g+'</div>'+groups[g].map(matchCard).join('')+'</div>';
+    // Ordenar por fecha y hora
+    var meses={'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12};
+    function fechaSort(m){
+      var parts=m.fecha.split(' ');
+      var dia=parseInt(parts[0],10)||1;
+      var mes=meses[parts[1]]||6;
+      var horaParts=m.hora.split(':');
+      var hh=parseInt(horaParts[0],10)||0;
+      var mm=parseInt((horaParts[1]||'0').replace(/[^0-9]/g,''),10)||0;
+      // 00:xx y 01:xx se tratan como madrugada (+24h para que caigan después de la noche anterior)
+      if(hh<3) hh+=24;
+      return mes*10000+dia*100+hh+mm/60;
+    }
+    var sorted=matches.slice().sort(function(a,b){ return fechaSort(a)-fechaSort(b); });
+    // Agrupar por fecha para mostrar separadores
+    var byFecha={};
+    var fechaOrden=[];
+    sorted.forEach(function(m){
+      if(!byFecha[m.fecha]){byFecha[m.fecha]=[];fechaOrden.push(m.fecha);}
+      byFecha[m.fecha].push(m);
+    });
+    container.innerHTML=fechaOrden.map(function(f){
+      return '<div class="grupo-block">'
+        +'<div class="grupo-label" style="font-size:13px;letter-spacing:.5px">📅 '+f+'</div>'
+        +byFecha[f].map(matchCard).join('')
+        +'</div>';
     }).join('');
   } else {
     container.innerHTML=matches.map(matchCard).join('');
   }
   loadInputValues();
 }
+
 
 function renderExtras(container){
   // Construir HTML de autores de gol argentino agrupado por partido
@@ -1193,7 +1268,15 @@ function renderAdminPanel(){
   var partContent = '';
   Object.keys(FIXTURE).forEach(function(phase){
     partContent += '<div style="margin:14px 0 8px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);padding-bottom:4px">'+phase+'</div>';
-    FIXTURE[phase].forEach(function(m){
+    var _phaseMs = FIXTURE[phase].slice();
+    if(phase==='grupos'){
+      var _mo2={'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12};
+      _phaseMs.sort(function(a,b){
+        function _k(m){var pts=m.fecha.split(' '),d=+pts[0]||1,mo=_mo2[pts[1]]||6,hp=m.hora.split(':'),hh=+hp[0]||0,mm=+(hp[1]||'0').replace(/[^0-9]/g,'')||0;if(hh<3)hh+=24;return mo*10000+d*100+hh+mm/60;}
+        return _k(a)-_k(b);
+      });
+    }
+    _phaseMs.forEach(function(m){
       var r=RESULTADOS_OFICIALES[m.id]||{h:'',a:''};
       partContent+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--bg3);padding:8px;border-radius:8px">'
         +'<span style="flex:1;text-align:right;font-size:12px;font-weight:500">'+m.local+'</span>'
@@ -1598,83 +1681,6 @@ function isArgMatch(id, phase){
   return argElim.indexOf(id)>=0;
 }
 
-// Calcula los puntos de un usuario obtenidos SOLO en partidos de una fecha específica (para "Jugador de la Fecha")
-function calcPuntosFecha(user, fechaStr){
-  var pts=0;
-  var ups=pronosticos[user]||{};
-
-  Object.keys(ups).forEach(function(id){
-    if(id==='extras')return;
-    var m = FIXTURE_BY_ID[id];
-    if(!m || m.fecha !== fechaStr) return; // solo partidos de esa fecha
-
-    var p=ups[id], r=RESULTADOS_OFICIALES[id];
-    if(!p||!r||r.h===''||r.a==='')return;
-
-    var phase=getPhaseOf(id);
-    var isGrupos=(phase==='grupos');
-    var esArg=isArgMatch(id, phase);
-    var esPleno=(p.h===r.h && p.a===r.a);
-    var esAcierto=(p.h>p.a&&r.h>r.a)||(p.h<p.a&&r.h<r.a)||(p.h===p.a&&r.h===r.a);
-
-    if(isGrupos){
-      if(esAcierto){
-        pts+=2;
-        if(esPleno){ pts+=1; pts+=(r.h+r.a); }
-        if(esArg) pts+=1;
-        if(esArg&&esPleno) pts+=1;
-      }
-    } else {
-      var base=0;
-      if(id==='FINAL') base=13;
-      else if(id==='3RD') base=11;
-      else if(phase==='semis') base=9;
-      else if(phase==='cuartos') base=7;
-      else base=5;
-
-      if(esAcierto){
-        pts+=base;
-        if(esPleno){ pts+=2; pts+=(r.h+r.a); }
-        if(esArg){
-          if(id==='FINAL') pts+=2;
-          else if(id!=='3RD') pts+=1;
-        }
-        if(esArg&&esPleno) pts+=5;
-      } else if(id==='3RD' && esArg && RESULTADOS_OFICIALES['3RD']){
-        pts-=5;
-      }
-    }
-  });
-
-  return pts;
-}
-
-// Devuelve la fecha (string del fixture, ej "16 Jun") más reciente que tenga
-// al menos un partido con resultado oficial cargado.
-function getUltimaFechaJugada(){
-  var fechas = [];
-  Object.keys(FIXTURE).forEach(function(phase){
-    FIXTURE[phase].forEach(function(m){
-      var r = RESULTADOS_OFICIALES[m.id];
-      if(r && r.h !== '' && r.h !== undefined){
-        if(fechas.indexOf(m.fecha) === -1) fechas.push(m.fecha);
-      }
-    });
-  });
-  if(!fechas.length) return null;
-
-  var MESES={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12,
-             Ene:1,Abr:4,Ago:8,Dic:12};
-  function toKey(f){
-    var fp=f.trim().split(' ');
-    var day=parseInt(fp[0],10)||0;
-    var mon=MESES[fp[1]]||0;
-    return mon*100+day;
-  }
-  fechas.sort(function(a,b){ return toKey(b)-toKey(a); }); // más reciente primero
-  return fechas[0];
-}
-
 function calcPuntos(user){
   var pts=0, exactos=0, parciales=0, errores=0;
   var ups=pronosticos[user]||{};
@@ -1769,6 +1775,84 @@ function calcPuntos(user){
   return{pts:pts, exactos:exactos, parciales:parciales, errores:errores};
 }
 
+// Calcula los puntos de un usuario obtenidos SOLO en partidos de una fecha específica (para "Jugador de la Fecha")
+// Nota: no incluye extras, ya que esos no tienen fecha de partido individual asociada.
+function calcPuntosFecha(user, fechaStr){
+  var pts=0;
+  var ups=pronosticos[user]||{};
+
+  Object.keys(ups).forEach(function(id){
+    if(id==='extras')return;
+    var m = FIXTURE_BY_ID[id];
+    if(!m || m.fecha !== fechaStr) return; // solo partidos de esa fecha
+
+    var p=ups[id], r=RESULTADOS_OFICIALES[id];
+    if(!p||!r||r.h===''||r.a==='')return;
+
+    var phase=getPhaseOf(id);
+    var isGrupos=(phase==='grupos');
+    var esArg=isArgMatch(id, phase);
+    var esPleno=(p.h===r.h && p.a===r.a);
+    var esAcierto=(p.h>p.a&&r.h>r.a)||(p.h<p.a&&r.h<r.a)||(p.h===p.a&&r.h===r.a);
+
+    if(isGrupos){
+      if(esAcierto){
+        pts+=2;
+        if(esPleno){ pts+=1; pts+=(r.h+r.a); }
+        if(esArg) pts+=1;
+        if(esArg&&esPleno) pts+=1;
+      }
+    } else {
+      var base=0;
+      if(id==='FINAL') base=13;
+      else if(id==='3RD') base=11;
+      else if(phase==='semis') base=9;
+      else if(phase==='cuartos') base=7;
+      else base=5;
+
+      if(esAcierto){
+        pts+=base;
+        if(esPleno){ pts+=2; pts+=(r.h+r.a); }
+        if(esArg){
+          if(id==='FINAL') pts+=2;
+          else if(id!=='3RD') pts+=1;
+        }
+        if(esArg&&esPleno) pts+=5;
+      } else if(id==='3RD' && esArg && RESULTADOS_OFICIALES['3RD']){
+        pts-=5;
+      }
+    }
+  });
+
+  return pts;
+}
+
+// Devuelve la fecha (string del fixture, ej "16 Jun") más reciente que tenga
+// al menos un partido con resultado oficial cargado.
+function getUltimaFechaJugada(){
+  var fechas = [];
+  Object.keys(FIXTURE).forEach(function(phase){
+    FIXTURE[phase].forEach(function(m){
+      var r = RESULTADOS_OFICIALES[m.id];
+      if(r && r.h !== '' && r.h !== undefined){
+        if(fechas.indexOf(m.fecha) === -1) fechas.push(m.fecha);
+      }
+    });
+  });
+  if(!fechas.length) return null;
+
+  var MESES={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12,
+             Ene:1,Abr:4,Ago:8,Dic:12};
+  function toKey(f){
+    var fp=f.trim().split(' ');
+    var day=parseInt(fp[0],10)||0;
+    var mon=MESES[fp[1]]||0;
+    return mon*100+day;
+  }
+  fechas.sort(function(a,b){ return toKey(b)-toKey(a); }); // más reciente primero
+  return fechas[0];
+}
+
 // ══════════════════════════════════════════
 //  TABLA
 // ══════════════════════════════════════════
@@ -1776,9 +1860,6 @@ function calcPuntos(user){
 // Cargamos el ranking previo de localStorage (persiste entre recargas)
 var prevRanking = {};
 try { prevRanking = JSON.parse(localStorage.getItem('prodi_prevRanking') || '{}'); } catch(e){}
-
-// Flag para saber si es la primera carga (no mostrar flechas todavía)
-var tablaFirstLoad = true;
 
 function updateTabla(){
   var tbody=document.getElementById('tabla-body');
@@ -1795,6 +1876,41 @@ function updateTabla(){
   });
   rows.sort(function(a,b){return b.pts-a.pts||b.exactos-a.exactos;});
 
+  var currentSnapshot = {};
+  rows.forEach(function(r, i){ 
+      currentSnapshot[r.u] = { pos: i + 1, pts: r.pts }; 
+  });
+  
+  var storedSnapshot = {};
+  try { storedSnapshot = JSON.parse(localStorage.getItem('prodi_currentSnapshot') || '{}'); } catch(e){}
+
+  var changed = false;
+  var storedUsers = Object.keys(storedSnapshot);
+  if (storedUsers.length !== users.length) {
+      changed = true;
+  } else {
+      for (var j=0; j<users.length; j++) {
+          var u = users[j];
+          if (!storedSnapshot[u] || storedSnapshot[u].pts !== currentSnapshot[u].pts) {
+              changed = true;
+              break;
+          }
+      }
+  }
+
+  if (changed) {
+      var newPrev = {};
+      for (var k in storedSnapshot) {
+          newPrev[k] = storedSnapshot[k].pos;
+      }
+      if (Object.keys(newPrev).length > 0) {
+          prevRanking = newPrev;
+          try { localStorage.setItem('prodi_prevRanking', JSON.stringify(prevRanking)); } catch(e){}
+      }
+  }
+  
+  try { localStorage.setItem('prodi_currentSnapshot', JSON.stringify(currentSnapshot)); } catch(e){}
+
   tbody.innerHTML=rows.map(function(r,i){
     var pos = i + 1;
     var rank=i===0?'<span class="rank-gold">🥇</span>':i===1?'<span class="rank-silver">🥈</span>':i===2?'<span class="rank-bronze">🥉</span>':'<span class="rank-num">'+pos+'</span>';
@@ -1802,9 +1918,9 @@ function updateTabla(){
     if(r.bonus>0) bonusBadge='<span style="font-size:10px;color:#4ade80;margin-left:6px;background:rgba(74,222,128,.1);padding:1px 6px;border-radius:10px">+'+r.bonus+' 🏅</span>';
     if(r.bonus<0) bonusBadge='<span style="font-size:10px;color:#f87171;margin-left:6px;background:rgba(248,113,113,.1);padding:1px 6px;border-radius:10px">'+r.bonus+' ⚠️</span>';
 
-    // Flecha de posición — solo si NO es la primera carga
+    // Flecha de posición
     var arrow = '';
-    if(!tablaFirstLoad && prevRanking[r.u] !== undefined){
+    if(prevRanking[r.u] !== undefined){
       var diff = prevRanking[r.u] - pos; // positivo = subió, negativo = bajó
       if(diff > 0)
         arrow = '<span title="Sub\u00ed '+diff+' lugar'+(diff>1?'es':'')+'" style="color:#4ade80;font-size:12px;margin-left:5px;font-weight:700">▲'+diff+'</span>';
@@ -1812,7 +1928,8 @@ function updateTabla(){
         arrow = '<span title="Baj\u00f3 '+Math.abs(diff)+' lugar'+(Math.abs(diff)>1?'es':'')+'" style="color:#f87171;font-size:12px;margin-left:5px;font-weight:700">▼'+Math.abs(diff)+'</span>';
     }
 
-    return '<tr><td style="width:36px;text-align:center">'+rank+'</td>'+
+    var safeU = r.u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<tr class="clickable-row" onclick="verDesglose(\''+safeU+'\')">'+'<td style="width:36px;text-align:center">'+rank+'</td>'+
       '<td><div class="player-cell"><div class="avatar">'+ini(r.u)+'</div><span class="player-name">'+r.u+'</span>'+arrow+bonusBadge+'</div></td>'+
       '<td style="width:54px;text-align:center"><span class="pts-big">'+r.pts+'</span></td>'+
       '<td style="width:42px;text-align:center" class="stat-cell">'+r.exactos+'</td>'+
@@ -1820,20 +1937,7 @@ function updateTabla(){
       '<td style="width:42px;text-align:center" class="stat-cell">'+r.errores+'</td></tr>';
   }).join('');
 
-  if(tablaFirstLoad){
-    // Primera carga: guardar posiciones como base y no mostrar flechas
-    tablaFirstLoad = false;
-    var snapshot = {};
-    rows.forEach(function(r, i){ snapshot[r.u] = i + 1; });
-    prevRanking = snapshot;
-    try { localStorage.setItem('prodi_prevRanking', JSON.stringify(snapshot)); } catch(e){}
-  } else {
-    // Actualizaciones siguientes: guardar nuevas posiciones como próximo "previo"
-    var snapshot = {};
-    rows.forEach(function(r, i){ snapshot[r.u] = i + 1; });
-    try { localStorage.setItem('prodi_prevRanking', JSON.stringify(snapshot)); } catch(e){}
-    // No pisamos prevRanking hasta el próximo ciclo — lo hacemos en el PRÓXIMO updateTabla
-  }
+
 }
 
 function updateStats(){
@@ -2217,7 +2321,6 @@ function renderJugadorFecha(){
 
   rows.sort(function(a,b){ return b.pts - a.pts; });
   var top = rows[0];
-  // Empate: mostrar a todos los que están en la cima
   var empatados = rows.filter(function(r){ return r.pts === top.pts; });
 
   if(empatados.length === 1){
@@ -2505,6 +2608,256 @@ document.addEventListener('DOMContentLoaded', function(){
   renderCocomunicados();
   if(currentUser==='ORGANIZADOR') renderAdminPanel();
 });
+// ══════════════════════════════════════════
+//  DESGLOSE DE PUNTOS
+// ══════════════════════════════════════════
+function closeDesglose(){
+  document.getElementById('desglose-overlay').classList.remove('open');
+}
+function closeDesgloseOutside(e){
+  if(e.target===document.getElementById('desglose-overlay')) closeDesglose();
+}
+
+function verDesglose(user){
+  var ov = document.getElementById('desglose-overlay');
+  var body = document.getElementById('desglose-body');
+  document.getElementById('desglose-avatar').textContent = ini(user);
+  document.getElementById('desglose-nombre').textContent = user;
+
+  var ups = pronosticos[user] || {};
+  var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
+  var ptsTotal = 0;
+  var exactosTotal = 0;
+  var parcialesTotal = 0;
+  var erroresTotal = 0;
+
+  // ── Construir filas por fase ──
+  var seccionesHtml = '';
+  var faseLabels = {
+    grupos:'⚽ Fase de Grupos',
+    r32:'⚔️ Ronda de 32',
+    r16:'🔥 Octavos de Final',
+    cuartos:'💥 Cuartos de Final',
+    semis:'⚡ Semifinales',
+    final:'🏆 Final / 3er Puesto'
+  };
+
+  var faseOrden = ['grupos','r32','r16','cuartos','semis','final'];
+  faseOrden.forEach(function(phase){
+    if(!FIXTURE[phase]) return;
+    var filas = '';
+    var fasePts = 0;
+    var hayResultado = false;
+
+    var _phaseMs = FIXTURE[phase].slice();
+    if(phase==='grupos'){
+      var _mo2={'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12};
+      _phaseMs.sort(function(a,b){
+        function _k(m){var pts=m.fecha.split(' '),d=+pts[0]||1,mo=_mo2[pts[1]]||6,hp=m.hora.split(':'),hh=+hp[0]||0,mm=+(hp[1]||'0').replace(/[^0-9]/g,'')||0;if(hh<3)hh+=24;return mo*10000+d*100+hh+mm/60;}
+        return _k(a)-_k(b);
+      });
+    }
+
+    _phaseMs.forEach(function(m){
+      var p = ups[m.id];
+      var r = RESULTADOS_OFICIALES[m.id];
+      var esArg = isArgMatch(m.id, phase);
+
+      // Fila sin pronóstico
+      if(!p){
+        filas += '<div class="desglose-row skip">'
+          + '<span class="desglose-match-name">'+m.local+' <span style="color:var(--text3);font-size:10px">vs</span> '+m.visita+'</span>'
+          + '<span style="font-size:11px;color:var(--text3);font-style:italic">Sin pronóstico</span>'
+          + '<span class="desglose-pts gray">—</span>'
+          + '</div>';
+        return;
+      }
+
+      var predText = p.h+'–'+p.a;
+      var oficialText = (r && r.h !== '' && r.h !== undefined && r.h !== null) ? r.h+'–'+r.a : '?';
+
+      if(!r || r.h === '' || r.h === undefined){
+        // Partido sin resultado aún
+        filas += '<div class="desglose-row">'
+          + '<span class="desglose-match-name">'+m.local+' <span style="color:var(--text3);font-size:10px">vs</span> '+m.visita+'</span>'
+          + '<span class="desglose-pred">'+predText+'</span>'
+          + '<span class="desglose-vs">→</span>'
+          + '<span style="font-size:11px;color:var(--text3)">Sin resultado</span>'
+          + '<span class="desglose-pts gray">—</span>'
+          + '</div>';
+        return;
+      }
+
+      hayResultado = true;
+      var isGrupos = (phase === 'grupos');
+      var ph=parseInt(p.h,10), pa=parseInt(p.a,10), rh=parseInt(r.h,10), ra=parseInt(r.a,10);
+      var esPleno = (ph === rh && pa === ra);
+      var esAcierto = (ph>pa && rh>ra)||(ph<pa && rh<ra)||(ph===pa && rh===ra);
+      var matchPts = 0;
+      var badges = [];
+      var rowClass = '';
+
+      if(esAcierto){
+        if(isGrupos){
+          matchPts += 2; badges.push('+2 acierto');
+          if(esPleno){ matchPts += 1; matchPts += (rh+ra); badges.push('+1 pleno'); badges.push('+'+(rh+ra)+' goles'); }
+          if(esArg){ matchPts += 1; badges.push('+1 🇦🇷'); }
+          if(esArg && esPleno){ matchPts += 1; badges.push('+1 pleno🇦🇷'); }
+        } else {
+          var base = 5;
+          if(m.id==='FINAL') base=13;
+          else if(m.id==='3RD') base=11;
+          else if(phase==='semis') base=9;
+          else if(phase==='cuartos') base=7;
+          matchPts += base; badges.push('+'+base+' acierto');
+          if(esPleno){ matchPts += 2; matchPts += (rh+ra); badges.push('+2 pleno'); badges.push('+'+(rh+ra)+' goles'); }
+          if(esArg){
+            if(m.id==='FINAL'){ matchPts+=2; badges.push('+2 🇦🇷'); }
+            else if(m.id!=='3RD'){ matchPts+=1; badges.push('+1 🇦🇷'); }
+          }
+          if(esArg && esPleno){ matchPts+=5; badges.push('+5 pleno🇦🇷'); }
+        }
+        rowClass = esPleno ? 'exact' : 'parcial';
+        if(esPleno) exactosTotal++; else parcialesTotal++;
+      } else {
+        rowClass = 'error';
+        erroresTotal++;
+        if(m.id==='3RD' && esArg && RESULTADOS_OFICIALES['3RD']){
+          matchPts -= 5; badges.push('−5 🇦🇷❌');
+        }
+      }
+
+      fasePts += matchPts;
+      ptsTotal += matchPts;
+
+      var ptsColor = matchPts > 0 ? 'green' : matchPts < 0 ? 'red' : 'gray';
+      var ptsPrefix = matchPts > 0 ? '+' : '';
+
+      filas += '<div class="desglose-row '+rowClass+'">'
+        + '<span class="desglose-match-name">'+m.local+' <span style="color:var(--text3);font-size:10px">vs</span> '+m.visita+'</span>'
+        + '<span class="desglose-pred">'+predText+'</span>'
+        + '<span class="desglose-vs">→</span>'
+        + '<span class="desglose-oficial">'+oficialText+'</span>'
+        + '<span style="font-size:10px;color:var(--text3);flex:1;text-align:right;padding-right:8px">'+badges.join(' ')+'</span>'
+        + '<span class="desglose-pts '+ptsColor+'">'+ptsPrefix+matchPts+'</span>'
+        + '</div>';
+    });
+
+    if(filas){
+      seccionesHtml += '<div class="desglose-section-title">'+
+        (faseLabels[phase]||phase)+
+        (hayResultado ? ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+fasePts+' pts</span>' : '')+
+        '</div>' + filas;
+    }
+  });
+
+  // ── EXTRAS ──
+  var pExt = ups.extras || {};
+  var rExt = RESULTADOS_OFICIALES.extras || {};
+  var extPts = 0;
+  var extFilas = '';
+
+  // Predicciones generales (15pts)
+  EXTRAS_DATA.grid.forEach(function(e){
+    var pred = pExt[e.id] || '';
+    var ofic = rExt[e.id] || '';
+    if(!pred){ return; }
+    var match = ofic && pred.trim().toLowerCase() === ofic.trim().toLowerCase();
+    var pts = match ? 15 : 0;
+    extPts += pts;
+    ptsTotal += pts;
+    var rowClass = match ? 'exact' : (ofic ? 'error' : '');
+    var ptsColor = match ? 'green' : 'gray';
+    extFilas += '<div class="desglose-row '+rowClass+'">'
+      + '<span class="desglose-match-name">'+e.label+'</span>'
+      + '<span style="font-size:11px;color:var(--gold-light);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pred+'</span>'
+      + (ofic ? '<span class="desglose-vs">→</span><span style="font-size:11px;color:var(--text3)">'+ofic+'</span>' : '')
+      + '<span class="desglose-pts '+ptsColor+'">'+(match?'+15':'—')+'</span>'
+      + '</div>';
+  });
+
+  // Autores gol Argentina
+  EXTRAS_DATA.arg.forEach(function(e){
+    var pred = pExt[e.id] || '';
+    var ofic = rExt[e.id] || '';
+    if(!pred){ return; }
+    var match = ofic && pred.trim().toLowerCase() === ofic.trim().toLowerCase();
+    var pts = match ? e.pts : 0;
+    extPts += pts;
+    ptsTotal += pts;
+    var rowClass = match ? 'exact' : (ofic ? 'error' : '');
+    var ptsColor = match ? (e.pts>=5?'green':'blue') : 'gray';
+    var ptsPrefix = match ? '+' : '';
+    extFilas += '<div class="desglose-row '+rowClass+'">'
+      + '<span class="desglose-match-name" style="font-size:11px">'+e.label+'</span>'
+      + '<span style="font-size:11px;color:var(--gold-light);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pred+'</span>'
+      + (ofic ? '<span class="desglose-vs">→</span><span style="font-size:11px;color:var(--text3)">'+ofic+'</span>' : '')
+      + '<span class="desglose-pts '+ptsColor+'">'+(match?ptsPrefix+pts:'—')+'</span>'
+      + '</div>';
+  });
+
+  if(extFilas){
+    seccionesHtml += '<div class="desglose-section-title">🎯 Extras'
+      + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+extPts+' pts</span>'
+      + '</div>' + extFilas;
+  }
+
+  // ── SANCIONES / BONIFICACIONES ──
+  var sanciones = RESULTADOS_OFICIALES.sanciones || [];
+  var sanFilas = '';
+  var sanPts = 0;
+  sanciones.filter(function(s){ return s.usuario === user; }).forEach(function(s){
+    var tipo = s.tipo || 'sancion';
+    var p = parseInt(s.puntos,10) || 0;
+    if(tipo==='sancion'){ sanPts -= p; ptsTotal -= p; }
+    else if(tipo==='bonificacion'){ sanPts += p; ptsTotal += p; }
+    var icon = tipo==='sancion'?'🚫':tipo==='bonificacion'?'🎁':'⚠️';
+    var ptsTxt = tipo==='sancion'?'−'+p:tipo==='bonificacion'?'+'+p:'';
+    var ptsColor = tipo==='sancion'?'red':tipo==='bonificacion'?'green':'gray';
+    sanFilas += '<div class="desglose-row '+(tipo==='sancion'?'error':tipo==='bonificacion'?'parcial':'')+'">'
+      + '<span style="font-size:16px">'+icon+'</span>'
+      + '<span class="desglose-match-name" style="font-size:12px">'+s.motivo+'</span>'
+      + '<span style="font-size:10px;color:var(--text3)">'+s.fecha+'</span>'
+      + '<span class="desglose-pts '+ptsColor+'">'+ptsTxt+'</span>'
+      + '</div>';
+  });
+  if(sanFilas){
+    seccionesHtml += '<div class="desglose-section-title">⚖️ Sanciones / Bonos'
+      + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+sanPts+' pts</span>'
+      + '</div>' + sanFilas;
+  }
+
+  // ── BONUS CIERRE ──
+  var bc = bonusCierre[user] || 0;
+  if(bc !== 0){
+    ptsTotal += bc;
+    var bcColor = bc>0?'green':'red';
+    var bcIcon = bc>0?'🏅':'⚠️';
+    seccionesHtml += '<div class="desglose-section-title">⚡ Cláusulas de Cierre'
+      + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">'+(bc>0?'+':'')+bc+' pts</span>'
+      + '</div>'
+      + '<div class="desglose-row '+(bc>0?'parcial':'error')+'">'
+        + '<span style="font-size:16px">'+bcIcon+'</span>'
+        + '<span class="desglose-match-name">Cláusula Arts. 14/15 — cierre de grupos</span>'
+        + '<span class="desglose-pts '+bcColor+'">'+(bc>0?'+':'')+bc+'</span>'
+        + '</div>';
+  }
+
+  // ── RESUMEN TOTAL ──
+  document.getElementById('desglose-subtitle').textContent =
+    exactosTotal+' plenos · '+parcialesTotal+' aciertos · '+erroresTotal+' errores';
+
+  var summaryHtml = '<div class="desglose-summary">'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:var(--green-light)">'+ptsTotal+'</div><div class="desglose-sum-lbl">Puntos Totales</div></div>'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:var(--gold)">'+exactosTotal+'</div><div class="desglose-sum-lbl">✅ Plenos</div></div>'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:#75AADB">'+parcialesTotal+'</div><div class="desglose-sum-lbl">〜 Aciertos</div></div>'
+    + '<div class="desglose-sum-card"><div class="desglose-sum-val" style="color:#f87171">'+erroresTotal+'</div><div class="desglose-sum-lbl">✗ Errores</div></div>'
+    + '</div>'
+    + '<p style="font-size:11px;color:var(--text3);margin-bottom:4px">👇 Hacé clic en cualquier fila para ver detalles. <span style="color:rgba(45,158,92,.7)">Verde = pleno</span> · <span style="color:rgba(117,170,219,.7)">Azul = acierto</span> · <span style="color:rgba(248,113,113,.7)">Rojo = error</span></p>';
+
+  body.innerHTML = summaryHtml + seccionesHtml;
+  ov.classList.add('open');
+}
 </script>
 </body>
 </html>
