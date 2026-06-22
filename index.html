@@ -1683,8 +1683,8 @@ function calcPuntos(user){
       // Art. 09 — 2pts acierto
       if(esAcierto){
         pts+=2; parciales++;
-        // Art. 10 — +1 pleno
-        if(esPleno){ pts+=1; exactos++; }
+        // Art. 10 — +1 pleno +1 x gol
+        if(esPleno){ pts+=1; pts+=(r.h+r.a); exactos++; }
         // Art. 11 — +1 arg acertado
         if(esArg) pts+=1;
         // Art. 12 — +1 pleno argento
@@ -1702,8 +1702,8 @@ function calcPuntos(user){
 
       if(esAcierto){
         pts+=base; parciales++;
-        // Art. 17 — +2 pleno
-        if(esPleno){ pts+=2; exactos++; }
+        // Art. 17 — +2 pleno +1 x gol
+        if(esPleno){ pts+=2; pts+=(r.h+r.a); exactos++; }
         // Art. 18 — bonus Argentina
         if(esArg){
           if(id==='FINAL') pts+=2;
@@ -1724,8 +1724,6 @@ function calcPuntos(user){
         }
       }
     }
-    if(p.h == r.h) pts += parseInt(r.h, 10);
-    if(p.a == r.a) pts += parseInt(r.a, 10);
   });
 
   // ── EXTRAS ──
@@ -2553,7 +2551,7 @@ function verDesglose(user){
       if(esAcierto){
         if(isGrupos){
           matchPts += 2; badges.push('+2 acierto');
-          if(esPleno){ matchPts += 1; badges.push('+1 pleno'); }
+          if(esPleno){ matchPts += 1; matchPts += (rh+ra); badges.push('+1 pleno'); badges.push('+'+(rh+ra)+' goles'); }
           if(esArg){ matchPts += 1; badges.push('+1 🇦🇷'); }
           if(esArg && esPleno){ matchPts += 1; badges.push('+1 pleno🇦🇷'); }
         } else {
@@ -2563,7 +2561,7 @@ function verDesglose(user){
           else if(phase==='semis') base=9;
           else if(phase==='cuartos') base=7;
           matchPts += base; badges.push('+'+base+' acierto');
-          if(esPleno){ matchPts += 2; badges.push('+2 pleno'); }
+          if(esPleno){ matchPts += 2; matchPts += (rh+ra); badges.push('+2 pleno'); badges.push('+'+(rh+ra)+' goles'); }
           if(esArg){
             if(m.id==='FINAL'){ matchPts+=2; badges.push('+2 🇦🇷'); }
             else if(m.id!=='3RD'){ matchPts+=1; badges.push('+1 🇦🇷'); }
@@ -2579,9 +2577,6 @@ function verDesglose(user){
           matchPts -= 5; badges.push('−5 🇦🇷❌');
         }
       }
-
-      if(ph === rh && rh > 0){ matchPts += rh; badges.push('+'+rh+' goles loc'); }
-      if(pa === ra && ra > 0){ matchPts += ra; badges.push('+'+ra+' goles vis'); }
 
       fasePts += matchPts;
       ptsTotal += matchPts;
