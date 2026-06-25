@@ -2705,8 +2705,8 @@
             html += '<h3 style="color:var(--gold);margin-bottom:15px;font-family:Bebas Neue,sans-serif;font-size:24px;text-align:center">PANEL DE CONTROL <span style="font-size:10px;color:var(--text3);font-family:Inter,sans-serif;letter-spacing:0">v2026.06.22-fix</span></h3>';
 
             html += '<div style="display:flex;justify-content:center;margin-bottom:24px">'
-                 + '<button onclick="exportarAuditoria()" style="padding:10px 16px;background:var(--green-mid);color:#fff;border:none;border-radius:var(--radius);font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">📊 EXPORTAR AUDITORÍA (CSV)</button>'
-                 + '</div>';
+                + '<button onclick="exportarAuditoria()" style="padding:10px 16px;background:var(--green-mid);color:#fff;border:none;border-radius:var(--radius);font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer">📊 EXPORTAR AUDITORÍA (CSV)</button>'
+                + '</div>';
 
             // ── ALERTAS DE MODIFICACIÓN ──
             var alertas = RESULTADOS_OFICIALES.alertas || [];
@@ -3009,40 +3009,40 @@
         }
 
         function exportarAuditoria() {
-            var users = Object.keys(pronosticos).filter(function(u) { return u !== 'ORGANIZADOR'; });
+            var users = Object.keys(pronosticos).filter(function (u) { return u !== 'ORGANIZADOR'; });
             if (!users.length) { showToast('No hay usuarios'); return; }
 
             var userStats = {};
-            users.forEach(function(u) {
+            users.forEach(function (u) {
                 var stats = calcPuntos(u);
                 var bonus = (RESULTADOS_OFICIALES.bonusCierre && RESULTADOS_OFICIALES.bonusCierre[u]) || 0;
                 stats.totalFinal = stats.pts + bonus;
                 userStats[u] = stats;
             });
-            users.sort(function(a, b) { return userStats[b].totalFinal - userStats[a].totalFinal; });
+            users.sort(function (a, b) { return userStats[b].totalFinal - userStats[a].totalFinal; });
 
             var csv = "Item,Resultado Oficial,";
-            users.forEach(function(u) { csv += u + " (Prono)," + u + " (Pts),"; });
+            users.forEach(function (u) { csv += u + " (Prono)," + u + " (Pts),"; });
             csv += "\n";
 
-            Object.keys(FIXTURE).forEach(function(phase) {
-                FIXTURE[phase].forEach(function(m) {
+            Object.keys(FIXTURE).forEach(function (phase) {
+                FIXTURE[phase].forEach(function (m) {
                     var ro = RESULTADOS_OFICIALES[m.id];
                     var resOfic = (ro && ro.h !== '' && ro.a !== '') ? (ro.h + '-' + ro.a) : '-';
                     var row = m.local + " vs " + m.visita + " (" + phase.toUpperCase() + ")," + resOfic + ",";
-                    
-                    users.forEach(function(u) {
+
+                    users.forEach(function (u) {
                         var p = pronosticos[u] || {};
                         var pu = p[m.id];
                         var pronoUser = (pu && pu.h !== '' && pu.a !== '') ? (pu.h + '-' + pu.a) : '-';
-                        
+
                         var ptsMatch = 0;
                         if (pronoUser !== '-' && resOfic !== '-') {
-                            var ph = parseInt(pu.h,10), pa = parseInt(pu.a,10), rh = parseInt(ro.h,10), ra = parseInt(ro.a,10);
-                            var esPleno = (ph===rh && pa===ra);
-                            var esAcierto = (ph>pa && rh>ra) || (ph<pa && rh<ra) || (ph===pa && rh===ra);
+                            var ph = parseInt(pu.h, 10), pa = parseInt(pu.a, 10), rh = parseInt(ro.h, 10), ra = parseInt(ro.a, 10);
+                            var esPleno = (ph === rh && pa === ra);
+                            var esAcierto = (ph > pa && rh > ra) || (ph < pa && rh < ra) || (ph === pa && rh === ra);
                             var esArg = isArgMatch(m.id, phase);
-                            
+
                             var argGolesPts = 0;
                             if (esArg) {
                                 var pExt = p.extras || {}, rExt = RESULTADOS_OFICIALES.extras || {};
@@ -3051,15 +3051,15 @@
                                     for (var i = 1; i <= 5; i++) {
                                         var eId = 'arg_' + argKey + '_' + i;
                                         if (pExt[eId] && rExt[eId]) {
-                                            if (String(pExt[eId]).trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase() === 
-                                                String(rExt[eId]).trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()) {
+                                            if (String(pExt[eId]).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ===
+                                                String(rExt[eId]).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()) {
                                                 argGolesPts += (argKey === 'F' ? 5 : 1);
                                             }
                                         }
                                     }
                                 }
                             }
-                            
+
                             if (phase === 'grupos') {
                                 if (esAcierto) {
                                     ptsMatch += 2;
@@ -3069,14 +3069,14 @@
                                 }
                             } else {
                                 var base = 5;
-                                if (m.id==='FINAL') base=13; else if(m.id==='3RD') base=11; else if(phase==='semis') base=9; else if(phase==='cuartos') base=7;
+                                if (m.id === 'FINAL') base = 13; else if (m.id === '3RD') base = 11; else if (phase === 'semis') base = 9; else if (phase === 'cuartos') base = 7;
                                 if (esAcierto) {
                                     ptsMatch += base;
                                     if (esPleno) ptsMatch += (2 + rh + ra);
-                                    if (esArg) ptsMatch += (m.id==='FINAL' ? 2 : (m.id!=='3RD' ? 1 : 0));
+                                    if (esArg) ptsMatch += (m.id === 'FINAL' ? 2 : (m.id !== '3RD' ? 1 : 0));
                                     if (esArg && esPleno) ptsMatch += 5;
                                 } else {
-                                    if (m.id==='3RD' && esArg && RESULTADOS_OFICIALES['3RD']) ptsMatch -= 5;
+                                    if (m.id === '3RD' && esArg && RESULTADOS_OFICIALES['3RD']) ptsMatch -= 5;
                                 }
                             }
                             ptsMatch += argGolesPts;
@@ -3087,27 +3087,27 @@
                 });
             });
 
-            EXTRAS_DATA.grid.forEach(function(e) {
+            EXTRAS_DATA.grid.forEach(function (e) {
                 var ro = RESULTADOS_OFICIALES.extras ? RESULTADOS_OFICIALES.extras[e.id] || '-' : '-';
-                var row = "EXTRA: " + e.label + "," + ro.replace(/,/g, '') + ",";
-                users.forEach(function(u) {
+                var row = "EXTRA: " + e.label + "," + String(ro).replace(/,/g, '') + ",";
+                users.forEach(function (u) {
                     var p = pronosticos[u] || {};
                     var pExt = p.extras || {};
                     var pu = pExt[e.id] || '-';
                     var pts = 0;
                     if (pu !== '-' && ro !== '-') {
-                        if (String(pu).trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase() === 
-                            String(ro).trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()) {
+                        if (String(pu).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ===
+                            String(ro).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()) {
                             pts = 15;
                         }
                     }
-                    row += pu.replace(/,/g, '') + "," + pts + ",";
+                    row += String(pu).replace(/,/g, '') + "," + pts + ",";
                 });
                 csv += row + "\n";
             });
 
             var rowB = "Bonus/Sanciones,-,";
-            users.forEach(function(u) {
+            users.forEach(function (u) {
                 var pts = 0;
                 var bonus = (RESULTADOS_OFICIALES.bonusCierre && RESULTADOS_OFICIALES.bonusCierre[u]) || 0;
                 pts += bonus;
@@ -3124,7 +3124,7 @@
             csv += rowB + "\n";
 
             var rowT = "TOTAL FINAL,-,";
-            users.forEach(function(u) { rowT += "-," + userStats[u].totalFinal + ","; });
+            users.forEach(function (u) { rowT += "-," + userStats[u].totalFinal + ","; });
             csv += rowT + "\n";
 
             var blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
