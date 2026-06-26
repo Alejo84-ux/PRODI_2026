@@ -5280,6 +5280,11 @@
             botInterval = setInterval(updateLiveScoresFromWeb, 120000);
             showToast("🚀 Bot activado en 2do plano (No cierres esta pestaña)");
         }
+
+        // Auto-iniciar si ya estaba logueado como Organizador
+        if (localStorage.getItem('prodeUser') === 'ORGANIZADOR') {
+            startLiveScoreBot();
+        }
     </script>
 </body>
 
