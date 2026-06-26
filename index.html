@@ -2941,6 +2941,10 @@
         // ══════════════════════════════════════════
         function savePronosticos() {
             if (!currentUser) { showToast('⚠️ Primero ingresá al grupo'); return; }
+            if (currentUser === 'ORGANIZADOR') {
+                showToast('⚠️ El Organizador no carga pronósticos desde aquí. Usá el Panel de Control.');
+                return;
+            }
             // Bloqueo Grupos y Extras
             var fasesBlockeadas = ['grupos', 'extras'];
             if (pronosticosBloqueados && currentUser !== 'ORGANIZADOR' && fasesBlockeadas.indexOf(currentPhase) >= 0) {
