@@ -4854,7 +4854,9 @@
         //  DESGLOSE DE PUNTOS
         // ══════════════════════════════════════════
         function closeDesglose() {
-            document.getElementById('desglose-overlay').classList.remove('open');
+            var ov = document.getElementById('desglose-overlay');
+            ov.classList.remove('open');
+            ov.style.display = '';
         }
         function closeDesgloseOutside(e) {
             if (e.target === document.getElementById('desglose-overlay')) closeDesglose();
