@@ -2588,6 +2588,7 @@
         var RESULTADOS_OFICIALES = { extras: {} };
         var currentPhase = 'grupos';
         var firebaseDataLoaded = false;
+        var adminPanelRenderedWithData = false;
 
         // ══════════════════════════════════════════
         //  HELPERS
@@ -2876,7 +2877,7 @@
             // su pronóstico), guardamos lo que el Organizador tiene tipeado en los inputs
             // para no perderlo si todavía no presionó "Publicar Resultados".
             var _preserved = {};
-            if (firebaseDataLoaded && card.querySelector('input, textarea, select')) {
+            if (adminPanelRenderedWithData && card.querySelector('input, textarea, select')) {
                 card.querySelectorAll('input, textarea, select').forEach(function (el) {
                     if (el.id) _preserved[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
                 });
@@ -3187,6 +3188,7 @@
                 if (el.type === 'checkbox') el.checked = _preserved[id];
                 else el.value = _preserved[id];
             });
+            adminPanelRenderedWithData = firebaseDataLoaded;
         }
 
         function exportarAuditoria() {
