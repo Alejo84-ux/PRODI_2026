@@ -2587,6 +2587,7 @@
         var pronosticos = {};
         var RESULTADOS_OFICIALES = { extras: {} };
         var currentPhase = 'grupos';
+        var firebaseDataLoaded = false;
 
         // ══════════════════════════════════════════
         //  HELPERS
@@ -2875,7 +2876,7 @@
             // su pronóstico), guardamos lo que el Organizador tiene tipeado en los inputs
             // para no perderlo si todavía no presionó "Publicar Resultados".
             var _preserved = {};
-            if (card.querySelector('input, textarea, select')) {
+            if (firebaseDataLoaded && card.querySelector('input, textarea, select')) {
                 card.querySelectorAll('input, textarea, select').forEach(function (el) {
                     if (el.id) _preserved[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
                 });
@@ -4308,6 +4309,7 @@
         //  FIRESTORE SYNC EN TIEMPO REAL
         // ══════════════════════════════════════════
         db.collection('pronosticos').onSnapshot(function (snapshot) {
+            firebaseDataLoaded = true;
             pronosticos = {};
             snapshot.forEach(function (snap) {
                 var d = snap.data();
