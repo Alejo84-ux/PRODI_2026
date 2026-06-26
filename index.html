@@ -1882,7 +1882,7 @@
                             style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;margin-bottom:8px">
                             🏆 Eliminatorias</div>
                         <div style="font-size:12px;color:var(--text2);line-height:1.8">
-                            Octavos: <strong style="color:var(--gold)">5</strong> · Cuartos: <strong
+                            16vos: <strong style="color:var(--gold)">3</strong> · Octavos: <strong style="color:var(--gold)">5</strong><br>Cuartos: <strong
                                 style="color:var(--gold)">7</strong> · Semis: <strong
                                 style="color:var(--gold)">9</strong><br>
                             3er puesto: <strong style="color:var(--gold)">11</strong> · Final: <strong
@@ -2122,7 +2122,15 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Octavos (R32 + R16)</td>
+                                <td>16vos de final</td>
+                                <td>3</td>
+                                <td>+2</td>
+                                <td>+1</td>
+                                <td>+1</td>
+                                <td>+5</td>
+                            </tr>
+                            <tr>
+                                <td>Octavos de final</td>
                                 <td>5</td>
                                 <td>+2</td>
                                 <td>+1</td>
@@ -2239,6 +2247,10 @@
                         fase):
                         <table class="pts-table" style="margin-top:8px">
                             <tr>
+                                <td>16vos de final</td>
+                                <td>3 pts</td>
+                            </tr>
+                            <tr>
                                 <td>Octavos de final</td>
                                 <td>5 pts</td>
                             </tr>
@@ -2327,7 +2339,7 @@
             <div class="modal-body">
                 <div class="phase-tabs">
                     <button class="phase-tab active" onclick="setPhase(this,'grupos')">Grupos</button>
-                    <button class="phase-tab" onclick="setPhase(this,'r32')">Ronda 32</button>
+                    <button class="phase-tab" onclick="setPhase(this,'r32')">16vos</button>
                     <button class="phase-tab" onclick="setPhase(this,'r16')">Octavos</button>
                     <button class="phase-tab" onclick="setPhase(this,'cuartos')">Cuartos</button>
                     <button class="phase-tab" onclick="setPhase(this,'semis')">Semis</button>
@@ -2571,7 +2583,7 @@
             { key: '1', label: 'Grupo 1er Partido' },
             { key: '2', label: 'Grupo 2do Partido' },
             { key: '3', label: 'Grupo 3er Partido' },
-            { key: 'R32', label: 'Ronda 32' },
+            { key: 'R32', label: '16vos de Final' },
             { key: 'R16', label: 'Octavos' },
             { key: 'QF', label: 'Cuartos' },
             { key: 'SF', label: 'Semis' },
@@ -2953,7 +2965,7 @@
 
             // ── BLOQUEO FASES ELIMINATORIAS ──
             var elimFases = [
-                { key: 'r32', label: 'Ronda de 32', icon: '⚔️' },
+                { key: 'r32', label: '16vos de Final', icon: '⚔️' },
                 { key: 'r16', label: 'Octavos de Final', icon: '🔥' },
                 { key: 'cuartos', label: 'Cuartos de Final', icon: '💥' },
                 { key: 'semis', label: 'Semifinales', icon: '⚡' },
@@ -3260,8 +3272,8 @@
                                     if (esArg && esPleno) ptsMatch += 1;
                                 }
                             } else {
-                                var base = 5;
-                                if (m.id === 'FINAL') base = 13; else if (m.id === '3RD') base = 11; else if (phase === 'semis') base = 9; else if (phase === 'cuartos') base = 7;
+                                var base = 3;
+                                if (m.id === 'FINAL') base = 13; else if (m.id === '3RD') base = 11; else if (phase === 'semis') base = 9; else if (phase === 'cuartos') base = 7; else if (phase === 'r16') base = 5;
                                 if (esAcierto) {
                                     ptsMatch += base;
                                     if (esPleno) ptsMatch += (2 + rh + ra);
@@ -3630,7 +3642,8 @@
                     else if (id === '3RD') base = 11;
                     else if (phase === 'semis') base = 9;
                     else if (phase === 'cuartos') base = 7;
-                    else base = 5; // r32 y r16
+                    else if (phase === 'r16') base = 5;
+                    else base = 3; // r32
 
                     if (esAcierto) {
                         pts += base; parciales++;
@@ -4203,7 +4216,7 @@
         }
 
         function _faseLabel(fase) {
-            return { grupos: 'Grupos', extras: 'Extras', r32: 'Ronda de 32', r16: 'Octavos', cuartos: 'Cuartos de final', semis: 'Semifinales', final: 'Final' }[fase] || fase;
+            return { grupos: 'Grupos', extras: 'Extras', r32: '16vos de final', r16: 'Octavos', cuartos: 'Cuartos de final', semis: 'Semifinales', final: 'Final' }[fase] || fase;
         }
 
         function updateUserAlertaBanner() {
@@ -4688,7 +4701,7 @@
             var seccionesHtml = '';
             var faseLabels = {
                 grupos: '⚽ Fase de Grupos',
-                r32: '⚔️ Ronda de 32',
+                r32: '⚔️ 16vos de final',
                 r16: '🔥 Octavos de Final',
                 cuartos: '💥 Cuartos de Final',
                 semis: '⚡ Semifinales',
