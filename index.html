@@ -5309,14 +5309,14 @@
 
                         if (match.score) {
                             const getScore = (team) => {
-                                if (match.score.fullTime && match.score.fullTime[team] !== null) return match.score.fullTime[team];
-                                if (match.score.regularTime && match.score.regularTime[team] !== null) return match.score.regularTime[team];
-                                if (match.score.halfTime && match.score.halfTime[team] !== null) return match.score.halfTime[team];
+                                if (match.score.fullTime && typeof match.score.fullTime[team] === 'number') return match.score.fullTime[team];
+                                if (match.score.regularTime && typeof match.score.regularTime[team] === 'number') return match.score.regularTime[team];
+                                if (match.score.halfTime && typeof match.score.halfTime[team] === 'number') return match.score.halfTime[team];
                                 return null;
                             };
                             home = getScore('home');
                             away = getScore('away');
-                            
+
                             if (match.score.penalties) {
                                 penHome = match.score.penalties.home;
                                 penAway = match.score.penalties.away;
