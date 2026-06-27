@@ -4332,7 +4332,15 @@
                 return { flag: '<div class="team-premium-shield"></div>', name: nameStr.toUpperCase() };
             }
 
-          
+            var html = '';
+            // Add the premium header
+            html += '<div class="bracket-header-premium">';
+            html += '<h2><span>2026</span> FIFA WORLD CUP</h2>';
+            html += '<div class="sub">ROAD TO THE ROUND OF 32</div>';
+            html += '</div>';
+
+            html += '<div class="bracket-container" style="justify-content: flex-start;">';
+
             var bracketMap = {
                 left: {
                     r32: ['R32-2', 'R32-5', 'R32-1', 'R32-3', 'R32-11', 'R32-12', 'R32-9', 'R32-10'],
