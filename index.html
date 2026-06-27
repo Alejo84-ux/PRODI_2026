@@ -1631,11 +1631,52 @@
         /* Bracket styles */
         .bracket-wrapper {
             overflow-x: auto;
-            padding: 20px 5px;
-            background: var(--bg2);
+            padding: 40px 10px;
+            background: #000000;
             border-radius: var(--radius);
             margin-top: 0;
             border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .bracket-header-premium {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .bracket-header-premium h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            color: #fff;
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .bracket-header-premium h2 span {
+            color: var(--gold);
+        }
+        
+        .bracket-header-premium .sub {
+            color: var(--gold);
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .bracket-header-premium .sub::before, .bracket-header-premium .sub::after {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--gold);
+            opacity: 0.5;
         }
 
         .bracket-container {
@@ -1644,6 +1685,8 @@
             justify-content: flex-start;
             gap: 0;
             width: 100%;
+            position: relative;
+            z-index: 5;
         }
 
         .bracket-column {
@@ -1667,21 +1710,17 @@
             flex-direction: column;
             justify-content: center;
             position: relative;
-            padding: 2px 4px;
-            /* Reduced from 6px 12px */
+            padding: 4px 6px;
         }
 
         .bracket-match {
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 4px;
-            /* Reduced from 6px 8px */
-            font-size: 9px;
-            /* Reduced from 11px */
+            background: #000;
+            border: 1px solid rgba(201, 162, 39, 0.5);
+            border-radius: 6px;
+            padding: 6px 8px;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
-            transition: transform 0.2s, border-color 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), inset 0 0 8px rgba(201, 162, 39, 0.05);
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             z-index: 2;
             width: 100%;
             min-width: 0;
@@ -1690,15 +1729,14 @@
         .bracket-match:hover {
             transform: translateY(-2px);
             border-color: var(--gold);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9), inset 0 0 12px rgba(201, 162, 39, 0.1);
         }
 
         .bracket-match-title {
             font-size: 8px;
-            /* Reduced */
-            color: var(--gold);
+            color: rgba(201, 162, 39, 0.7);
             text-transform: uppercase;
-            margin-bottom: 2px;
-            /* Reduced */
+            margin-bottom: 4px;
             text-align: center;
             font-weight: 600;
             letter-spacing: 0px;
@@ -1711,9 +1749,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2px 0;
-            border-bottom: 1px solid var(--border);
-            color: var(--text2);
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #ccc;
             min-width: 0;
         }
 
@@ -1724,20 +1762,45 @@
         .bracket-team.winner {
             color: #fff;
             font-weight: 600;
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+        
+        .team-premium-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+        
+        .team-premium-flag {
+            font-size: 14px;
+            line-height: 1;
+        }
+        
+        .team-premium-shield {
+            width: 12px;
+            height: 14px;
+            background: linear-gradient(135deg, rgba(201,162,39,0.8), rgba(201,162,39,0.2));
+            border: 1px solid var(--gold);
+            border-radius: 2px 2px 6px 6px;
+            display: inline-block;
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
         }
 
         .bracket-score {
-            background: var(--bg1);
-            padding: 1px 3px;
-            /* Reduced */
-            border-radius: 3px;
-            font-family: monospace;
-            font-size: 9px;
-            /* Reduced */
+            background: transparent;
+            padding: 1px 2px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
             min-width: 14px;
-            /* Reduced */
-            text-align: center;
-            color: var(--gold);
+            text-align: right;
+            color: #fff;
             flex-shrink: 0;
         }
 
@@ -1749,9 +1812,9 @@
             top: 50%;
             height: 100%;
             width: 6px;
-            border-top: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            border-top: 1px solid rgba(201, 162, 39, 0.4);
+            border-right: 1px solid rgba(201, 162, 39, 0.4);
+            border-bottom: 1px solid rgba(201, 162, 39, 0.4);
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
             z-index: 1;
@@ -1764,7 +1827,7 @@
             top: 100%;
             width: 6px;
             height: 1px;
-            background: var(--border);
+            background: rgba(201, 162, 39, 0.4);
             z-index: 1;
         }
 
@@ -1784,9 +1847,9 @@
             top: 50%;
             height: 100%;
             width: 6px;
-            border-top: 1px solid var(--border);
-            border-left: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            border-top: 1px solid rgba(201, 162, 39, 0.4);
+            border-left: 1px solid rgba(201, 162, 39, 0.4);
+            border-bottom: 1px solid rgba(201, 162, 39, 0.4);
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
             z-index: 1;
@@ -1799,7 +1862,7 @@
             top: 100%;
             width: 6px;
             height: 1px;
-            background: var(--border);
+            background: rgba(201, 162, 39, 0.4);
             z-index: 1;
         }
 
@@ -4248,7 +4311,32 @@
             var wrapper = document.getElementById('bracket-wrapper');
             if (!wrapper) return;
 
-            var html = '<div class="bracket-container" style="justify-content: flex-start;">';
+            // Define helper for premium team format
+            function formatPremiumTeam(nameStr) {
+                if (!nameStr) return { flag: '<div class="team-premium-shield"></div>', name: 'TBD' };
+                if (nameStr.indexOf('1° ') >= 0 || nameStr.indexOf('2° ') >= 0 || nameStr.indexOf('Gan.') >= 0 || nameStr.indexOf('Perd.') >= 0) {
+                    return { flag: '<div class="team-premium-shield"></div>', name: nameStr };
+                }
+                var parts = nameStr.trim().split(' ');
+                var lastChar = parts[parts.length - 1];
+                var emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Emoji_Presentation}/gu;
+                if (emojiRegex.test(lastChar)) {
+                    return {
+                        flag: '<span class="team-premium-flag">' + lastChar + '</span>',
+                        name: parts.slice(0, -1).join(' ').toUpperCase()
+                    };
+                }
+                return { flag: '<div class="team-premium-shield"></div>', name: nameStr.toUpperCase() };
+            }
+
+            var html = '';
+            // Add the premium header
+            html += '<div class="bracket-header-premium">';
+            html += '<h2><span>2026</span> FIFA WORLD CUP</h2>';
+            html += '<div class="sub">ROAD TO THE ROUND OF 32</div>';
+            html += '</div>';
+
+            html += '<div class="bracket-container" style="justify-content: flex-start;">';
 
             var bracketMap = {
                 left: {
@@ -4321,17 +4409,20 @@
                         }
                     }
 
+                    var pLocal = formatPremiumTeam(m.local);
+                    var pVisita = formatPremiumTeam(m.visita);
+
                     html += '<div class="bracket-match-wrapper">';
                     html += '<div class="bracket-match">';
                     html += '<div class="bracket-match-title">' + (m.label || m.id) + '</div>';
 
                     html += '<div class="bracket-team ' + hwinner + '">';
-                    html += '<div class="team-name" style="font-size: 10px; flex: 1; margin-right: 4px; justify-content: flex-start;" title="' + m.local + '">' + formatTeamName(m.local) + '</div>';
+                    html += '<div class="team-premium-name" title="' + m.local + '">' + pLocal.flag + ' ' + pLocal.name + '</div>';
                     html += '<span class="bracket-score" style="' + scoreStyle + '">' + hscore + '</span>';
                     html += '</div>';
 
                     html += '<div class="bracket-team ' + awinner + '">';
-                    html += '<div class="team-name" style="font-size: 10px; flex: 1; margin-right: 4px; justify-content: flex-start;" title="' + m.visita + '">' + formatTeamName(m.visita) + '</div>';
+                    html += '<div class="team-premium-name" title="' + m.visita + '">' + pVisita.flag + ' ' + pVisita.name + '</div>';
                     html += '<span class="bracket-score" style="' + scoreStyle + '">' + ascore + '</span>';
                     html += '</div>';
 
