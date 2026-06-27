@@ -3057,14 +3057,12 @@
             var card = document.getElementById('resultados-card');
             if (!card || currentUser !== 'ORGANIZADOR') return;
 
-            // ── PRESERVAR VALORES NO GUARDADOS ──
-            // Antes de reconstruir el HTML (esto pasa cada vez que cualquier jugador guarda
-            // su pronóstico), guardamos lo que el Organizador tiene tipeado en los inputs
-            // para no perderlo si todavía no presionó "Publicar Resultados".
             var _preserved = {};
             if (adminPanelRenderedWithData && card.querySelector('input, textarea, select')) {
                 card.querySelectorAll('input, textarea, select').forEach(function (el) {
-                    if (el.id) _preserved[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+                    if (el.id && el.getAttribute('data-dirty') === 'true') {
+                        _preserved[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+                    }
                 });
             }
 
@@ -3194,9 +3192,9 @@
                     var r = RESULTADOS_OFICIALES[m.id] || { h: '', a: '' };
                     partContent += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--bg3);padding:8px;border-radius:8px">'
                         + '<span style="flex:1;text-align:right;font-size:12px;font-weight:500">' + m.local + '</span>'
-                        + '<input type="number" min="0" max="20" id="of-h-' + m.id + '" value="' + r.h + '" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:Bebas Neue,sans-serif;font-size:16px;outline:none">'
+                        + '<input type="number" min="0" max="20" id="of-h-' + m.id + '" value="' + r.h + '" oninput="this.setAttribute(\'data-dirty\',\'true\')" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:Bebas Neue,sans-serif;font-size:16px;outline:none">'
                         + '<span style="color:var(--text3);font-size:11px">VS</span>'
-                        + '<input type="number" min="0" max="20" id="of-a-' + m.id + '" value="' + r.a + '" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:Bebas Neue,sans-serif;font-size:16px;outline:none">'
+                        + '<input type="number" min="0" max="20" id="of-a-' + m.id + '" value="' + r.a + '" oninput="this.setAttribute(\'data-dirty\',\'true\')" style="width:36px;text-align:center;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px;font-family:Bebas Neue,sans-serif;font-size:16px;outline:none">'
                         + '<span style="flex:1;font-size:12px;font-weight:500">' + m.visita + '</span>'
                         + '</div>';
                 });
@@ -3210,14 +3208,14 @@
                 var pts = isFinal ? '+5pts' : '+1pt';
                 extContent += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--bg3);padding:8px 12px;border-radius:8px">'
                     + '<span style="font-size:12px;color:' + (isFinal ? 'var(--gold)' : '#75AADB') + ';font-weight:500">' + e.label + ' <span style="font-size:10px;color:var(--text3)">' + pts + '</span></span>'
-                    + '<input type="text" id="of-ext-' + e.id + '" value="' + val + '" list="dl-arg-squad" placeholder="Elegí jugador..." style="width:180px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:Inter,sans-serif;font-size:12px;outline:none">'
+                    + '<input type="text" id="of-ext-' + e.id + '" value="' + val + '" oninput="this.setAttribute(\'data-dirty\',\'true\')" list="dl-arg-squad" placeholder="Elegí jugador..." style="width:180px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:Inter,sans-serif;font-size:12px;outline:none">'
                     + '</div>';
             });
             EXTRAS_DATA.grid.forEach(function (e) {
                 var val = RESULTADOS_OFICIALES.extras[e.id] || '';
                 extContent += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;background:var(--bg3);padding:8px 12px;border-radius:8px">'
                     + '<span style="font-size:12px;color:var(--text);font-weight:500">' + e.label + '</span>'
-                    + '<input type="text" id="of-ext-' + e.id + '" value="' + val + '" placeholder="..." style="width:140px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:Inter,sans-serif;font-size:12px;outline:none">'
+                    + '<input type="text" id="of-ext-' + e.id + '" value="' + val + '" oninput="this.setAttribute(\'data-dirty\',\'true\')" placeholder="..." style="width:140px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:Inter,sans-serif;font-size:12px;outline:none">'
                     + '</div>';
             });
 
@@ -3231,7 +3229,7 @@
                     var checked = argPartidos.indexOf(m.id) >= 0 ? 'checked' : '';
                     var is3rd = m.id === '3RD';
                     argContent += '<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:8px;margin-bottom:6px;cursor:pointer;border:1px solid var(--border);">'
-                        + '<input type="checkbox" id="argp-' + m.id + '" ' + checked + ' style="width:16px;height:16px;accent-color:#75AADB">'
+                        + '<input type="checkbox" id="argp-' + m.id + '" ' + checked + ' onchange="this.setAttribute(\'data-dirty\',\'true\')" style="width:16px;height:16px;accent-color:#75AADB">'
                         + '<span style="font-size:12px;flex:1">' + m.local + ' vs ' + m.visita + ' <span style="color:var(--text3)">(' + m.fecha + ')</span></span>'
                         + (is3rd ? '<span style="font-size:10px;color:#f87171;background:rgba(248,113,113,.1);padding:2px 6px;border-radius:10px">⚠️ Si marcás esto: −5pts a quienes pronostiquen Argentina aquí</span>' : '')
                         + '</label>';
@@ -4517,7 +4515,7 @@
             pronosticos = {};
             snapshot.forEach(function (snap) {
                 var d = snap.data();
-                if (d.nombre === 'ORGANIZADOR') {
+                if (snap.id === 'ORGANIZADOR') {
                     var incoming = d.pronosticos || {};
                     RESULTADOS_OFICIALES = Object.assign({ extras: {}, bonusCierre: {}, argPartidos: [], pronosticosBloqueados: false }, incoming);
                     if (!RESULTADOS_OFICIALES.extras) RESULTADOS_OFICIALES.extras = {};
@@ -4528,12 +4526,12 @@
                     fasesElimBloqueadas = RESULTADOS_OFICIALES.fasesElimBloqueadas || {};
 
                     // Calculamos automáticamente el bracket en función de RESULTADOS_OFICIALES
-                    // calculateBracketAdvancements();
+                    calculateBracketAdvancements();
 
                     updateLockBanner();
-                    // updateLockBadgeInicio();
+                    updateLockBadgeInicio();
                     if (currentUser === 'ORGANIZADOR') renderAdminPanel();
-                } else if (d.nombre && d.pronosticos) {
+                } else if (snap.id !== 'LIVE_SCORES' && d.nombre && d.pronosticos) {
                     pronosticos[d.nombre] = d.pronosticos;
                 }
             });
