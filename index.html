@@ -1832,7 +1832,7 @@
         <!-- BANNER GLOBAL LIVE SCORES -->
         <div id="global-live-banner"
             style="display:none; position: absolute; top: 60px; left: 0; right: 0; background: #991b1b; color: white; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-align: center; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-bottom: 1px solid #7f1d1d; z-index: 99; overflow: hidden; white-space: nowrap;">
-            <span style="animation: blink 1.5s infinite; color: #fca5a5; flex-shrink: 0;">🔴 EN VIVO</span>
+            <span id="global-live-badge" style="color: #fca5a5; flex-shrink: 0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">⚽ Resultados</span>
             <div id="global-live-text" style="flex: 1; display: flex; align-items: center; overflow: hidden;"></div>
         </div>
         <style>
@@ -5149,8 +5149,8 @@
                 
                 const argDateStr = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
                 const argToday = new Date(argDateStr);
-                // Restamos 4 horas para que el "día futbolístico" termine a las 4 AM y no a las 12 AM
-                argToday.setHours(argToday.getHours() - 4);
+                // Restamos 12 horas para que el "día futbolístico" termine a las 12 PM (mediodía) del día siguiente
+                argToday.setHours(argToday.getHours() - 12);
                 const mesesArr = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                 const todayFecha = argToday.getDate() + ' ' + mesesArr[argToday.getMonth()];
 
