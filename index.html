@@ -5338,7 +5338,7 @@
                 const dateToStr = formatDate(tomorrow);
 
                 console.log("🌐 Web Bot consultando football-data.org (vía proxy) para: " + dateFromStr + " a " + dateToStr);
-                const targetUrl = `https://api.football-data.org/v4/competitions/WC/matches?dateFrom=${dateFromStr}&dateTo=${dateToStr}`;
+                const targetUrl = `https://api.football-data.org/v4/competitions/WC/matches?dateFrom=${dateFromStr}&dateTo=${dateToStr}&_cb=${Date.now()}`;
 
                 // Múltiples opciones de proxy o directo para evitar el error "Failed to fetch" (común al abrir como file://)
                 let response;
@@ -5435,8 +5435,6 @@
 
                         if (match.score) {
                             const getScore = (team) => {
-                                const isGroup = /^[A-L]\d$/.test(appMatchId);
-                                if (isGroup && match.score.regularTime && typeof match.score.regularTime[team] === 'number') return match.score.regularTime[team];
                                 if (match.score.fullTime && typeof match.score.fullTime[team] === 'number') return match.score.fullTime[team];
                                 if (match.score.regularTime && typeof match.score.regularTime[team] === 'number') return match.score.regularTime[team];
                                 if (match.score.halfTime && typeof match.score.halfTime[team] === 'number') return match.score.halfTime[team];
