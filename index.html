@@ -1833,7 +1833,7 @@
         <div id="global-live-banner"
             style="display:none; position: absolute; top: 60px; left: 0; right: 0; background: #991b1b; color: white; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-align: center; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-bottom: 1px solid #7f1d1d; z-index: 99; overflow: hidden; white-space: nowrap;">
             <span style="animation: blink 1.5s infinite; color: #fca5a5; flex-shrink: 0;">🔴 EN VIVO</span>
-            <marquee id="global-live-text" scrollamount="5" scrolldelay="50" style="flex: 1; margin-left: 8px;"></marquee>
+            <div id="global-live-text" style="flex: 1; display: flex; align-items: center; overflow: hidden;"></div>
         </div>
         <style>
             @keyframes blink {
@@ -5146,46 +5146,48 @@
             if (doc.exists) {
                 const data = doc.data();
                 LIVE_SCORES_DATA = data || {};
-                let liveMatchText = '';
-                let hasLiveMatches = false;
+                
+                const argDateStr = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
+                const argToday = new Date(argDateStr);
+                const mesesArr = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                const todayFecha = argToday.getDate() + ' ' + mesesArr[argToday.getMonth()];
+
+                let inPlayMatches = [];
+                let finishedMatches = [];
 
                 for (const [key, matchData] of Object.entries(data)) {
                     if (key !== 'updatedAt') {
-                        let shouldShow = false;
-                        if (matchData.status === 'IN_PLAY' || matchData.status === 'PAUSED') {
-                            shouldShow = true;
-                        } else if (matchData.status === 'FINISHED') {
-                            if (matchData.finishedAt && (Date.now() - matchData.finishedAt <= 5 * 60 * 1000)) {
-                                shouldShow = true;
-                            }
-                        }
-
-                        if (shouldShow) {
-                        let local = '', visita = '';
+                        let local = '', visita = '', matchFecha = '';
                         Object.values(FIXTURE).forEach(phase => {
                             phase.forEach(m => {
                                 if (m.id === key) {
                                     local = m.local;
                                     visita = m.visita;
+                                    matchFecha = m.fecha;
                                 }
                             });
                         });
 
                         if (local && visita) {
-                            if (hasLiveMatches) {
-                                liveMatchText += '   •   ';
+                            let matchText = `${local.replace(/ [^\s]+$/, '')} ${matchData.homeScore} - ${matchData.awayScore} ${visita.replace(/ [^\s]+$/, '')} (${matchData.time})`;
+                            
+                            if (matchData.status === 'IN_PLAY' || matchData.status === 'PAUSED') {
+                                inPlayMatches.push(matchText);
+                            } else if (matchData.status === 'FINISHED' && matchFecha === todayFecha) {
+                                finishedMatches.push(matchText);
                             }
-                            hasLiveMatches = true;
-                            liveMatchText += `${local.replace(/ [^\s]+$/, '')} ${matchData.homeScore} - ${matchData.awayScore} ${visita.replace(/ [^\s]+$/, '')} (${matchData.time})`;
                         }
                     }
                 }
-                }
 
                 const banner = document.getElementById('global-live-banner');
-                const textSpan = document.getElementById('global-live-text');
-                if (hasLiveMatches) {
-                    textSpan.textContent = liveMatchText;
+                const textContainer = document.getElementById('global-live-text');
+                
+                if (inPlayMatches.length > 0) {
+                    textContainer.innerHTML = '<span>' + inPlayMatches.join(' &nbsp;•&nbsp; ') + '</span>';
+                    banner.style.display = 'flex';
+                } else if (finishedMatches.length > 0) {
+                    textContainer.innerHTML = '<marquee scrollamount="5" scrolldelay="50" style="flex:1; margin-left:8px;">' + finishedMatches.join(' &nbsp;•&nbsp; ') + '</marquee>';
                     banner.style.display = 'flex';
                 } else {
                     banner.style.display = 'none';
