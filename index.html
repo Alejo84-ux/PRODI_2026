@@ -5333,15 +5333,6 @@
                                 awayScore: away !== null ? away : 0
                             };
                         }
-                        else if (finishedStatuses.includes(status)) {
-                            if (!finalResultsData) finalResultsData = {};
-                            let resultObj = { h: home !== null ? home : 0, a: away !== null ? away : 0 };
-                            if (penHome !== null && penAway !== null) {
-                                resultObj.penH = penHome;
-                                resultObj.penA = penAway;
-                            }
-                            finalResultsData[appMatchId] = resultObj;
-                        }
                     });
                 }
                 liveMatchesData.updatedAt = new Date().toISOString();
@@ -5349,12 +5340,6 @@
                 // 1. Guardar Live Scores
                 await db.collection('pronosticos').doc('LIVE_SCORES').set(liveMatchesData);
                 console.log("✅ Web Bot: Live Score actualizados en Firebase.");
-
-                // 2. Guardar Resultados Oficiales si hay nuevos FT
-                if (finalResultsData) {
-                    console.log("🏆 Web Bot: Subiendo resultados finales a Firebase...", finalResultsData);
-                    await db.collection('pronosticos').doc('RESULTADOS_OFICIALES').set(finalResultsData, { merge: true });
-                }
 
             } catch (error) {
                 console.error("❌ Error Web Bot:", error);
