@@ -5483,7 +5483,7 @@
                 }
                 liveMatchesData.updatedAt = new Date().toISOString();
 
-                // 1. Guardar Live Scores
+                // 1. Guardar Live Scores (esto alimenta el scroll de inicio)
                 await db.collection('pronosticos').doc('LIVE_SCORES').set(liveMatchesData);
                 console.log("✅ Web Bot: Live Score actualizados en Firebase.");
 
@@ -5494,11 +5494,11 @@
 
         function startLiveScoreBot() {
             if (botInterval) clearInterval(botInterval);
-            console.log("🚀 Web Bot: Iniciado! Revisando cada 2 minutos...");
+            console.log("🚀 Web Bot: Iniciado! Revisando cada 1 minuto...");
             // Ejecutar enseguida la primera vez
             updateLiveScoresFromWeb();
-            // Luego cada 2 minutos (120000 ms)
-            botInterval = setInterval(updateLiveScoresFromWeb, 120000);
+            // Luego cada 1 minuto (60000 ms)
+            botInterval = setInterval(updateLiveScoresFromWeb, 60000);
             showToast("🚀 Bot activado en 2do plano (No cierres esta pestaña)");
         }
 
