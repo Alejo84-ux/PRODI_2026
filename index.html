@@ -5315,7 +5315,8 @@
 
                             Object.values(FIXTURE).forEach(phase => {
                                 phase.forEach(m => {
-                                    if (m.local.includes(hName) && m.visita.includes(aName)) {
+                                    if ((m.local.includes(hName) && m.visita.includes(aName)) || 
+                                        (m.local.includes(aName) && m.visita.includes(hName))) {
                                         appMatchId = m.id;
                                     }
                                 });
