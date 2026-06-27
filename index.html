@@ -4405,8 +4405,8 @@
                 var emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Emoji_Presentation}/gu;
                 if (emojiRegex.test(lastChar)) {
                     return {
-                        flag: '<span class="team-premium-flag" style="font-size: 1.5em; display: inline-block; width: 100%; text-align: center;">' + lastChar + '</span>',
-                        name: ''
+                        flag: '<span class="team-premium-flag">' + lastChar + '</span>',
+                        name: parts.slice(0, -1).join(' ').toUpperCase()
                     };
                 }
                 return { flag: '<div class="team-premium-shield"></div>', name: nameStr.toUpperCase() };
