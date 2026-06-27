@@ -5362,12 +5362,19 @@
                             const url3 = `https://thingproxy.freeboard.io/fetch/${targetUrl}`;
                             response = await fetch(url3, fetchOptions);
                         } catch (e3) {
-                            console.warn("Proxy 3 falló, intentando petición directa...");
+                            console.warn("Proxy 3 falló, intentando Proxy 4 (allorigins)...");
                             try {
-                                // Intento 4: Directo
-                                response = await fetch(targetUrl, fetchOptions);
+                                // Intento 4: allorigins
+                                const url4 = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                                response = await fetch(url4, fetchOptions);
                             } catch (e4) {
-                                throw new Error("Todas las conexiones fallaron. Esto pasa al abrir el archivo directamente (file://). Usa 'Live Server' de VS Code para probarlo.");
+                                console.warn("Proxy 4 falló, intentando petición directa...");
+                                try {
+                                    // Intento 5: Directo
+                                    response = await fetch(targetUrl, fetchOptions);
+                                } catch (e5) {
+                                    throw new Error("Todas las conexiones fallaron. Esto pasa al abrir el archivo directamente (file://). Usa 'Live Server' de VS Code para probarlo.");
+                                }
                             }
                         }
                     }
@@ -5400,6 +5407,7 @@
                     apiData.matches.forEach(match => {
                         const matchIdApi = match.id;
                         let appMatchId = API_TO_APP_IDS[matchIdApi];
+                        let isSwapped = false;
 
                         if (!appMatchId && match.homeTeam && match.awayTeam) {
                             const hName = TEAM_NAME_MAP[match.homeTeam.name] || match.homeTeam.name;
@@ -5407,9 +5415,12 @@
 
                             Object.values(FIXTURE).forEach(phase => {
                                 phase.forEach(m => {
-                                    if ((m.local.includes(hName) && m.visita.includes(aName)) || 
-                                        (m.local.includes(aName) && m.visita.includes(hName))) {
+                                    if (m.local.includes(hName) && m.visita.includes(aName)) {
                                         appMatchId = m.id;
+                                        isSwapped = false;
+                                    } else if (m.local.includes(aName) && m.visita.includes(hName)) {
+                                        appMatchId = m.id;
+                                        isSwapped = true;
                                     }
                                 });
                             });
@@ -5458,8 +5469,8 @@
                             liveMatchesData[appMatchId] = {
                                 status: finishedStatuses.includes(status) ? 'FINISHED' : (pausedStatuses.includes(status) ? 'PAUSED' : 'IN_PLAY'),
                                 time: matchTime,
-                                homeScore: home !== null ? home : 0,
-                                awayScore: away !== null ? away : 0,
+                                homeScore: home !== null ? (isSwapped ? away : home) : 0,
+                                awayScore: away !== null ? (isSwapped ? home : away) : 0,
                                 finishedAt: finishedAt
                             };
                         }
