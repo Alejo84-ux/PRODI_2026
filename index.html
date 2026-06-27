@@ -1632,12 +1632,8 @@
         .bracket-wrapper {
             overflow-x: auto;
             padding: 40px 10px;
-            background-color: #111111; /* Si falla la imagen, se verá gris oscuro */
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('./fondo_llave.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: url('fondo_llave.jpg') center/cover no-repeat;
+            background-color: #111111;
             border-radius: var(--radius);
             margin-top: 0;
             border-top: 1px solid var(--border);
