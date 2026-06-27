@@ -5150,7 +5150,17 @@
                 let hasLiveMatches = false;
 
                 for (const [key, matchData] of Object.entries(data)) {
-                    if (key !== 'updatedAt' && (matchData.status === 'IN_PLAY' || matchData.status === 'PAUSED')) {
+                    if (key !== 'updatedAt') {
+                        let shouldShow = false;
+                        if (matchData.status === 'IN_PLAY' || matchData.status === 'PAUSED') {
+                            shouldShow = true;
+                        } else if (matchData.status === 'FINISHED') {
+                            if (matchData.finishedAt && (Date.now() - matchData.finishedAt <= 5 * 60 * 1000)) {
+                                shouldShow = true;
+                            }
+                        }
+
+                        if (shouldShow) {
                         let local = '', visita = '';
                         Object.values(FIXTURE).forEach(phase => {
                             phase.forEach(m => {
@@ -5162,8 +5172,11 @@
                         });
 
                         if (local && visita) {
+                            if (hasLiveMatches) {
+                                liveMatchText += '   •   ';
+                            }
                             hasLiveMatches = true;
-                            liveMatchText += `${local.replace(/ [^\s]+$/, '')} ${matchData.homeScore} - ${matchData.awayScore} ${visita.replace(/ [^\s]+$/, '')} (${matchData.time})   `;
+                            liveMatchText += `${local.replace(/ [^\s]+$/, '')} ${matchData.homeScore} - ${matchData.awayScore} ${visita.replace(/ [^\s]+$/, '')} (${matchData.time})`;
                         }
                     }
                 }
@@ -5329,12 +5342,27 @@
                         const pausedStatuses = ['PAUSED']; // Entretiempo
                         const finishedStatuses = ['FINISHED', 'AWARDED'];
 
-                        if (inPlayStatuses.includes(status) || pausedStatuses.includes(status)) {
+                        if (inPlayStatuses.includes(status) || pausedStatuses.includes(status) || finishedStatuses.includes(status)) {
+                            let matchTime = 'En juego';
+                            if (pausedStatuses.includes(status)) matchTime = 'ET';
+                            else if (finishedStatuses.includes(status)) matchTime = 'Terminado';
+                            else if (match.minute) matchTime = match.minute + "'";
+
+                            let finishedAt = null;
+                            if (finishedStatuses.includes(status)) {
+                                if (LIVE_SCORES_DATA[appMatchId] && LIVE_SCORES_DATA[appMatchId].status === 'FINISHED' && LIVE_SCORES_DATA[appMatchId].finishedAt) {
+                                    finishedAt = LIVE_SCORES_DATA[appMatchId].finishedAt;
+                                } else {
+                                    finishedAt = Date.now();
+                                }
+                            }
+
                             liveMatchesData[appMatchId] = {
-                                status: pausedStatuses.includes(status) ? 'PAUSED' : 'IN_PLAY',
-                                time: match.minute ? match.minute + "'" : 'En juego',
+                                status: finishedStatuses.includes(status) ? 'FINISHED' : (pausedStatuses.includes(status) ? 'PAUSED' : 'IN_PLAY'),
+                                time: matchTime,
                                 homeScore: home !== null ? home : 0,
-                                awayScore: away !== null ? away : 0
+                                awayScore: away !== null ? away : 0,
+                                finishedAt: finishedAt
                             };
                         }
                     });
