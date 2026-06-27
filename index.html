@@ -5207,7 +5207,7 @@
                 // Forzamos el horario de Argentina para no pedir el día equivocado
                 const argDateStr = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
                 const today = new Date(argDateStr);
-                
+
                 // Usamos ventana de 3 días para evitar problemas de UTC
                 const yesterday = new Date(today);
                 yesterday.setDate(yesterday.getDate() - 1);
@@ -5225,7 +5225,7 @@
 
                 console.log("🌐 Web Bot consultando football-data.org (vía proxy) para: " + dateFromStr + " a " + dateToStr);
                 const targetUrl = `https://api.football-data.org/v4/competitions/WC/matches?dateFrom=${dateFromStr}&dateTo=${dateToStr}`;
-                
+
                 // Múltiples opciones de proxy o directo para evitar el error "Failed to fetch" (común al abrir como file://)
                 let response;
                 const fetchOptions = {
@@ -5292,7 +5292,7 @@
                         if (!appMatchId && match.homeTeam && match.awayTeam) {
                             const hName = TEAM_NAME_MAP[match.homeTeam.name] || match.homeTeam.name;
                             const aName = TEAM_NAME_MAP[match.awayTeam.name] || match.awayTeam.name;
-                            
+
                             Object.values(FIXTURE).forEach(phase => {
                                 phase.forEach(m => {
                                     if (m.local.includes(hName) && m.visita.includes(aName)) {
