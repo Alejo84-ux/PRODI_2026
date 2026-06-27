@@ -5239,8 +5239,8 @@
 
                 const argDateStr = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
                 const argToday = new Date(argDateStr);
-                // Restamos 12 horas para que el "día futbolístico" termine a las 12 PM (mediodía) del día siguiente
-                argToday.setHours(argToday.getHours() - 12);
+                // Restamos 12 horas para que el "día futbolístico" termine a las 15 PM (mediodía) del día siguiente
+                argToday.setHours(argToday.getHours() - 15);
                 const mesesArr = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                 const todayFecha = argToday.getDate() + ' ' + mesesArr[argToday.getMonth()];
 
