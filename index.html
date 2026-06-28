@@ -3402,7 +3402,9 @@
                 if (yaaplicado) {
                     bonusContent += '<div style="padding:10px 14px;background:rgba(45,158,92,.1);border:1px solid rgba(45,158,92,.3);border-radius:8px;font-size:12px;color:#4ade80">✅ Cláusulas ya aplicadas.</div>';
                 } else {
-                    bonusContent += '<button onclick="aplicarCierre(' + JSON.stringify(leader) + ',' + JSON.stringify(last) + ')" style="width:100%;padding:12px;background:rgba(201,162,39,.15);border:1px solid var(--gold);border-radius:8px;font-size:18px;letter-spacing:1px;cursor:pointer;color:var(--gold)">&#9889; APLICAR CLÁUSULAS DE CIERRE</button>';
+                    var leaderArg = JSON.stringify(leader).replace(/"/g, '&quot;');
+                    var lastArg = JSON.stringify(last).replace(/"/g, '&quot;');
+                    bonusContent += '<button onclick="aplicarCierre(' + leaderArg + ',' + lastArg + ')" style="width:100%;padding:12px;background:rgba(201,162,39,.15);border:1px solid var(--gold);border-radius:8px;font-size:18px;letter-spacing:1px;cursor:pointer;color:var(--gold)">&#9889; APLICAR CLÁUSULAS DE CIERRE</button>';
                 }
                 bonusContent += '</div>';
             }
