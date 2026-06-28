@@ -414,11 +414,11 @@
             z-index: 2;
             box-shadow: 1px 0 0 var(--border);
         }
-        
+
         .tabla-fija-col th:first-child {
             z-index: 3;
         }
-        
+
         .tabla-fija-col tr:hover td:first-child {
             background: #1e242c;
         }
@@ -3273,14 +3273,14 @@
 
             var allTeamsSet = {};
             if (FIXTURE.grupos) {
-                FIXTURE.grupos.forEach(function(m) {
+                FIXTURE.grupos.forEach(function (m) {
                     allTeamsSet[m.local] = true;
                     allTeamsSet[m.visita] = true;
                 });
             }
             var allTeamsArr = Object.keys(allTeamsSet).sort();
             var teamOptionsHtml = '<option value="">-- Seleccionar país --</option>';
-            allTeamsArr.forEach(function(t) {
+            allTeamsArr.forEach(function (t) {
                 teamOptionsHtml += '<option value="' + t + '">' + t + '</option>';
             });
 
@@ -3288,9 +3288,9 @@
             clasifContent += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">';
             clasifContent += '<div style="flex:1;min-width:260px">';
             clasifContent += '<h4 style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);margin-bottom:8px">1ros y 2dos de Grupo</h4>';
-            keysGrupos.forEach(function(k) {
+            keysGrupos.forEach(function (k) {
                 var val = clasificados[k] || '';
-                var selectHtml = '<select id="clasif-' + k.replace(/°/g,'').replace(/ /g,'-') + '" data-key="' + k + '" onchange="this.setAttribute(\'data-dirty\',\'true\')" class="clasif-input" style="flex:1;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:Inter,sans-serif;font-size:12px;outline:none">';
+                var selectHtml = '<select id="clasif-' + k.replace(/°/g, '').replace(/ /g, '-') + '" data-key="' + k + '" onchange="this.setAttribute(\'data-dirty\',\'true\')" class="clasif-input" style="flex:1;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:Inter,sans-serif;font-size:12px;outline:none">';
                 selectHtml += teamOptionsHtml.replace('value="' + val + '"', 'value="' + val + '" selected');
                 selectHtml += '</select>';
                 clasifContent += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--bg3);padding:6px 10px;border-radius:6px">'
@@ -3302,9 +3302,9 @@
 
             clasifContent += '<div style="flex:1;min-width:260px">';
             clasifContent += '<h4 style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#75AADB;margin-bottom:8px">3ros Mejores</h4>';
-            keysMejores.forEach(function(k) {
+            keysMejores.forEach(function (k) {
                 var val = clasificados[k] || '';
-                var selectHtml = '<select id="clasif-' + k.replace(/°|\(|\)/g,'').replace(/ /g,'-') + '" data-key="' + k + '" onchange="this.setAttribute(\'data-dirty\',\'true\')" class="clasif-input" style="flex:1;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:Inter,sans-serif;font-size:12px;outline:none">';
+                var selectHtml = '<select id="clasif-' + k.replace(/°|\(|\)/g, '').replace(/ /g, '-') + '" data-key="' + k + '" onchange="this.setAttribute(\'data-dirty\',\'true\')" class="clasif-input" style="flex:1;background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:Inter,sans-serif;font-size:12px;outline:none">';
                 selectHtml += teamOptionsHtml.replace('value="' + val + '"', 'value="' + val + '" selected');
                 selectHtml += '</select>';
                 clasifContent += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--bg3);padding:6px 10px;border-radius:6px">'
@@ -3348,8 +3348,8 @@
                     var isElim = phase !== 'grupos';
                     var penH = r.penH !== undefined ? r.penH : '';
                     var penA = r.penA !== undefined ? r.penA : '';
-                    
-                    var penalsHtml = isElim ? 
+
+                    var penalsHtml = isElim ?
                         '<div style="display:flex;justify-content:center;margin-top:6px">' +
                         '<div style="display:flex;align-items:center;gap:6px;background:rgba(201,162,39,.1);padding:4px 8px;border-radius:6px;border:1px solid rgba(201,162,39,.2)">' +
                         '<span style="font-size:10px;color:var(--gold);text-transform:uppercase;font-weight:600">Penales:</span>' +
@@ -3513,7 +3513,7 @@
                 cocos.forEach(function (c, idx) {
                     cocoContent += '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(201,162,39,.04);border:1px solid rgba(201,162,39,.15);border-radius:8px;padding:10px 12px;margin-bottom:8px">'
                         + '<div style="flex:1"><div style="font-size:11px;color:var(--gold);margin-bottom:2px">' + c.fecha + '</div>'
-                        + '<div style="font-size:12px;color:var(--text2);white-space:pre-wrap;">' + c.texto + '</div></div>'
+                        + '<div style="font-size:12px;color:var(--text2);white-space:pre-wrap;">' + highlightJugadores(c.texto) + '</div></div>'
                         + '<button onclick="deleteCoco(' + idx + ')" style="flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">&#10005;</button>'
                         + '</div>';
                 });
@@ -3871,7 +3871,7 @@
             oficiales.clasificados = {};
             var allKeys = ['1° Grupo A', '2° Grupo A', '1° Grupo B', '2° Grupo B', '1° Grupo C', '2° Grupo C', '1° Grupo D', '2° Grupo D', '1° Grupo E', '2° Grupo E', '1° Grupo F', '2° Grupo F', '1° Grupo G', '2° Grupo G', '1° Grupo H', '2° Grupo H', '1° Grupo I', '2° Grupo I', '1° Grupo J', '2° Grupo J', '1° Grupo K', '2° Grupo K', '1° Grupo L', '2° Grupo L', '3° mejor (vs 1E)', '3° mejor (vs 1I)', '3° mejor (vs 1A)', '3° mejor (vs 1L)', '3° mejor (vs 1D)', '3° mejor (vs 1G)', '3° mejor (vs 1B)', '3° mejor (vs 1K)'];
             allKeys.forEach(function (k) {
-                var el = document.getElementById('clasif-' + k.replace(/°|\(|\)/g,'').replace(/ /g,'-'));
+                var el = document.getElementById('clasif-' + k.replace(/°|\(|\)/g, '').replace(/ /g, '-'));
                 if (el && el.value.trim() !== '') oficiales.clasificados[k] = el.value.trim();
             });
 
@@ -4224,8 +4224,8 @@
                 if (r.golesAciertos > 0) golesBadge = '<span title="Autores de goles acertados en el torneo" style="font-size:10px;color:#75AADB;margin-left:6px;background:rgba(117,170,219,.15);border:1px solid rgba(117,170,219,.3);padding:1px 6px;border-radius:10px">⚽ ' + r.golesAciertos + '</span>';
 
                 var sancionBadge = '';
-                var userSanciones = (RESULTADOS_OFICIALES.sanciones || []).filter(function(s) { return s.usuario === r.u; });
-                userSanciones.forEach(function(s) {
+                var userSanciones = (RESULTADOS_OFICIALES.sanciones || []).filter(function (s) { return s.usuario === r.u; });
+                userSanciones.forEach(function (s) {
                     var t = s.tipo || 'sancion';
                     var pts = parseInt(s.puntos, 10) || 0;
                     if (t === 'investigacion') {
@@ -4891,6 +4891,15 @@
         // ══════════════════════════════════════════
         //  COCOMUNICADOS
         // ══════════════════════════════════════════
+        function highlightJugadores(texto) {
+            if (!texto) return '';
+            var users = Object.keys(pronosticos);
+            if (!users.length) return texto;
+            var escapedUsers = users.slice().sort(function (a, b) { return b.length - a.length }).map(function (u) { return u.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); });
+            var regex = new RegExp('(^|[^a-zA-Z0-9\\u00C0-\\u017F])(' + escapedUsers.join('|') + ')(?=[^a-zA-Z0-9\\u00C0-\\u017F]|$)', 'gi');
+            return texto.replace(regex, '$1<span style="color:var(--gold-light);font-weight:700;background:rgba(201,162,39,.15);padding:0 4px;border-radius:4px">$2</span>');
+        }
+
         function renderCocomunicados() {
             var container = document.getElementById('cocomunicados-container');
             if (!container) return;
@@ -4904,7 +4913,7 @@
                     + '<div class="coco-icon">\u{1F965}</div>'
                     + '<div class="coco-body">'
                     + '<div class="coco-fecha">' + c.fecha + '</div>'
-                    + '<div class="coco-texto" style="white-space: pre-wrap;"><strong style="color:var(--gold)">Cocomunicado</strong> ' + c.texto + '</div>'
+                    + '<div class="coco-texto" style="white-space: pre-wrap;"><strong style="color:var(--gold)">Cocomunicado</strong> ' + highlightJugadores(c.texto) + '</div>'
                     + '</div>'
                     + '</div>';
             }).join('');
