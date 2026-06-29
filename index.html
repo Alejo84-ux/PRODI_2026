@@ -5417,8 +5417,8 @@
                         Object.values(FIXTURE).forEach(phase => {
                             phase.forEach(m => {
                                 if (m.id === key) {
-                                    local = m.local;
-                                    visita = m.visita;
+                                    local = getMappedTeamName(m.local);
+                                    visita = getMappedTeamName(m.visita);
                                     matchFecha = m.fecha;
                                 }
                             });
