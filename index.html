@@ -419,6 +419,10 @@
             z-index: 3;
         }
 
+        .tabla-fija-col tr:first-child td:first-child {
+            background: #191e23; /* bg2 + gold tint solid */
+        }
+
         .tabla-fija-col tr:hover td:first-child {
             background: #1e242c;
         }
@@ -1911,6 +1915,13 @@
     </datalist>
 
     <header class="site-header">
+        <!-- BANNER NUEVO COCOMUNICADO -->
+        <div id="coco-alert-banner"
+            style="display:none; position: absolute; top: 60px; left: 0; right: 0; background: rgba(201, 162, 39, 0.95); color: #000; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-align: center; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-bottom: 1px solid var(--gold); z-index: 98; cursor: pointer; white-space: nowrap;"
+            onclick="abrirCocomunicados()">
+            <span style="font-size:16px; flex-shrink:0;">📩</span>
+            <div id="coco-alert-text" style="flex: 1; display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis;"></div>
+        </div>
         <!-- BANNER GLOBAL LIVE SCORES -->
         <div id="global-live-banner"
             style="display:none; position: absolute; top: 60px; left: 0; right: 0; background: #991b1b; color: white; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-align: center; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-bottom: 1px solid #7f1d1d; z-index: 99; overflow: hidden; white-space: nowrap;">
@@ -2880,19 +2891,43 @@
             var saved = currentUser && pronosticos[currentUser] && pronosticos[currentUser][m.id];
             var hv = saved ? saved.h : '';
             var av = saved ? saved.a : '';
+            var penAdv = saved ? saved.penAdv : '';
             var lbl = m.label ? '<div style="font-size:11px;color:var(--gold);margin-bottom:4px;font-weight:600">' + m.label + '</div>' : '';
+            var penHtml = '';
+            if (m.id.startsWith('R16-')) {
+                penHtml = '<div style="margin-top:8px;text-align:center;font-size:11px;color:var(--text3);' + (hv !== '' && hv === av ? '' : 'display:none;') + '" id="pen-div-' + m.id + '">Si hay penales, pasa: ' +
+                    '<select id="pen-' + m.id + '" onchange="markChanged(\'' + m.id + '\')" style="background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:2px 4px;font-family:Inter,sans-serif;font-size:11px;outline:none;margin-left:4px">' +
+                    '<option value="">-</option>' +
+                    '<option value="H" ' + (penAdv === 'H' ? 'selected' : '') + '>' + getMappedTeamName(m.local) + '</option>' +
+                    '<option value="A" ' + (penAdv === 'A' ? 'selected' : '') + '>' + getMappedTeamName(m.visita) + '</option>' +
+                    '</select></div>';
+            }
             return '<div class="match-card' + (saved ? ' saved' : '') + '" id="mc-' + m.id + '">' + lbl +
                 '<div class="match-top">' +
                 '<div class="team-block right"><span class="team-name">' + formatTeamName(getMappedTeamName(m.local)) + '</span></div>' +
                 '<div class="score-inputs">' +
-                '<input type="number" min="0" max="20" class="score-in" id="h-' + m.id + '" value="' + hv + '" onchange="markChanged(\'' + m.id + '\')" placeholder="-">' +
+                '<input type="number" min="0" max="20" class="score-in" id="h-' + m.id + '" value="' + hv + '" oninput="checkTie(\'' + m.id + '\')" onchange="markChanged(\'' + m.id + '\'); checkTie(\'' + m.id + '\')" placeholder="-">' +
                 '<span class="vs-sep">VS</span>' +
-                '<input type="number" min="0" max="20" class="score-in" id="a-' + m.id + '" value="' + av + '" onchange="markChanged(\'' + m.id + '\')" placeholder="-">' +
+                '<input type="number" min="0" max="20" class="score-in" id="a-' + m.id + '" value="' + av + '" oninput="checkTie(\'' + m.id + '\')" onchange="markChanged(\'' + m.id + '\'); checkTie(\'' + m.id + '\')" placeholder="-">' +
                 '</div>' +
                 '<div class="team-block"><span class="team-name">' + formatTeamName(getMappedTeamName(m.visita)) + '</span></div>' +
                 '</div>' +
+                penHtml +
                 '<div class="match-meta"><span>📅 ' + m.fecha + ' · ' + m.hora + '</span><span>📍 ' + m.sede + '</span></div>' +
                 '</div>';
+        }
+
+        function checkTie(id) {
+            var h = document.getElementById('h-' + id);
+            var a = document.getElementById('a-' + id);
+            var div = document.getElementById('pen-div-' + id);
+            if (h && a && div) {
+                if (h.value !== '' && a.value !== '' && h.value === a.value) {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            }
         }
 
         function renderMatches(phase) {
@@ -3067,8 +3102,13 @@
                     FIXTURE[phase].forEach(function (m) {
                         var hi = document.getElementById('h-' + m.id);
                         var ai = document.getElementById('a-' + m.id);
+                        var pi = document.getElementById('pen-' + m.id);
                         if (hi && ai && hi.value !== '' && ai.value !== '') {
-                            pronosticos[currentUser][m.id] = { h: parseInt(hi.value), a: parseInt(ai.value) };
+                            var pronoObj = { h: parseInt(hi.value), a: parseInt(ai.value) };
+                            if (pi && hi.value === ai.value) {
+                                pronoObj.penAdv = pi.value;
+                            }
+                            pronosticos[currentUser][m.id] = pronoObj;
                             var card = document.getElementById('mc-' + m.id);
                             if (card) { card.classList.add('saved'); card.style.borderColor = ''; }
                             count++;
@@ -4003,6 +4043,20 @@
                         pts += base; parciales++;
                         // Art. 17 — +2 pleno +1 x gol
                         if (esPleno) { pts += 2; pts += (r.h + r.a); exactos++; }
+                        
+                        // NEW LOGIC: Si es R16, y predijo empate, y el resultado oficial fue empate
+                        if (phase === 'r16' && p.h === p.a && r.h === r.a) {
+                            if (p.penAdv && p.penAdv !== '') {
+                                var officialAdv = '';
+                                if (r.penH !== undefined && r.penA !== undefined) {
+                                    officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
+                                }
+                                if (p.penAdv === officialAdv) {
+                                    pts += 5; 
+                                }
+                            }
+                        }
+
                         // Art. 18 — bonus Argentina
                         if (esArg) {
                             if (id === 'FINAL') pts += 2;
@@ -4113,6 +4167,20 @@
                     if (esAcierto) {
                         pts += base;
                         if (esPleno) { pts += 2; pts += (r.h + r.a); }
+                        
+                        // NEW LOGIC
+                        if (phase === 'r16' && p.h === p.a && r.h === r.a) {
+                            if (p.penAdv && p.penAdv !== '') {
+                                var officialAdv = '';
+                                if (r.penH !== undefined && r.penA !== undefined) {
+                                    officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
+                                }
+                                if (p.penAdv === officialAdv) {
+                                    pts += 5; 
+                                }
+                            }
+                        }
+
                         if (esArg) {
                             if (id === 'FINAL') pts += 2;
                             else if (id !== '3RD') pts += 1;
@@ -4891,6 +4959,35 @@
         // ══════════════════════════════════════════
         //  COCOMUNICADOS
         // ══════════════════════════════════════════
+        var cocoAccOpen = false;
+
+        function toggleCocoAcc() {
+            cocoAccOpen = !cocoAccOpen;
+            var body = document.getElementById('coco-list-body');
+            var arrow = document.getElementById('coco-arrow');
+            if (body) body.style.display = cocoAccOpen ? 'block' : 'none';
+            if (arrow) arrow.textContent = cocoAccOpen ? '▾' : '▸';
+
+            if (cocoAccOpen) {
+                var cocos = (RESULTADOS_OFICIALES && RESULTADOS_OFICIALES.cocomunicados) || [];
+                if (cocos.length > 0 && cocos[0].timestamp) {
+                    localStorage.setItem('prodi_lastSeenCocoTs', cocos[0].timestamp.toString());
+                }
+                var banner = document.getElementById('coco-alert-banner');
+                if (banner) banner.style.display = 'none';
+            }
+        }
+
+        function abrirCocomunicados() {
+            var el = document.getElementById('cocomunicados-container');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+            if (!cocoAccOpen) {
+                toggleCocoAcc();
+            }
+            var banner = document.getElementById('coco-alert-banner');
+            if (banner) banner.style.display = 'none';
+        }
+
         function highlightJugadores(texto) {
             if (!texto) return '';
             var users = Object.keys(pronosticos);
@@ -4904,6 +5001,24 @@
             var container = document.getElementById('cocomunicados-container');
             if (!container) return;
             var cocos = (RESULTADOS_OFICIALES && RESULTADOS_OFICIALES.cocomunicados) || [];
+
+            var banner = document.getElementById('coco-alert-banner');
+            var textEl = document.getElementById('coco-alert-text');
+            if (banner && textEl) banner.style.display = 'none';
+
+            if (cocos.length > 0 && cocos[0].timestamp) {
+                var ageMs = Date.now() - cocos[0].timestamp;
+                var isRecent = ageMs < 12 * 60 * 60 * 1000;
+                var lastSeenTs = parseInt(localStorage.getItem('prodi_lastSeenCocoTs') || '0', 10);
+
+                if (isRecent && cocos[0].timestamp > lastSeenTs) {
+                    if (banner && textEl) {
+                        textEl.innerHTML = '<strong style="margin-right:6px">NUEVO MENSAJE:</strong> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + cocos[0].texto + '</span>';
+                        banner.style.display = 'flex';
+                    }
+                }
+            }
+
             if (!cocos.length) {
                 container.innerHTML = '<div class="coco-panel"><div class="coco-empty">\u{1F965} Sin cocomunicados por el momento.</div></div>';
                 return;
@@ -4918,14 +5033,17 @@
                     + '</div>';
             }).join('');
             var n = cocos.length;
+            var displayStyle = cocoAccOpen ? 'block' : 'none';
+            var arrowTxt = cocoAccOpen ? '▾' : '▸';
+
             container.innerHTML =
                 '<div class="coco-panel">'
-                + '<div class="coco-header">'
+                + '<div class="coco-header" onclick="toggleCocoAcc()" style="cursor:pointer; transition: background 0.15s;" onmouseover="this.style.background=\'rgba(201, 162, 39, .1)\'" onmouseout="this.style.background=\'rgba(201, 162, 39, .05)\'">'
                 + '<span style="font-size:22px">\u{1F965}</span>'
                 + '<span class="coco-header-title">Cocomunicados</span>'
-                + '<span class="coco-header-sub">' + n + ' comunicado' + (n !== 1 ? 's' : '') + '</span>'
+                + '<span class="coco-header-sub">' + n + ' comunicado' + (n !== 1 ? 's' : '') + ' <span id="coco-arrow" style="margin-left:6px;font-size:14px;color:var(--text2)">' + arrowTxt + '</span></span>'
                 + '</div>'
-                + '<div class="coco-list">' + items + '</div>'
+                + '<div class="coco-list" id="coco-list-body" style="display:' + displayStyle + '">' + items + '</div>'
                 + '</div>';
         }
 
@@ -4942,7 +5060,7 @@
             var texto = input.value.trim();
             if (!texto) { showToast('\u26A0\uFE0F Escribi algo antes de publicar'); return; }
             var cocos = (RESULTADOS_OFICIALES.cocomunicados || []).slice();
-            cocos.unshift({ fecha: _cocoFechaHoy(), texto: texto });
+            cocos.unshift({ fecha: _cocoFechaHoy(), texto: texto, timestamp: Date.now() });
             RESULTADOS_OFICIALES.cocomunicados = cocos;
             _saveCocosToFirebase(cocos, function () {
                 input.value = '';
@@ -5178,7 +5296,13 @@
                     }
 
                     var predText = p.h + '–' + p.a;
+                    if (p.penAdv === 'H') predText += ' (Pasa ' + m.local + ')';
+                    else if (p.penAdv === 'A') predText += ' (Pasa ' + m.visita + ')';
+
                     var oficialText = (r && r.h !== '' && r.h !== undefined && r.h !== null) ? r.h + '–' + r.a : '?';
+                    if (r && r.penH !== undefined && r.penA !== undefined) {
+                        oficialText += ' (' + r.penH + '-' + r.penA + ' p)';
+                    }
 
                     if (!r || r.h === '' || r.h === undefined) {
                         // Partido sin resultado aún
@@ -5234,6 +5358,20 @@
                             else if (phase === 'cuartos') base = 7;
                             matchPts += base; badges.push('+' + base + ' acierto');
                             if (esPleno) { matchPts += 2; matchPts += (rh + ra); badges.push('+2 pleno'); badges.push('+' + (rh + ra) + ' goles'); }
+
+                            if (phase === 'r16' && ph === pa && rh === ra) {
+                                if (p.penAdv && p.penAdv !== '') {
+                                    var officialAdv = '';
+                                    if (r.penH !== undefined && r.penA !== undefined) {
+                                        officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
+                                    }
+                                    if (p.penAdv === officialAdv) {
+                                        matchPts += 5; 
+                                        badges.push('+5 penales'); 
+                                    }
+                                }
+                            }
+
                             if (esArg) {
                                 if (m.id === 'FINAL') { matchPts += 2; badges.push('+2 🇦🇷'); }
                                 else if (m.id !== '3RD') { matchPts += 1; badges.push('+1 🇦🇷'); }
