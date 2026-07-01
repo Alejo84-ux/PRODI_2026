@@ -1501,6 +1501,9 @@
             padding: 18px 20px
         }
 
+        .desglose-details {
+            margin-bottom: 8px;
+        }
         .desglose-section-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 16px;
@@ -1511,7 +1514,23 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 6px
+            gap: 6px;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+        .desglose-section-title::-webkit-details-marker {
+            display: none;
+        }
+        .desglose-section-title::before {
+            content: "▶";
+            font-size: 10px;
+            transition: transform 0.2s;
+            margin-right: 2px;
+            color: var(--gold-light);
+        }
+        .desglose-details[open] .desglose-section-title::before {
+            transform: rotate(90deg);
         }
 
         .desglose-row {
@@ -5413,10 +5432,10 @@
                 });
 
                 if (filas) {
-                    seccionesHtml += '<div class="desglose-section-title">' +
+                    seccionesHtml += '<details class="desglose-details"><summary class="desglose-section-title">' +
                         (faseLabels[phase] || phase) +
                         (hayResultado ? ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">' + fasePts + ' pts</span>' : '') +
-                        '</div>' + filas;
+                        '</summary>' + filas + '</details>';
                 }
             });
 
@@ -5465,9 +5484,9 @@
             });
 
             if (extFilas) {
-                seccionesHtml += '<div class="desglose-section-title">🎯 Extras'
+                seccionesHtml += '<details class="desglose-details"><summary class="desglose-section-title">🎯 Extras'
                     + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">' + extPts + ' pts</span>'
-                    + '</div>' + extFilas;
+                    + '</summary>' + extFilas + '</details>';
             }
 
             // ── SANCIONES / BONIFICACIONES ──
@@ -5490,9 +5509,9 @@
                     + '</div>';
             });
             if (sanFilas) {
-                seccionesHtml += '<div class="desglose-section-title">⚖️ Sanciones / Bonos'
+                seccionesHtml += '<details class="desglose-details"><summary class="desglose-section-title">⚖️ Sanciones / Bonos'
                     + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">' + sanPts + ' pts</span>'
-                    + '</div>' + sanFilas;
+                    + '</summary>' + sanFilas + '</details>';
             }
 
             // ── BONUS CIERRE ──
@@ -5501,14 +5520,14 @@
                 ptsTotal += bc;
                 var bcColor = bc > 0 ? 'green' : 'red';
                 var bcIcon = bc > 0 ? '🏅' : '⚠️';
-                seccionesHtml += '<div class="desglose-section-title">⚡ Cláusulas de Cierre'
+                seccionesHtml += '<details class="desglose-details"><summary class="desglose-section-title">⚡ Cláusulas de Cierre'
                     + ' <span style="margin-left:auto;font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:var(--text3)">' + (bc > 0 ? '+' : '') + bc + ' pts</span>'
-                    + '</div>'
+                    + '</summary>'
                     + '<div class="desglose-row ' + (bc > 0 ? 'parcial' : 'error') + '">'
                     + '<span style="font-size:16px">' + bcIcon + '</span>'
                     + '<span class="desglose-match-name">Cláusula Arts. 14/15 — cierre de grupos</span>'
                     + '<span class="desglose-pts ' + bcColor + '">' + (bc > 0 ? '+' : '') + bc + '</span>'
-                    + '</div>';
+                    + '</div></details>';
             }
 
             // ── RESUMEN TOTAL ──
