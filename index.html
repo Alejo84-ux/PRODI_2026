@@ -4375,7 +4375,7 @@
         // ══════════════════════════════════════════
         //  TODOS — acordeón jugados / próximos
         // ══════════════════════════════════════════
-        var todosAccOpen = { jugados: false, jugadosGrupo: false, proximos: true };
+        var todosAccOpen = { jugados: false, proximos: true };
         var selectedPartidoId = '';
 
         function toggleTodosAcc(key) {
@@ -4426,11 +4426,8 @@
             });
             todos.sort(function (a, b) { return toSortKey(a) - toSortKey(b); });
 
-            var jugados = todos.filter(function (m) { return RESULTADOS_OFICIALES[m.id] && RESULTADOS_OFICIALES[m.id].h !== ''; }).reverse();
+            var jugados = todos.filter(function (m) { return RESULTADOS_OFICIALES[m.id] && RESULTADOS_OFICIALES[m.id].h !== ''; });
             var proximos = todos.filter(function (m) { return !RESULTADOS_OFICIALES[m.id] || RESULTADOS_OFICIALES[m.id].h === ''; });
-
-            var jugadosGrupo = jugados.filter(function (m) { return m.grupo; });
-            var jugadosLlaves = jugados.filter(function (m) { return !m.grupo; });
 
             function makeBtn(m) {
                 var ofic = RESULTADOS_OFICIALES[m.id];
@@ -4451,26 +4448,7 @@
             var proximosEl = document.getElementById('acc-todos-proximos');
             if (!jugadosEl || !proximosEl) return;
 
-            var htmlJugados = '';
-            if (jugadosLlaves.length) {
-                htmlJugados += jugadosLlaves.map(makeBtn).join('');
-            }
-            if (jugadosGrupo.length) {
-                var disp = todosAccOpen.jugadosGrupo ? 'flex' : 'none';
-                var arr = todosAccOpen.jugadosGrupo ? '▾' : '▸';
-                htmlJugados += '<div onclick="toggleTodosAcc(\'jugadosGrupo\')" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-top:4px;cursor:pointer;user-select:none">'
-                             + '<span style="font-size:12px;font-weight:600;color:var(--text2);flex:1">Fase de Grupos</span>'
-                             + '<span id="acc-todos-arrow-jugadosGrupo" style="color:var(--text3);font-size:12px">' + arr + '</span>'
-                             + '</div>'
-                             + '<div id="acc-todos-jugadosGrupo" style="display:' + disp + ';margin-top:4px;flex-direction:column;gap:4px">'
-                             + jugadosGrupo.map(makeBtn).join('')
-                             + '</div>';
-            }
-            if (!jugadosLlaves.length && !jugadosGrupo.length) {
-                htmlJugados = '<div style="padding:8px 12px;font-size:12px;color:var(--text3)">Aún no hay partidos jugados.</div>';
-            }
-            jugadosEl.innerHTML = htmlJugados;
-
+            jugadosEl.innerHTML = jugados.length ? jugados.map(makeBtn).join('') : '<div style="padding:8px 12px;font-size:12px;color:var(--text3)">Aún no hay partidos jugados.</div>';
             proximosEl.innerHTML = proximos.length ? proximos.map(makeBtn).join('') : '<div style="padding:8px 12px;font-size:12px;color:var(--text3)">No hay partidos pendientes.</div>';
 
             // Aplicar estado de acordeones
@@ -5729,7 +5707,7 @@
 
                 const TEAM_NAME_MAP = {
                     "Mexico": "México", "South Africa": "Sudáfrica", "South Korea": "Corea del Sur", "Czech Republic": "Rep. Checa", "Czechia": "Rep. Checa",
-                    "Canada": "Canadá", "Bosnia and Herzegovina": "Bosnia y Herz.", "Bosnia-Herzegovina": "Bosnia y Herz.", "Qatar": "Qatar", "Switzerland": "Suiza",
+                    "Canada": "Canadá", "Bosnia and Herzegovina": "Bosnia y Herz.", "Qatar": "Qatar", "Switzerland": "Suiza",
                     "Brazil": "Brasil", "Morocco": "Marruecos", "Haiti": "Haití", "Scotland": "Escocia",
                     "United States": "Estados Unidos", "USA": "Estados Unidos", "Paraguay": "Paraguay", "Australia": "Australia", "Turkey": "Turquía",
                     "Germany": "Alemania", "Curacao": "Curazao", "Ivory Coast": "Costa de Marfil", "Côte d'Ivoire": "Costa de Marfil", "Ecuador": "Ecuador",
