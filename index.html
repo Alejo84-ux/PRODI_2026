@@ -2873,7 +2873,8 @@
         //  STATE
         // ══════════════════════════════════════════
         var currentUser = localStorage.getItem('prodeUser') || null;
-        var pronosticosBloqueados = false; // Grupos + Extras — Controlado por el Organizador
+        var gruposBloqueados = false; // Controlado por el Organizador
+        var extrasBloqueados = false; // Controlado por el Organizador
         var fasesElimBloqueadas = {};      // { r32: true, r16: true, cuartos: true, semis: true, final: true }
         var pronosticos = {};
         var RESULTADOS_OFICIALES = { extras: {} };
@@ -3100,10 +3101,15 @@
                 return;
             }
             // Bloqueo Grupos y Extras
-            var fasesBlockeadas = ['grupos', 'extras'];
-            if (pronosticosBloqueados && currentUser !== 'ORGANIZADOR' && fasesBlockeadas.indexOf(currentPhase) >= 0) {
-                showToast('\u{1F512} Grupos y Extras cerrados.');
-                return;
+            if (currentUser !== 'ORGANIZADOR') {
+                if (currentPhase === 'grupos' && gruposBloqueados) {
+                    showToast('\u{1F512} Grupos cerrados.');
+                    return;
+                }
+                if (currentPhase === 'extras' && extrasBloqueados) {
+                    showToast('\u{1F512} Extras cerrados.');
+                    return;
+                }
             }
             // Bloqueo fases eliminatorias individuales
             if (currentUser !== 'ORGANIZADOR' && fasesElimBloqueadas[currentPhase]) {
@@ -3259,24 +3265,38 @@
             html += '</div>';
 
             // ── BLOQUEO DE PRONÓSTICOS ──
-            var isLocked = pronosticosBloqueados;
-            var lockBg = isLocked ? 'rgba(239,68,68,.12)' : 'rgba(45,158,92,.08)';
-            var lockBord = isLocked ? 'rgba(239,68,68,.35)' : 'rgba(45,158,92,.3)';
-            var lockColor = isLocked ? '#f87171' : '#4ade80';
-            var lockIcon = isLocked ? '🔒' : '🔓';
-            var lockLabel = isLocked ? 'PRONÓSTICOS CERRADOS' : 'PRONÓSTICOS ABIERTOS';
-            var lockDesc = isLocked ? 'Grupos y Extras bloqueados. Las fases eliminatorias siguen abiertas.'
-                : 'Los jugadores pueden cargar Grupos y Extras normalmente.';
-            var lockBtnTxt = isLocked ? '🔓 ABRIR GRUPOS Y EXTRAS' : '🔒 CERRAR GRUPOS Y EXTRAS';
-            var lockBtnBg = isLocked ? 'var(--green-mid)' : '#dc2626';
-            html += '<div style="background:' + lockBg + ';border:2px solid ' + lockBord + ';border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:24px;">'
-                + '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
-                + '<div style="font-size:36px">' + lockIcon + '</div>'
-                + '<div style="flex:1;">'
-                + '<div style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:1px;color:' + lockColor + '">' + lockLabel + '</div>'
-                + '<div style="font-size:12px;color:var(--text2);margin-top:3px">' + lockDesc + '</div>'
+            var isLockedG = gruposBloqueados;
+            var lockBgG = isLockedG ? 'rgba(239,68,68,.12)' : 'rgba(45,158,92,.08)';
+            var lockBordG = isLockedG ? 'rgba(239,68,68,.35)' : 'rgba(45,158,92,.3)';
+            var lockColorG = isLockedG ? '#f87171' : '#4ade80';
+            var lockIconG = isLockedG ? '🔒' : '🔓';
+            var lockLabelG = isLockedG ? 'GRUPOS CERRADOS' : 'GRUPOS ABIERTOS';
+            var lockBtnTxtG = isLockedG ? '🔓 ABRIR GRUPOS' : '🔒 CERRAR GRUPOS';
+            var lockBtnBgG = isLockedG ? 'var(--green-mid)' : '#dc2626';
+
+            var isLockedE = extrasBloqueados;
+            var lockBgE = isLockedE ? 'rgba(239,68,68,.12)' : 'rgba(45,158,92,.08)';
+            var lockBordE = isLockedE ? 'rgba(239,68,68,.35)' : 'rgba(45,158,92,.3)';
+            var lockColorE = isLockedE ? '#f87171' : '#4ade80';
+            var lockIconE = isLockedE ? '🔒' : '🔓';
+            var lockLabelE = isLockedE ? 'EXTRAS CERRADOS' : 'EXTRAS ABIERTOS';
+            var lockBtnTxtE = isLockedE ? '🔓 ABRIR EXTRAS' : '🔒 CERRAR EXTRAS';
+            var lockBtnBgE = isLockedE ? 'var(--green-mid)' : '#dc2626';
+
+            html += '<div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">'
+                + '<div style="flex:1; min-width:200px; background:' + lockBgG + ';border:2px solid ' + lockBordG + ';border-radius:var(--radius-lg);padding:14px;">'
+                + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">'
+                + '<div style="font-size:24px">' + lockIconG + '</div>'
+                + '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:1px;color:' + lockColorG + '">' + lockLabelG + '</div>'
                 + '</div>'
-                + '<button onclick="toggleLock()" style="padding:12px 20px;background:' + lockBtnBg + ';color:#fff;border:none;border-radius:var(--radius);font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;white-space:nowrap">' + lockBtnTxt + '</button>'
+                + '<button onclick="toggleLock(\'grupos\')" style="width:100%;padding:10px;background:' + lockBtnBgG + ';color:#fff;border:none;border-radius:var(--radius);font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer">' + lockBtnTxtG + '</button>'
+                + '</div>'
+                + '<div style="flex:1; min-width:200px; background:' + lockBgE + ';border:2px solid ' + lockBordE + ';border-radius:var(--radius-lg);padding:14px;">'
+                + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">'
+                + '<div style="font-size:24px">' + lockIconE + '</div>'
+                + '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:1px;color:' + lockColorE + '">' + lockLabelE + '</div>'
+                + '</div>'
+                + '<button onclick="toggleLock(\'extras\')" style="width:100%;padding:10px;background:' + lockBtnBgE + ';color:#fff;border:none;border-radius:var(--radius);font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer">' + lockBtnTxtE + '</button>'
                 + '</div>'
                 + '</div>';
 
@@ -3757,44 +3777,44 @@
         // ══════════════════════════════════════════
         //  BLOQUEO DE PRONÓSTICOS
         // ══════════════════════════════════════════
-        function toggleLock() {
-            var newState = !pronosticosBloqueados;
+        function toggleLock(type) {
+            var isGrupos = type === 'grupos';
+            var currentState = isGrupos ? gruposBloqueados : extrasBloqueados;
+            var newState = !currentState;
+            var label = isGrupos ? 'Grupos' : 'Extras';
             var msg = newState
-                ? '¿Cerrar Grupos y Extras? Las fases eliminatorias quedan abiertas.'
-                : '¿Abrir Grupos y Extras? Los jugadores podrán volver a cargar.';
+                ? '¿Cerrar ' + label + '?'
+                : '¿Abrir ' + label + '?';
             if (!confirm(msg)) return;
 
-            // Guardar en Firebase bajo ORGANIZADOR
-            // Usar update() para modificar SOLO el campo pronosticosBloqueados
-            // sin tocar los resultados, bonusCierre ni ningún otro dato
+            var updateObj = {};
+            updateObj['pronosticos.' + (isGrupos ? 'gruposBloqueados' : 'extrasBloqueados')] = newState;
+            updateObj.updatedAt = new Date().toISOString();
+
             if (db) {
-                db.collection('pronosticos').doc('ORGANIZADOR').update({
-                    'pronosticos.pronosticosBloqueados': newState,
-                    updatedAt: new Date().toISOString()
-                }).then(function () {
-                    pronosticosBloqueados = newState;
+                db.collection('pronosticos').doc('ORGANIZADOR').update(updateObj).then(function () {
+                    if (isGrupos) gruposBloqueados = newState; else extrasBloqueados = newState;
                     updateLockBanner();
                     renderAdminPanel();
                     updateLockBadgeInicio();
-                    showToast(newState ? '🔒 Grupos y Extras cerrados' : '🔓 Grupos y Extras abiertos');
+                    showToast(newState ? '🔒 ' + label + ' cerrados' : '🔓 ' + label + ' abiertos');
                 }).catch(function (err) {
-                    // Si el doc no existe aún, crear con set
                     var data = Object.assign({}, RESULTADOS_OFICIALES);
-                    data.pronosticosBloqueados = newState;
+                    if (isGrupos) data.gruposBloqueados = newState; else data.extrasBloqueados = newState;
                     db.collection('pronosticos').doc('ORGANIZADOR').set({
                         nombre: 'ORGANIZADOR', pronosticos: data, updatedAt: new Date().toISOString()
                     }).then(function () {
-                        pronosticosBloqueados = newState;
+                        if (isGrupos) gruposBloqueados = newState; else extrasBloqueados = newState;
                         updateLockBanner(); renderAdminPanel(); updateLockBadgeInicio();
-                        showToast(newState ? '🔒 Grupos y Extras cerrados' : '🔓 Grupos y Extras abiertos');
+                        showToast(newState ? '🔒 ' + label + ' cerrados' : '🔓 ' + label + ' abiertos');
                     }).catch(function (e) { showToast('❌ Error: ' + e.message); });
                 });
             } else {
-                pronosticosBloqueados = newState;
+                if (isGrupos) gruposBloqueados = newState; else extrasBloqueados = newState;
                 updateLockBanner();
                 renderAdminPanel();
                 updateLockBadgeInicio();
-                showToast(newState ? '🔒 Grupos y Extras cerrados (local)' : '🔓 Grupos y Extras abiertos (local)');
+                showToast(newState ? '🔒 ' + label + ' cerrados (local)' : '🔓 ' + label + ' abiertos (local)');
             }
         }
 
@@ -3837,8 +3857,9 @@
         function updateLockBadgeInicio() {
             var badge = document.getElementById('lock-badge-inicio');
             if (!badge) return;
-            if (pronosticosBloqueados) {
-                badge.innerHTML = '🔒 <strong style="color:#f87171">Grupos y Extras CERRADOS</strong> — El Organizador bloqueó la carga inicial. Las fases eliminatorias siguen abiertas cuando se conozcan los cruces.';
+            if (gruposBloqueados || extrasBloqueados) {
+                var txt = (gruposBloqueados && extrasBloqueados) ? 'Grupos y Extras' : (gruposBloqueados ? 'Grupos' : 'Extras');
+                badge.innerHTML = '🔒 <strong style="color:#f87171">' + txt + ' CERRADOS</strong> — El Organizador bloqueó la carga inicial. Las fases eliminatorias siguen abiertas cuando se conozcan los cruces.';
                 badge.style.borderColor = 'rgba(239,68,68,.3)';
                 badge.style.background = 'rgba(239,68,68,.06)';
             } else {
@@ -3897,7 +3918,8 @@
             // Preservar SIEMPRE todos los demás datos de RESULTADOS_OFICIALES (alertas, sanciones, bloqueos, etc)
             var oficiales = Object.assign({}, RESULTADOS_OFICIALES);
             oficiales.extras = {}; // Se reconstruye abajo
-            oficiales.pronosticosBloqueados = pronosticosBloqueados;
+            oficiales.gruposBloqueados = gruposBloqueados;
+            oficiales.extrasBloqueados = extrasBloqueados;
 
             // Limpiar los resultados de partidos anteriores para reconstruirlos desde el DOM
             Object.keys(FIXTURE).forEach(function (phase) {
@@ -4795,8 +4817,7 @@
             var bannerTxt = document.getElementById('lock-banner-txt');
             var saveBtn = document.getElementById('save-pronos-btn');
             if (!banner) return;
-            var fasesBlockeadas = ['grupos', 'extras'];
-            var bloqGrupos = pronosticosBloqueados && currentUser !== 'ORGANIZADOR' && fasesBlockeadas.indexOf(currentPhase) >= 0;
+            var bloqGrupos = currentUser !== 'ORGANIZADOR' && ((currentPhase === 'grupos' && gruposBloqueados) || (currentPhase === 'extras' && extrasBloqueados));
             var bloqElim = currentUser !== 'ORGANIZADOR' && fasesElimBloqueadas[currentPhase];
             var bloqueada = bloqGrupos || bloqElim;
             if (bloqueada) {
@@ -4877,12 +4898,13 @@
                 var d = snap.data();
                 if (snap.id === 'ORGANIZADOR') {
                     var incoming = d.pronosticos || {};
-                    RESULTADOS_OFICIALES = Object.assign({ extras: {}, bonusCierre: {}, argPartidos: [], pronosticosBloqueados: false }, incoming);
+                    RESULTADOS_OFICIALES = Object.assign({ extras: {}, bonusCierre: {}, argPartidos: [], gruposBloqueados: false, extrasBloqueados: false }, incoming);
                     if (!RESULTADOS_OFICIALES.extras) RESULTADOS_OFICIALES.extras = {};
                     if (!RESULTADOS_OFICIALES.bonusCierre) RESULTADOS_OFICIALES.bonusCierre = {};
                     if (!RESULTADOS_OFICIALES.argPartidos) RESULTADOS_OFICIALES.argPartidos = [];
                     // El estado de bloqueo viene SIEMPRE de Firebase — es la fuente de verdad
-                    pronosticosBloqueados = RESULTADOS_OFICIALES.pronosticosBloqueados === true;
+                    gruposBloqueados = RESULTADOS_OFICIALES.gruposBloqueados === true;
+                    extrasBloqueados = RESULTADOS_OFICIALES.extrasBloqueados === true;
                     fasesElimBloqueadas = RESULTADOS_OFICIALES.fasesElimBloqueadas || {};
 
                     // Calculamos automáticamente el bracket en función de RESULTADOS_OFICIALES
