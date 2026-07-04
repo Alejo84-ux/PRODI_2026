@@ -4015,7 +4015,24 @@
             // En eliminatorias: si RESULTADOS_OFICIALES marca que Argentina jugó ese partido
             // Se indica via RESULTADOS_OFICIALES.argPartidos = ['R32-12', 'QF-3', ...]
             var argElim = RESULTADOS_OFICIALES.argPartidos || [];
-            return argElim.indexOf(id) >= 0;
+            if (argElim.indexOf(id) >= 0) return true;
+            
+            // Detección automática por nombre de equipo
+            var isArgAuto = false;
+            if (phase && FIXTURE[phase]) {
+                for (var i = 0; i < FIXTURE[phase].length; i++) {
+                    var m = FIXTURE[phase][i];
+                    if (m.id === id) {
+                        var l = getMappedTeamName(m.local).toLowerCase();
+                        var v = getMappedTeamName(m.visita).toLowerCase();
+                        if (l.indexOf('argentina') >= 0 || v.indexOf('argentina') >= 0) {
+                            isArgAuto = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            return isArgAuto;
         }
 
         function getArgKeyForMatch(id) {
@@ -5421,23 +5438,24 @@
                             if (esArg) { matchPts += 1; badges.push('+1 🇦🇷'); }
                             if (esArg && esPleno) { matchPts += 1; badges.push('+1 pleno🇦🇷'); }
                         } else {
-                            var base = 5;
+                            var base = 3;
                             if (m.id === 'FINAL') base = 13;
                             else if (m.id === '3RD') base = 11;
                             else if (phase === 'semis') base = 9;
                             else if (phase === 'cuartos') base = 7;
+                            else if (phase === 'r16') base = 5;
                             matchPts += base; badges.push('+' + base + ' acierto');
                             if (esPleno) { matchPts += 2; matchPts += (rh + ra); badges.push('+2 pleno'); badges.push('+' + (rh + ra) + ' goles'); }
 
-                            if (phase === 'r16' && ph === pa && rh === ra) {
+                            if (phase !== 'r32' && ph === pa && rh === ra) {
                                 if (p.penAdv && p.penAdv !== '') {
                                     var officialAdv = '';
                                     if (r.penH !== undefined && r.penA !== undefined) {
                                         officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
                                     }
                                     if (p.penAdv === officialAdv) {
-                                        matchPts += 5;
-                                        badges.push('+5 penales');
+                                        matchPts += 2;
+                                        badges.push('+2 penales');
                                     }
                                 }
                             }
