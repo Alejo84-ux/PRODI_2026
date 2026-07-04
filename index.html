@@ -4069,15 +4069,15 @@
                         // Art. 17 — +2 pleno +1 x gol
                         if (esPleno) { pts += 2; pts += (r.h + r.a); exactos++; }
 
-                        // NEW LOGIC: Si es R16, y predijo empate, y el resultado oficial fue empate
-                        if (phase === 'r16' && p.h === p.a && r.h === r.a) {
+                        // NEW LOGIC: Si es de R16 en adelante, y predijo empate, y el resultado oficial fue empate
+                        if (phase !== 'r32' && p.h === p.a && r.h === r.a) {
                             if (p.penAdv && p.penAdv !== '') {
                                 var officialAdv = '';
                                 if (r.penH !== undefined && r.penA !== undefined) {
                                     officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
                                 }
                                 if (p.penAdv === officialAdv) {
-                                    pts += 5;
+                                    pts += 2;
                                 }
                             }
                         }
