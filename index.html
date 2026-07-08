@@ -2921,7 +2921,7 @@
             var penAdv = saved ? saved.penAdv : '';
             var lbl = m.label ? '<div style="font-size:11px;color:var(--gold);margin-bottom:4px;font-weight:600">' + m.label + '</div>' : '';
             var penHtml = '';
-            if (m.id.startsWith('R16-')) {
+            if (m.id.startsWith('R16-') || m.id.startsWith('QF-') || m.id.startsWith('SF-') || m.id === '3RD' || m.id === 'FINAL') {
                 penHtml = '<div style="margin-top:8px;text-align:center;font-size:11px;color:var(--text3);' + (hv !== '' && hv === av ? '' : 'display:none;') + '" id="pen-div-' + m.id + '">Si hay penales, pasa: ' +
                     '<select id="pen-' + m.id + '" onchange="markChanged(\'' + m.id + '\')" style="background:var(--bg);color:white;border:1px solid var(--border);border-radius:4px;padding:2px 4px;font-family:Inter,sans-serif;font-size:11px;outline:none;margin-left:4px">' +
                     '<option value="">-</option>' +
@@ -4217,7 +4217,7 @@
                                     officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
                                 }
                                 if (p.penAdv === officialAdv) {
-                                    pts += 2;
+                                    pts += 5;
                                 }
                             }
                         }
@@ -4344,7 +4344,7 @@
                         if (esPleno) { pts += 2; pts += (r.h + r.a); }
 
                         // NEW LOGIC
-                        if (phase === 'r16' && p.h === p.a && r.h === r.a) {
+                        if (phase !== 'r32' && p.h === p.a && r.h === r.a) {
                             if (p.penAdv && p.penAdv !== '') {
                                 var officialAdv = '';
                                 if (r.penH !== undefined && r.penA !== undefined) {
@@ -4712,7 +4712,10 @@
                 var p = pronosticos[u][id];
                 if (!p) return '';
                 var resText = (oficial && oficial.h !== '') ? (oficial.h + ' — ' + oficial.a + (oficial.penH !== undefined ? ' <span style="font-size:10px;color:var(--text3)">(' + oficial.penH + '-' + oficial.penA + ' p)</span>' : '')) : '—';
-                return '<tr><td><div class="player-cell"><div class="avatar">' + ini(u) + '</div><span class="player-name">' + u + '</span></div></td><td style="font-weight:600;color:var(--gold-light)">' + p.h + ' — ' + p.a + '</td><td style="color:var(--text2)">' + resText + '</td></tr>';
+                var pText = p.h + ' — ' + p.a;
+                if (p.penAdv === 'H') pText += ' (Pasa L)';
+                else if (p.penAdv === 'A') pText += ' (Pasa V)';
+                return '<tr><td><div class="player-cell"><div class="avatar">' + ini(u) + '</div><span class="player-name">' + u + '</span></div></td><td style="font-weight:600;color:var(--gold-light)">' + pText + '</td><td style="color:var(--text2)">' + resText + '</td></tr>';
             }).join('');
             tbody.innerHTML = rows2 || '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:32px">Nadie cargó pronóstico para este partido</td></tr>';
         }
@@ -5572,8 +5575,8 @@
                                         officialAdv = r.penH > r.penA ? 'H' : (r.penH < r.penA ? 'A' : '');
                                     }
                                     if (p.penAdv === officialAdv) {
-                                        matchPts += 2;
-                                        badges.push('+2 penales');
+                                        matchPts += 5;
+                                        badges.push('+5 penales');
                                     }
                                 }
                             }
