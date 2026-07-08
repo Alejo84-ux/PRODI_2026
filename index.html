@@ -2878,6 +2878,7 @@
         var extrasBloqueados = false; // Controlado por el Organizador
         var fasesElimBloqueadas = {};      // { r32: true, r16: true, cuartos: true, semis: true, final: true }
         var pronosticos = {};
+        var avatares = {};
         var RESULTADOS_OFICIALES = { extras: {} };
         var LIVE_SCORES_DATA = {};
         var currentPhase = 'grupos';
@@ -2894,6 +2895,38 @@
         }
         function ini(name) {
             return name.split(' ').map(function (w) { return w[0] || '' }).join('').substring(0, 2).toUpperCase();
+        }
+        function getAvatarHtml(user, className, extraStyle, idStr) {
+            var st = extraStyle || '';
+            var idAttr = idStr ? ' id="' + idStr + '"' : '';
+            if (avatares[user]) {
+                st += ';background-image:url(' + avatares[user] + ');background-size:cover;background-position:center;color:transparent;';
+            }
+            return '<div' + idAttr + ' class="' + className + '" style="' + st + '" title="' + user + '">' + ini(user) + '</div>';
+        }
+        function uploadAvatar(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    var MAX = 120;
+                    var minDim = Math.min(img.width, img.height);
+                    var sx = (img.width - minDim) / 2, sy = (img.height - minDim) / 2;
+                    canvas.width = MAX; canvas.height = MAX;
+                    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, MAX, MAX);
+                    var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    db.collection('pronosticos').doc(currentUser).set({
+                        avatar: dataUrl, nombre: currentUser, updatedAt: new Date().toISOString()
+                    }, { merge: true }).then(function() { showToast('✅ Avatar actualizado'); })
+                    .catch(function(err) { showToast('❌ Error: ' + err.message); });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         // ══════════════════════════════════════════
@@ -4016,7 +4049,7 @@
             // Se indica via RESULTADOS_OFICIALES.argPartidos = ['R32-12', 'QF-3', ...]
             var argElim = RESULTADOS_OFICIALES.argPartidos || [];
             if (argElim.indexOf(id) >= 0) return true;
-            
+
             // Detección automática por nombre de equipo
             var isArgAuto = false;
             if (phase && FIXTURE[phase]) {
@@ -4083,7 +4116,7 @@
             console.log('═══════════════════════════════════════');
 
             // Mostrar goles oficiales
-            ARG_PARTIDOS.forEach(function(p) {
+            ARG_PARTIDOS.forEach(function (p) {
                 var goles = [];
                 for (var i = 1; i <= 5; i++) {
                     var val = rExt['arg_' + p.key + '_' + i];
@@ -4097,12 +4130,12 @@
             console.log('───────────────────────────────────────');
 
             // Para cada usuario
-            Object.keys(pronosticos).forEach(function(user) {
+            Object.keys(pronosticos).forEach(function (user) {
                 var ups = pronosticos[user] || {};
                 var pExt = ups.extras || {};
                 var tieneAlgo = false;
 
-                ARG_PARTIDOS.forEach(function(p) {
+                ARG_PARTIDOS.forEach(function (p) {
                     var resultados = [];
                     var acertados = getArgGolesAcertadosSet(pExt, rExt, p.key);
 
@@ -4118,13 +4151,13 @@
                     }
                     if (resultados.length) {
                         console.log('👤 ' + user + ' — ' + p.label + ' | Acertados: ' + Object.keys(acertados).length);
-                        resultados.forEach(function(r) { console.log(r); });
+                        resultados.forEach(function (r) { console.log(r); });
                     }
                 });
 
                 // Verificar si los partidos son detectados como argentinos
                 if (tieneAlgo) {
-                    Object.keys(ups).forEach(function(id) {
+                    Object.keys(ups).forEach(function (id) {
                         if (id === 'extras') return;
                         var phase = getPhaseOf(id);
                         var esArg = isArgMatch(id, phase);
@@ -4507,7 +4540,7 @@
 
                 var safeU = r.u.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                 return '<tr class="clickable-row" onclick="verDesglose(\'' + safeU + '\')">' + '<td style="width:36px;text-align:center">' + rank + '</td>' +
-                    '<td><div class="player-cell"><div class="avatar">' + ini(r.u) + '</div><span class="player-name">' + r.u + '</span>' + arrow + bonusBadge + golesBadge + sancionBadge + grandeBadge + '</div></td>' +
+                    '<td><div class="player-cell">' + getAvatarHtml(r.u, 'avatar') + '<span class="player-name">' + r.u + '</span>' + arrow + bonusBadge + golesBadge + sancionBadge + grandeBadge + '</div></td>' +
                     '<td style="width:54px;text-align:center"><span class="pts-big">' + r.pts + '</span></td>' +
                     '<td style="width:42px;text-align:center" class="stat-cell">' + r.exactos + '</td>' +
                     '<td style="width:42px;text-align:center" class="stat-cell">' + r.parciales + '</td>' +
@@ -4715,7 +4748,7 @@
                 var pText = p.h + ' — ' + p.a;
                 if (p.penAdv === 'H') pText += ' (Pasa L)';
                 else if (p.penAdv === 'A') pText += ' (Pasa V)';
-                return '<tr><td><div class="player-cell"><div class="avatar">' + ini(u) + '</div><span class="player-name">' + u + '</span></div></td><td style="font-weight:600;color:var(--gold-light)">' + pText + '</td><td style="color:var(--text2)">' + resText + '</td></tr>';
+                return '<tr><td><div class="player-cell">' + getAvatarHtml(u, 'avatar') + '<span class="player-name">' + u + '</span></div></td><td style="font-weight:600;color:var(--gold-light)">' + pText + '</td><td style="color:var(--text2)">' + resText + '</td></tr>';
             }).join('');
             tbody.innerHTML = rows2 || '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:32px">Nadie cargó pronóstico para este partido</td></tr>';
         }
@@ -5028,7 +5061,15 @@
         function updateHeaderUser() {
             var area = document.getElementById('header-user-area');
             if (!currentUser) return;
-            area.innerHTML = '<div class="user-avatar" title="' + currentUser + '">' + ini(currentUser) + '</div><span style="font-size:13px;color:var(--text2)">' + currentUser + '</span>';
+            area.innerHTML = '<input type="file" id="avatar-upload" style="display:none" accept="image/*" onchange="uploadAvatar(event)">' + 
+                             getAvatarHtml(currentUser, 'user-avatar') + 
+                             '<span style="font-size:13px;color:var(--text2)">' + currentUser + '</span>';
+            var avatarDiv = area.querySelector('.user-avatar');
+            if (avatarDiv) {
+                avatarDiv.onclick = function() { document.getElementById('avatar-upload').click(); };
+                avatarDiv.style.cursor = 'pointer';
+                avatarDiv.title = 'Cambiar Avatar';
+            }
             var info = document.getElementById('modal-user-info');
             if (info) info.textContent = 'Jugando como: ' + currentUser;
         }
@@ -5058,8 +5099,9 @@
                     updateLockBanner();
                     updateLockBadgeInicio();
                     if (currentUser === 'ORGANIZADOR') renderAdminPanel();
-                } else if (snap.id !== 'LIVE_SCORES' && d.nombre && d.pronosticos) {
-                    pronosticos[d.nombre] = d.pronosticos;
+                } else if (snap.id !== 'LIVE_SCORES' && d.nombre) {
+                    if (d.pronosticos) pronosticos[d.nombre] = d.pronosticos;
+                    if (d.avatar) avatares[d.nombre] = d.avatar;
                 }
             });
             if (currentUser && currentUser !== 'ORGANIZADOR') {
@@ -5153,7 +5195,7 @@
                 var cls = classes[vi];
                 return '<div class="podio-slot ' + cls + '">'
                     + '<span class="podio-medal">' + medals[realIdx] + '</span>'
-                    + '<div class="podio-avatar" style="background:var(--green-mid)">' + ini(r.u) + '</div>'
+                    + getAvatarHtml(r.u, 'podio-avatar', 'background:var(--green-mid)')
                     + '<span class="podio-name">' + r.u + '</span>'
                     + '<span class="podio-pts">' + r.pts + '</span>'
                     + '<span class="podio-pts-lbl">pts</span>'
@@ -5457,7 +5499,7 @@
         function verDesglose(user) {
             var ov = document.getElementById('desglose-overlay');
             var body = document.getElementById('desglose-body');
-            document.getElementById('desglose-avatar').textContent = ini(user);
+            document.getElementById('desglose-avatar').outerHTML = getAvatarHtml(user, 'desglose-avatar', '', 'desglose-avatar');
             document.getElementById('desglose-nombre').textContent = user;
 
             var ups = pronosticos[user] || {};
