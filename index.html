@@ -2733,7 +2733,7 @@
                     <span style="font-size:24px">🔒</span>
                     <div style="flex:1">
                         <div id="lock-banner-txt" style="font-size:13px;font-weight:600;color:#f87171">Fase cerrada por
-                            el Organizador</div>
+                            la Cocomisión</div>
                         <div style="font-size:12px;color:var(--text3);margin-top:2px">No podés guardar pronósticos en
                             esta fase.</div>
                     </div>
@@ -2756,7 +2756,7 @@
             <label class="input-label">Tu nombre</label>
             <input class="input-field" type="text" id="login-nombre" placeholder="Ej: Martín González" />
             <label class="input-label">Código del grupo</label>
-            <input class="input-field" type="text" id="login-codigo" placeholder="Pedíselo al organizador" />
+            <input class="input-field" type="text" id="login-codigo" placeholder="Pedíselo a la Cocomisión" />
             <button class="btn-save" onclick="doLogin()" style="margin-top:4px">ENTRAR AL GRUPO</button>
             <button onclick="closeLogin()"
                 style="margin-top:10px;width:100%;padding:8px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">Cancelar</button>
@@ -3122,6 +3122,7 @@
             setTimeout(function () { t.classList.remove('show') }, 2800);
         }
         function ini(name) {
+            if (name === 'ORGANIZADOR') return 'CC';
             return name.split(' ').map(function (w) { return w[0] || '' }).join('').substring(0, 2).toUpperCase();
         }
         function getAvatarHtml(user, className, extraStyle, idStr) {
@@ -5233,7 +5234,7 @@
             var bloqueada = bloqGrupos || bloqElim;
             if (bloqueada) {
                 banner.style.display = 'flex';
-                if (bannerTxt) bannerTxt.textContent = _faseLabel(currentPhase) + ' cerrada por el Organizador.';
+                if (bannerTxt) bannerTxt.textContent = _faseLabel(currentPhase) + ' cerrada por la Cocomisión.';
                 if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; saveBtn.style.cursor = 'not-allowed'; }
             } else {
                 banner.style.display = 'none';
@@ -5274,7 +5275,7 @@
                     closeLogin(); updateHeaderUser();
                     navGo('resultados', document.getElementById('navbtn-resultados'));
                     renderAdminPanel();
-                    showToast('👑 Modo Organizador Activado');
+                    showToast('👑 Modo Cocomisión Activado');
 
                     // Iniciar el Bot en la Web (Opción 2)
                     startLiveScoreBot();
@@ -5296,7 +5297,7 @@
             if (!currentUser) return;
             area.innerHTML = '<input type="file" id="avatar-upload" style="display:none" accept="image/*" onchange="uploadAvatar(event)">' + 
                              getAvatarHtml(currentUser, 'user-avatar') + 
-                             '<span style="font-size:13px;color:var(--text2)">' + currentUser + '</span>';
+                             '<span style="font-size:13px;color:var(--text2)">' + (currentUser === 'ORGANIZADOR' ? 'Cocomisión' : currentUser) + '</span>';
             var avatarDiv = area.querySelector('.user-avatar');
             if (avatarDiv) {
                 avatarDiv.onclick = function() { document.getElementById('avatar-upload').click(); };
@@ -6342,11 +6343,15 @@
             var btn = document.getElementById('chat-send');
             btn.disabled = true;
             
-            db.collection('chat').add({
+            var newMsg = {
                 u: currentUser,
                 t: text,
-                ts: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(function() {
+                ts: Date.now()
+            };
+
+            db.collection('pronosticos').doc('CHAT_GENERAL').set({
+                mensajes: firebase.firestore.FieldValue.arrayUnion(newMsg)
+            }, { merge: true }).then(function() {
                 input.value = '';
                 btn.disabled = false;
                 input.focus();
@@ -6360,38 +6365,44 @@
             if (!currentUser) return;
             var body = document.getElementById('chat-body');
             
-            chatUnsubscribe = db.collection('chat').orderBy('ts', 'asc').limitToLast(50)
-                .onSnapshot(function(snapshot) {
+            chatUnsubscribe = db.collection('pronosticos').doc('CHAT_GENERAL')
+                .onSnapshot(function(doc) {
                     var html = '';
                     var newMsgs = 0;
-                    snapshot.forEach(function(doc) {
+                    if (doc.exists) {
                         var d = doc.data();
-                        var isMe = d.u === currentUser;
+                        var mensajes = d.mensajes || [];
                         
-                        var timeStr = '';
-                        if (d.ts) {
-                            var date = d.ts.toDate ? d.ts.toDate() : new Date(d.ts);
-                            var hh = date.getHours().toString().padStart(2, '0');
-                            var mm = date.getMinutes().toString().padStart(2, '0');
-                            timeStr = hh + ':' + mm;
-                            
-                            if (!isMe && date.getTime() > lastChatReadTime) {
-                                newMsgs++;
+                        // Mostrar solo los últimos 50 mensajes
+                        if (mensajes.length > 50) mensajes = mensajes.slice(mensajes.length - 50);
+
+                        mensajes.forEach(function(msg) {
+                            var isMe = msg.u === currentUser;
+                            var timeStr = '';
+                            if (msg.ts) {
+                                var date = new Date(msg.ts);
+                                var hh = date.getHours().toString().padStart(2, '0');
+                                var mm = date.getMinutes().toString().padStart(2, '0');
+                                timeStr = hh + ':' + mm;
+                                
+                                if (!isMe && date.getTime() > lastChatReadTime) {
+                                    newMsgs++;
+                                }
                             }
-                        }
-                        
-                        var avatarHtml = getAvatarHtml(d.u, 'avatar-box');
-                        
-                        html += '<div class="chat-msg ' + (isMe ? 'mine' : '') + '">'
-                             + avatarHtml
-                             + '<div class="msg-content">'
-                             + '<div class="chat-msg-header">'
-                             + '<span class="chat-msg-author">' + d.u + '</span>'
-                             + '<span class="chat-msg-time">' + timeStr + '</span>'
-                             + '</div>'
-                             + d.t.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                             + '</div></div>';
-                    });
+                            
+                            var avatarHtml = getAvatarHtml(msg.u, 'avatar-box');
+                            
+                            html += '<div class="chat-msg ' + (isMe ? 'mine' : '') + '">'
+                                 + avatarHtml
+                                 + '<div class="msg-content">'
+                                 + '<div class="chat-msg-header">'
+                                 + '<span class="chat-msg-author">' + (msg.u === 'ORGANIZADOR' ? 'Cocomisión' : msg.u) + '</span>'
+                                 + '<span class="chat-msg-time">' + timeStr + '</span>'
+                                 + '</div>'
+                                 + msg.t.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                                 + '</div></div>';
+                        });
+                    }
                     
                     body.innerHTML = html;
                     if (chatOpen) {
