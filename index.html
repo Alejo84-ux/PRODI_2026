@@ -2921,7 +2921,11 @@
                     var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     db.collection('pronosticos').doc(currentUser).set({
                         avatar: dataUrl, nombre: currentUser, updatedAt: new Date().toISOString()
-                    }, { merge: true }).then(function() { showToast('✅ Avatar actualizado'); })
+                    }, { merge: true }).then(function() { 
+                        avatares[currentUser] = dataUrl;
+                        updateHeaderUser();
+                        showToast('✅ Avatar actualizado'); 
+                    })
                     .catch(function(err) { showToast('❌ Error: ' + err.message); });
                 };
                 img.src = e.target.result;
@@ -5109,7 +5113,7 @@
                 if (local && !pronosticos[currentUser]) { try { pronosticos[currentUser] = JSON.parse(local); } catch (e) { } }
                 loadInputValues();
             }
-            updateStats(); updateTabla(); renderMiniTabla(); renderJugadorFecha(); updateMatchSelector(); renderTodos(); renderCocomunicados(); updateUserAlertaBanner();
+            updateHeaderUser(); updateStats(); updateTabla(); renderMiniTabla(); renderJugadorFecha(); updateMatchSelector(); renderTodos(); renderCocomunicados(); updateUserAlertaBanner();
             if (currentUser === 'ORGANIZADOR') renderAdminPanel();
         });
 
