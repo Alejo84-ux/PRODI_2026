@@ -5332,6 +5332,7 @@
 
                     updateLockBanner();
                     updateLockBadgeInicio();
+                    if (d.avatar) avatares['ORGANIZADOR'] = d.avatar;
                     if (currentUser === 'ORGANIZADOR') renderAdminPanel();
                 } else if (snap.id !== 'LIVE_SCORES' && d.nombre) {
                     if (d.pronosticos) pronosticos[d.nombre] = d.pronosticos;
