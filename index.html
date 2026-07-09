@@ -1947,14 +1947,16 @@
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             z-index: 999;
             transition: transform 0.2s, background 0.2s;
         }
+
         .chat-fab:hover {
             background: var(--green-light);
             transform: scale(1.05);
         }
+
         .chat-fab .badge {
             position: absolute;
             top: -2px;
@@ -1967,6 +1969,7 @@
             border-radius: 10px;
             display: none;
         }
+
         .chat-panel {
             position: fixed;
             bottom: 85px;
@@ -1977,17 +1980,26 @@
             background: var(--bg2);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
             z-index: 998;
             display: none;
             flex-direction: column;
             overflow: hidden;
             animation: slideUpChat 0.2s ease;
         }
+
         @keyframes slideUpChat {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .chat-header {
             padding: 12px 16px;
             background: radial-gradient(circle at center, #facc15 12px, transparent 13px), linear-gradient(180deg, #75aadb 33.33%, #ffffff 33.33%, #ffffff 66.66%, #75aadb 66.66%);
@@ -1996,6 +2008,7 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .chat-header h3 {
             font-size: 16px;
             font-weight: 700;
@@ -2006,8 +2019,9 @@
             align-items: center;
             gap: 8px;
         }
+
         .chat-close {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 50%;
             width: 26px;
             height: 26px;
@@ -2020,8 +2034,12 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .chat-close:hover { background: rgba(0,0,0,0.8); color: #fff; }
-        
+
+        .chat-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+        }
+
         .chat-body {
             flex: 1;
             overflow-y: auto;
@@ -2031,15 +2049,18 @@
             gap: 12px;
             background: var(--bg);
         }
+
         .chat-msg {
             display: flex;
             gap: 10px;
             max-width: 85%;
         }
+
         .chat-msg.mine {
             align-self: flex-end;
             flex-direction: row-reverse;
         }
+
         .chat-msg .avatar-box {
             flex-shrink: 0;
             width: 32px;
@@ -2055,6 +2076,7 @@
             border: 1px solid var(--border);
             overflow: hidden;
         }
+
         .chat-msg .msg-content {
             background: var(--bg3);
             padding: 8px 12px;
@@ -2066,11 +2088,13 @@
             position: relative;
             word-wrap: break-word;
         }
+
         .chat-msg.mine .msg-content {
             background: var(--green-mid);
             border-top-left-radius: 12px;
             border-top-right-radius: 2px;
         }
+
         .chat-msg-header {
             display: flex;
             justify-content: space-between;
@@ -2078,25 +2102,30 @@
             margin-bottom: 4px;
             gap: 8px;
         }
+
         .chat-msg.mine .chat-msg-header {
             flex-direction: row-reverse;
         }
+
         .chat-msg-author {
             font-size: 11px;
             font-weight: 700;
             color: var(--gold);
         }
+
         .chat-msg.mine .chat-msg-author {
             color: var(--gold-light);
         }
+
         .chat-msg-time {
             font-size: 9px;
             color: var(--text3);
         }
+
         .chat-msg.mine .chat-msg-time {
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
         }
-        
+
         .chat-footer {
             padding: 12px;
             background: var(--bg2);
@@ -2104,6 +2133,7 @@
             display: flex;
             gap: 8px;
         }
+
         .chat-input {
             flex: 1;
             background: var(--bg);
@@ -2116,9 +2146,11 @@
             outline: none;
             transition: border-color 0.2s;
         }
+
         .chat-input:focus {
             border-color: var(--green-light);
         }
+
         .chat-send {
             background: var(--gold);
             color: #000;
@@ -2132,10 +2164,12 @@
             cursor: pointer;
             transition: transform 0.2s, background 0.2s;
         }
+
         .chat-send:hover {
             transform: scale(1.1);
             background: var(--gold-light);
         }
+
         .chat-send:disabled {
             background: var(--text3);
             cursor: not-allowed;
@@ -2339,21 +2373,30 @@
                         <div class="dot"></div>Evolución de Posiciones
                     </div>
                 </div>
-                
-                <div id="race-date-indicator" style="position: absolute; right: 16px; bottom: 16px; width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: bold; color: var(--text); background: rgba(0,0,0,0.8); pointer-events: none; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">Inicio</div>
+
+                <div id="race-date-indicator"
+                    style="position: absolute; right: 16px; bottom: 16px; width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: bold; color: var(--text); background: rgba(0,0,0,0.8); pointer-events: none; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
+                    Inicio</div>
+
+                <div style="padding: 16px 16px 0 16px; width: 100%; display: flex; gap: 8px; justify-content: center;">
+                    <button onclick="playRace()"
+                        style="padding: 6px 16px; border-radius: 20px; border: none; background: var(--gold); color: #000; font-weight: bold; cursor: pointer;">▶
+                        Play</button>A
+                    <button onclick="pauseRace()"
+                        style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏸
+                        Pausa</button>
+                    <button onclick="resetRace()"
+                        style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏪
+                        Reiniciar</button>
+                </div>
                 
                 <div style="padding: 16px; width: 100%; overflow-x: auto;">
-                    <div style="margin-bottom: 16px; display: flex; gap: 8px; justify-content: center;">
-                        <button onclick="playRace()" style="padding: 6px 16px; border-radius: 20px; border: none; background: var(--gold); color: #000; font-weight: bold; cursor: pointer;">▶ Play</button>
-                        <button onclick="pauseRace()" style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏸ Pausa</button>
-                        <button onclick="resetRace()" style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏪ Reiniciar</button>
-                    </div>
                     <div style="min-width: 600px; height: 500px; position: relative;">
                         <canvas id="evolucionChart"></canvas>
                     </div>
                 </div>
             </div>
-            
+
             <div class="card" style="margin-top: 24px;">
                 <div class="card-header">
                     <div class="card-title">
@@ -2361,7 +2404,8 @@
                     </div>
                 </div>
                 <div style="padding: 16px; width: 100%; overflow-x: auto;">
-                    <div id="hall-of-fame-container" style="display: flex; gap: 16px; padding-bottom: 12px; overflow-x: auto;">
+                    <div id="hall-of-fame-container"
+                        style="display: flex; gap: 16px; padding-bottom: 12px; overflow-x: auto;">
                         <!-- JS renderiza el hall of fame aqui -->
                     </div>
                 </div>
@@ -2841,7 +2885,8 @@
         <div class="chat-body" id="chat-body">
         </div>
         <div class="chat-footer">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Escribí un mensaje..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Escribí un mensaje..."
+                onkeypress="if(event.key==='Enter') sendChatMessage()">
             <button class="chat-send" id="chat-send" onclick="sendChatMessage()">➤</button>
         </div>
     </div>
@@ -3179,7 +3224,7 @@
                 var safeUrl = avatares[user].replace(/"/g, '&quot;').replace(/'/g, '%27');
                 st += ';background-image:url(\'' + safeUrl + '\');background-size:cover;background-position:center;color:transparent;';
             }
-            
+
             if (isOnline === undefined) {
                 isOnline = window.onlineUsersObj && window.onlineUsersObj[user] === true;
             }
@@ -3195,9 +3240,9 @@
             var file = event.target.files[0];
             if (!file) return;
             var reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 var img = new Image();
-                img.onload = function() {
+                img.onload = function () {
                     var canvas = document.createElement('canvas');
                     var ctx = canvas.getContext('2d');
                     var MAX = 120;
@@ -3208,20 +3253,20 @@
                     var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     db.collection('pronosticos').doc(currentUser).set({
                         avatar: dataUrl, nombre: currentUser, updatedAt: new Date().toISOString()
-                    }, { merge: true }).then(function() { 
+                    }, { merge: true }).then(function () {
                         avatares[currentUser] = dataUrl;
                         updateHeaderUser();
-                        showToast('✅ Avatar actualizado'); 
+                        showToast('✅ Avatar actualizado');
                         if (document.getElementById('avatar-upload')) {
                             document.getElementById('avatar-upload').value = '';
                         }
                     })
-                    .catch(function(err) { 
-                        showToast('❌ Error: ' + err.message); 
-                        if (document.getElementById('avatar-upload')) {
-                            document.getElementById('avatar-upload').value = '';
-                        }
-                    });
+                        .catch(function (err) {
+                            showToast('❌ Error: ' + err.message);
+                            if (document.getElementById('avatar-upload')) {
+                                document.getElementById('avatar-upload').value = '';
+                            }
+                        });
                 };
                 img.src = e.target.result;
             };
@@ -5362,12 +5407,12 @@
         function updateHeaderUser() {
             var area = document.getElementById('header-user-area');
             if (!currentUser) return;
-            area.innerHTML = '<input type="file" id="avatar-upload" style="display:none" accept="image/*" onchange="uploadAvatar(event)">' + 
-                             getAvatarHtml(currentUser, 'user-avatar') + 
-                             '<span style="font-size:13px;color:var(--text2)">' + (currentUser === 'ORGANIZADOR' ? 'Cocomisión' : currentUser) + '</span>';
+            area.innerHTML = '<input type="file" id="avatar-upload" style="display:none" accept="image/*" onchange="uploadAvatar(event)">' +
+                getAvatarHtml(currentUser, 'user-avatar') +
+                '<span style="font-size:13px;color:var(--text2)">' + (currentUser === 'ORGANIZADOR' ? 'Cocomisión' : currentUser) + '</span>';
             var avatarDiv = area.querySelector('.user-avatar');
             if (avatarDiv) {
-                avatarDiv.onclick = function() { document.getElementById('avatar-upload').click(); };
+                avatarDiv.onclick = function () { document.getElementById('avatar-upload').click(); };
                 avatarDiv.style.cursor = 'pointer';
                 avatarDiv.title = 'Cambiar Avatar';
             }
@@ -6410,7 +6455,7 @@
 
             var btn = document.getElementById('chat-send');
             btn.disabled = true;
-            
+
             var newMsg = {
                 u: currentUser,
                 t: text,
@@ -6419,11 +6464,11 @@
 
             db.collection('pronosticos').doc('CHAT_GENERAL').set({
                 mensajes: firebase.firestore.FieldValue.arrayUnion(newMsg)
-            }, { merge: true }).then(function() {
+            }, { merge: true }).then(function () {
                 input.value = '';
                 btn.disabled = false;
                 input.focus();
-            }).catch(function(err) {
+            }).catch(function (err) {
                 showToast('Error al enviar: ' + err.message);
                 btn.disabled = false;
             });
@@ -6432,19 +6477,19 @@
         function initChat() {
             if (!currentUser) return;
             var body = document.getElementById('chat-body');
-            
+
             chatUnsubscribe = db.collection('pronosticos').doc('CHAT_GENERAL')
-                .onSnapshot(function(doc) {
+                .onSnapshot(function (doc) {
                     var html = '';
                     var newMsgs = 0;
                     if (doc.exists) {
                         var d = doc.data();
                         var mensajes = d.mensajes || [];
-                        
+
                         // Mostrar solo los últimos 50 mensajes
                         if (mensajes.length > 50) mensajes = mensajes.slice(mensajes.length - 50);
 
-                        mensajes.forEach(function(msg) {
+                        mensajes.forEach(function (msg) {
                             var isMe = msg.u === currentUser;
                             var timeStr = '';
                             if (msg.ts) {
@@ -6452,26 +6497,26 @@
                                 var hh = date.getHours().toString().padStart(2, '0');
                                 var mm = date.getMinutes().toString().padStart(2, '0');
                                 timeStr = hh + ':' + mm;
-                                
+
                                 if (!isMe && date.getTime() > lastChatReadTime) {
                                     newMsgs++;
                                 }
                             }
-                            
+
                             var avatarHtml = getAvatarHtml(msg.u, 'avatar-box');
-                            
+
                             html += '<div class="chat-msg ' + (isMe ? 'mine' : '') + '">'
-                                 + avatarHtml
-                                 + '<div class="msg-content">'
-                                 + '<div class="chat-msg-header">'
-                                 + '<span class="chat-msg-author">' + (msg.u === 'ORGANIZADOR' ? 'Cocomisión' : msg.u) + '</span>'
-                                 + '<span class="chat-msg-time">' + timeStr + '</span>'
-                                 + '</div>'
-                                 + msg.t.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                                 + '</div></div>';
+                                + avatarHtml
+                                + '<div class="msg-content">'
+                                + '<div class="chat-msg-header">'
+                                + '<span class="chat-msg-author">' + (msg.u === 'ORGANIZADOR' ? 'Cocomisión' : msg.u) + '</span>'
+                                + '<span class="chat-msg-time">' + timeStr + '</span>'
+                                + '</div>'
+                                + msg.t.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                                + '</div></div>';
                         });
                     }
-                    
+
                     body.innerHTML = html;
                     if (chatOpen) {
                         scrollToChatBottom();
@@ -6497,7 +6542,7 @@
         var currentFrameIndex = 0;
         var historyFrames = [];
         var globalUserColors = {};
-        
+
         function stringToColor(str) {
             return globalUserColors[str] || '#ccc';
         }
@@ -6505,20 +6550,20 @@
         function renderEvolucionChart() {
             var canvas = document.getElementById('evolucionChart');
             if (!canvas) return;
-            
+
             var users = Object.keys(pronosticos);
             if (!users.length) return;
-            
+
             var palette = [
                 '#4285F4', '#EA4335', '#FBBC05', '#34A853', '#FF6D00',
                 '#46BDC6', '#9C27B0', '#E91E63', '#009688', '#CDDC39',
                 '#FFC107', '#673AB7', '#03A9F4', '#8BC34A', '#FF5722',
                 '#795548', '#607D8B', '#F06292', '#BA68C8', '#4DB6AC'
             ];
-            users.sort().forEach(function(u, i) {
+            users.sort().forEach(function (u, i) {
                 globalUserColors[u] = palette[i % palette.length];
             });
-            
+
             var fechasSet = new Set();
             Object.keys(FIXTURE).forEach(function (phase) {
                 FIXTURE[phase].forEach(function (m) {
@@ -6537,66 +6582,66 @@
                 return mon * 100 + day;
             }
             fechas.sort(function (a, b) { return toKey(a) - toKey(b); });
-            
+
             historyFrames = [];
             var puntosAcumulados = {};
-            users.forEach(function(u) { puntosAcumulados[u] = 0; });
-            
+            users.forEach(function (u) { puntosAcumulados[u] = 0; });
+
             var frame0 = { date: 'Inicio', data: [] };
-            users.forEach(function(u) { frame0.data.push({ user: u, pts: 0 }); });
-            frame0.data.sort(function(a,b) { return a.user.localeCompare(b.user); });
+            users.forEach(function (u) { frame0.data.push({ user: u, pts: 0 }); });
+            frame0.data.sort(function (a, b) { return a.user.localeCompare(b.user); });
             historyFrames.push(frame0);
-            
-            fechas.forEach(function(f) {
+
+            fechas.forEach(function (f) {
                 var frame = { date: f, data: [] };
-                users.forEach(function(u) {
+                users.forEach(function (u) {
                     var ptsF = calcPuntosFecha(u, f);
                     puntosAcumulados[u] += (ptsF || 0);
                     frame.data.push({ user: u, pts: puntosAcumulados[u] });
                 });
-                frame.data.sort(function(a, b) { return b.pts - a.pts || a.user.localeCompare(b.user); });
+                frame.data.sort(function (a, b) { return b.pts - a.pts || a.user.localeCompare(b.user); });
                 historyFrames.push(frame);
             });
-            
+
             var finalFrame = { date: 'Final', data: [] };
             var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
-            users.forEach(function(u) {
+            users.forEach(function (u) {
                 var finalCalc = calcPuntos(u);
                 var officialTotal = finalCalc.pts + (bonusCierre[u] || 0);
                 finalFrame.data.push({ user: u, pts: officialTotal });
             });
-            finalFrame.data.sort(function(a, b) { return b.pts - a.pts || a.user.localeCompare(b.user); });
+            finalFrame.data.sort(function (a, b) { return b.pts - a.pts || a.user.localeCompare(b.user); });
             historyFrames.push(finalFrame);
-            
+
             var maxPts = finalFrame.data[0].pts;
-            
+
             if (chartEvolucion) {
                 chartEvolucion.destroy();
             }
-            
+
             var avatarImageCache = window.avatarImageCache || {};
             window.avatarImageCache = avatarImageCache;
-            
+
             var avatarPlugin = {
                 id: 'avatarPlugin',
-                afterDraw: function(chart) {
+                afterDraw: function (chart) {
                     var ctx = chart.ctx;
-                    chart.data.datasets.forEach(function(dataset, i) {
+                    chart.data.datasets.forEach(function (dataset, i) {
                         var meta = chart.getDatasetMeta(i);
                         if (!meta || meta.hidden || !meta.data.length) return;
-                        
+
                         var model = meta.data[0];
                         if (!model) return;
                         var x = model.x;
                         var y = model.y;
                         var label = dataset.label;
                         var color = dataset.backgroundColor;
-                        
+
                         var avatarUrl = avatares[label];
-                        
+
                         ctx.beginPath();
                         ctx.arc(x + 16, y, 12, 0, 2 * Math.PI);
-                        
+
                         if (avatarUrl) {
                             if (!avatarImageCache[label]) {
                                 var img = new Image();
@@ -6627,19 +6672,19 @@
                             ctx.textBaseline = 'middle';
                             ctx.fillText(label.charAt(0).toUpperCase(), x + 16, y);
                         }
-                        
+
                         ctx.beginPath();
                         ctx.arc(x + 16, y, 12, 0, 2 * Math.PI);
                         ctx.lineWidth = 2;
                         ctx.strokeStyle = '#fff';
                         ctx.stroke();
-                        
+
                         var pts = dataset.data[0].x;
                         ctx.fillStyle = '#ccc';
                         ctx.font = 'bold 12px Inter, sans-serif';
                         ctx.textAlign = 'left';
                         ctx.fillText(pts, x + 34, y);
-                        
+
                         var maxWidth = x - 10;
                         if (maxWidth > 20) {
                             var shortName = label.split(' ')[0];
@@ -6655,16 +6700,16 @@
                     });
                 }
             };
-            
+
             Chart.defaults.color = '#ccc';
             Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
 
             var ctx = canvas.getContext('2d');
             currentFrameIndex = 0;
             var initFrame = historyFrames[0];
-            
-            var datasets = users.map(function(u) {
-                var rank = initFrame.data.findIndex(function(d) { return d.user === u; });
+
+            var datasets = users.map(function (u) {
+                var rank = initFrame.data.findIndex(function (d) { return d.user === u; });
                 var pts = initFrame.data[rank].pts;
                 return {
                     label: u,
@@ -6692,19 +6737,19 @@
                         easing: 'easeInOutCubic'
                     },
                     scales: {
-                        x: { 
-                            beginAtZero: true, 
-                            max: Math.ceil(maxPts * 1.1) 
+                        x: {
+                            beginAtZero: true,
+                            max: Math.ceil(maxPts * 1.1)
                         },
-                        y: { 
+                        y: {
                             type: 'linear',
                             reverse: true,
                             min: -0.5,
                             max: users.length - 0.5,
-                            ticks: { 
+                            ticks: {
                                 stepSize: 1,
                                 font: { size: 12, weight: 'bold' },
-                                callback: function(value) {
+                                callback: function (value) {
                                     if (value !== Math.floor(value)) return '';
                                     var frame = historyFrames[currentFrameIndex];
                                     if (frame && frame.data[value]) {
@@ -6723,9 +6768,9 @@
                 },
                 plugins: [avatarPlugin]
             });
-            
+
             updateRaceIndicator(0, initFrame.date);
-            
+
             renderHallOfFame();
         }
 
@@ -6740,9 +6785,9 @@
 
         function applyFrameData(frameIndex) {
             var frame = historyFrames[frameIndex];
-            chartEvolucion.data.datasets.forEach(function(ds) {
+            chartEvolucion.data.datasets.forEach(function (ds) {
                 var u = ds.label;
-                var rank = frame.data.findIndex(function(d) { return d.user === u; });
+                var rank = frame.data.findIndex(function (d) { return d.user === u; });
                 if (rank !== -1) {
                     var pts = frame.data[rank].pts;
                     ds.data[0] = { x: pts, y: rank };
@@ -6757,7 +6802,7 @@
             if (currentFrameIndex >= historyFrames.length - 1) {
                 currentFrameIndex = 0;
             }
-            raceInterval = setInterval(function() {
+            raceInterval = setInterval(function () {
                 currentFrameIndex++;
                 if (currentFrameIndex >= historyFrames.length) {
                     pauseRace();
@@ -6784,10 +6829,10 @@
         function renderHallOfFame() {
             var container = document.getElementById('hall-of-fame-container');
             if (!container) return;
-            
+
             var users = Object.keys(pronosticos);
             if (!users.length) return;
-            
+
             var fechasSet = new Set();
             Object.keys(FIXTURE).forEach(function (phase) {
                 FIXTURE[phase].forEach(function (m) {
@@ -6806,13 +6851,13 @@
                 return mon * 100 + day;
             }
             fechas.sort(function (a, b) { return toKey(a) - toKey(b); });
-            
+
             var html = '';
             var fechaCount = 1;
-            fechas.forEach(function(f) {
+            fechas.forEach(function (f) {
                 var maxPts = -1;
                 var winners = [];
-                users.forEach(function(u) {
+                users.forEach(function (u) {
                     var pts = calcPuntosFecha(u, f) || 0;
                     if (pts > maxPts) {
                         maxPts = pts;
@@ -6821,26 +6866,26 @@
                         winners.push(u);
                     }
                 });
-                
+
                 if (maxPts > 0) {
                     html += '<div style="flex: 0 0 auto; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 140px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">';
                     html += '<div style="color: var(--gold); font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Fecha ' + fechaCount + '<br><span style="color:var(--text2);font-size:10px">' + f + '</span></div>';
-                    
+
                     html += '<div style="display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-bottom: 12px;">';
-                    winners.forEach(function(w) {
+                    winners.forEach(function (w) {
                         html += '<div style="display:flex; flex-direction:column; align-items:center;">';
                         html += getAvatarHtml(w, '', 'width:48px;height:48px;border-radius:50%;margin-bottom:6px;border:2px solid var(--gold);box-shadow:0 0 8px rgba(255,215,0,0.4)');
                         html += '<div style="font-size:12px; font-weight:600; color:var(--text); max-width:70px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + w.split(' ')[0] + '</div>';
                         html += '</div>';
                     });
                     html += '</div>';
-                    
+
                     html += '<div style="display:inline-block; font-size: 15px; font-weight: 800; color: #fff; background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.3); padding: 4px 12px; border-radius: 20px;">' + maxPts + ' pts</div>';
                     html += '</div>';
                 }
                 fechaCount++;
             });
-            
+
             if (html === '') {
                 html = '<div style="color:var(--text2); font-style:italic; padding: 20px; width: 100%; text-align: center;">Aún no hay resultados para calcular el Hall of Fame.</div>';
             }
@@ -6849,12 +6894,12 @@
 
         function scrollToChatBottom() {
             var body = document.getElementById('chat-body');
-            setTimeout(function() { body.scrollTop = body.scrollHeight; }, 100);
+            setTimeout(function () { body.scrollTop = body.scrollHeight; }, 100);
         }
 
         function updateChatPresence() {
             var avatars = document.querySelectorAll('#chat-body .avatar-box');
-            avatars.forEach(function(avatar) {
+            avatars.forEach(function (avatar) {
                 var title = avatar.getAttribute('title') || '';
                 var user = title.replace('Conectado: ', '');
                 var isOnline = window.onlineUsersObj && window.onlineUsersObj[user] === true;
@@ -6871,38 +6916,38 @@
                 }
             });
         }
-        
+
         window.onlineUsersObj = {};
         var presenceInterval = null;
         var presenceUnsubscribe = null;
 
         function initPresence() {
             if (!currentUser) return;
-            
+
             function emitHeartbeat() {
                 var obj = {};
                 obj[currentUser] = Date.now();
-                db.collection('pronosticos').doc('ONLINE_USERS').set(obj, { merge: true }).catch(function(e){});
+                db.collection('pronosticos').doc('ONLINE_USERS').set(obj, { merge: true }).catch(function (e) { });
             }
-            
+
             emitHeartbeat();
             if (presenceInterval) clearInterval(presenceInterval);
             presenceInterval = setInterval(emitHeartbeat, 30000);
-            
+
             if (presenceUnsubscribe) presenceUnsubscribe();
-            presenceUnsubscribe = db.collection('pronosticos').doc('ONLINE_USERS').onSnapshot(function(doc) {
+            presenceUnsubscribe = db.collection('pronosticos').doc('ONLINE_USERS').onSnapshot(function (doc) {
                 if (doc.exists) {
                     var data = doc.data();
                     var now = Date.now();
                     var changed = false;
-                    
+
                     for (var u in window.onlineUsersObj) {
                         if (!data[u] || (now - data[u] >= 60000)) changed = true;
                     }
                     for (var u in data) {
                         if (now - data[u] < 60000 && !window.onlineUsersObj[u]) changed = true;
                     }
-                    
+
                     if (changed) {
                         var newOnlineObj = {};
                         for (var u in data) {
@@ -6914,11 +6959,11 @@
                     }
                 }
             });
-            
-            window.addEventListener('beforeunload', function() {
+
+            window.addEventListener('beforeunload', function () {
                 var obj = {};
                 obj[currentUser] = firebase.firestore.FieldValue.delete();
-                db.collection('pronosticos').doc('ONLINE_USERS').update(obj).catch(function(e){});
+                db.collection('pronosticos').doc('ONLINE_USERS').update(obj).catch(function (e) { });
             });
         }
 
