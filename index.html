@@ -18,7 +18,7 @@
             --green-light: #2d9e5c;
             --gold: #c9a227;
             --gold-light: #f0c94a;
-            --bg: #0d1117;F
+            --bg: #0d1117;
             --bg2: #161b22;
             --bg3: #21262d;
             --border: rgba(255, 255, 255, 0.08);
@@ -2788,7 +2788,7 @@
     </div>
     <div class="chat-panel" id="chat-panel">
         <div class="chat-header">
-            <h3>💬 CocoChat </h3>
+            <h3>💬 Chat / Muro</h3>
             <button class="chat-close" onclick="toggleChat()">✕</button>
         </div>
         <div class="chat-body" id="chat-body">
@@ -3125,13 +3125,18 @@
             if (name === 'ORGANIZADOR') return 'CC';
             return name.split(' ').map(function (w) { return w[0] || '' }).join('').substring(0, 2).toUpperCase();
         }
-        function getAvatarHtml(user, className, extraStyle, idStr) {
+        function getAvatarHtml(user, className, extraStyle, idStr, isOnline) {
             var st = extraStyle || '';
             var idAttr = idStr ? ' id="' + idStr + '"' : '';
             if (avatares[user]) {
                 var safeUrl = avatares[user].replace(/"/g, '&quot;').replace(/'/g, '%27');
                 st += ';background-image:url(\'' + safeUrl + '\');background-size:cover;background-position:center;color:transparent;';
             }
+            if (isOnline) {
+                st += ';border:3px solid #4ade80; border-radius:50%; margin:1px; box-sizing:border-box;';
+                return '<div' + idAttr + ' class="' + className + '" style="' + st + '" title="Conectado: ' + user + '">' + ini(user) + '</div>';
+            }
+            st += ';border:none;';
             return '<div' + idAttr + ' class="' + className + '" style="' + st + '" title="' + user + '">' + ini(user) + '</div>';
         }
         function uploadAvatar(event) {
@@ -4773,8 +4778,9 @@
                 }
 
                 var safeU = r.u.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                var isOnline = window.onlineUsersObj && window.onlineUsersObj[r.u] === true;
                 return '<tr class="clickable-row" onclick="verDesglose(\'' + safeU + '\')">' + '<td style="width:36px;text-align:center">' + rank + '</td>' +
-                    '<td><div class="player-cell">' + getAvatarHtml(r.u, 'avatar') + '<span class="player-name">' + r.u + '</span>' + arrow + bonusBadge + golesBadge + sancionBadge + grandeBadge + '</div></td>' +
+                    '<td><div class="player-cell">' + getAvatarHtml(r.u, 'avatar', '', '', isOnline) + '<span class="player-name">' + r.u + '</span>' + arrow + bonusBadge + golesBadge + sancionBadge + grandeBadge + '</div></td>' +
                     '<td style="width:54px;text-align:center"><span class="pts-big">' + r.pts + '</span></td>' +
                     '<td style="width:42px;text-align:center" class="stat-cell">' + r.exactos + '</td>' +
                     '<td style="width:42px;text-align:center" class="stat-cell">' + r.parciales + '</td>' +
@@ -6427,8 +6433,58 @@
             setTimeout(function() { body.scrollTop = body.scrollHeight; }, 100);
         }
         
+        window.onlineUsersObj = {};
+        var presenceInterval = null;
+        var presenceUnsubscribe = null;
+
+        function initPresence() {
+            if (!currentUser) return;
+            
+            function emitHeartbeat() {
+                var obj = {};
+                obj[currentUser] = Date.now();
+                db.collection('pronosticos').doc('ONLINE_USERS').set(obj, { merge: true }).catch(function(e){});
+            }
+            
+            emitHeartbeat();
+            if (presenceInterval) clearInterval(presenceInterval);
+            presenceInterval = setInterval(emitHeartbeat, 30000);
+            
+            if (presenceUnsubscribe) presenceUnsubscribe();
+            presenceUnsubscribe = db.collection('pronosticos').doc('ONLINE_USERS').onSnapshot(function(doc) {
+                if (doc.exists) {
+                    var data = doc.data();
+                    var now = Date.now();
+                    var changed = false;
+                    
+                    for (var u in window.onlineUsersObj) {
+                        if (!data[u] || (now - data[u] >= 60000)) changed = true;
+                    }
+                    for (var u in data) {
+                        if (now - data[u] < 60000 && !window.onlineUsersObj[u]) changed = true;
+                    }
+                    
+                    if (changed) {
+                        var newOnlineObj = {};
+                        for (var u in data) {
+                            if (now - data[u] < 60000) newOnlineObj[u] = true;
+                        }
+                        window.onlineUsersObj = newOnlineObj;
+                        if (typeof updateTabla === 'function') updateTabla();
+                    }
+                }
+            });
+            
+            window.addEventListener('beforeunload', function() {
+                var obj = {};
+                obj[currentUser] = firebase.firestore.FieldValue.delete();
+                db.collection('pronosticos').doc('ONLINE_USERS').update(obj).catch(function(e){});
+            });
+        }
+
         if (currentUser) {
             initChat();
+            initPresence();
         }
 
         // Auto-iniciar si ya estaba logueado como Organizador
