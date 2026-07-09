@@ -6453,6 +6453,26 @@
             var body = document.getElementById('chat-body');
             setTimeout(function() { body.scrollTop = body.scrollHeight; }, 100);
         }
+
+        function updateChatPresence() {
+            var avatars = document.querySelectorAll('#chat-body .avatar-box');
+            avatars.forEach(function(avatar) {
+                var title = avatar.getAttribute('title') || '';
+                var user = title.replace('Conectado: ', '');
+                var isOnline = window.onlineUsersObj && window.onlineUsersObj[user] === true;
+                if (isOnline) {
+                    avatar.style.border = '3px solid #4ade80';
+                    avatar.style.borderRadius = '50%';
+                    avatar.style.margin = '1px';
+                    avatar.style.boxSizing = 'border-box';
+                    avatar.setAttribute('title', 'Conectado: ' + user);
+                } else {
+                    avatar.style.border = 'none';
+                    avatar.style.margin = '';
+                    avatar.setAttribute('title', user);
+                }
+            });
+        }
         
         window.onlineUsersObj = {};
         var presenceInterval = null;
@@ -6492,6 +6512,7 @@
                         }
                         window.onlineUsersObj = newOnlineObj;
                         if (typeof updateTabla === 'function') updateTabla();
+                        if (typeof updateChatPresence === 'function') updateChatPresence();
                     }
                 }
             });
