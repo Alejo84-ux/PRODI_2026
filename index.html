@@ -5,11 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prodi Mundial 2026 🏆</title>
-    <link href="WhatsApp Image 2026-06-04 at 10.37.49 PM.jpeg" rel="stylesheet">
 
     <!-- Firebase CDN (versión compat — no requiere módulos ES) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 
     <style>
         :root {
@@ -2197,6 +2199,7 @@
         <div class="nav-dropdown" id="nav-dropdown">
             <button class="nav-drop-btn active" id="navbtn-inicio" onclick="navGo('inicio',this)">🏠 Inicio</button>
             <button class="nav-drop-btn" id="navbtn-tabla" onclick="navGo('tabla',this)">🏆 Tabla</button>
+            <button class="nav-drop-btn" id="navbtn-evolucion" onclick="navGo('evolucion',this)">📈 Evolución</button>
             <button class="nav-drop-btn" id="navbtn-todos" onclick="navGo('todos',this)">👥 Todos</button>
             <button class="nav-drop-btn" id="navbtn-resultados" onclick="navGo('resultados',this)">⚽ Resultados</button>
             <button class="nav-drop-btn" id="navbtn-llave" onclick="navGo('llave',this)">🔑 Llave</button>
@@ -2325,6 +2328,27 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="evolucion" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="dot"></div>Evolución de Posiciones
+                    </div>
+                </div>
+                <div style="padding: 16px; width: 100%; overflow-x: auto;">
+                    <div style="margin-bottom: 16px; display: flex; gap: 8px; justify-content: center;">
+                        <button onclick="playRace()" style="padding: 6px 16px; border-radius: 20px; border: none; background: var(--gold); color: #000; font-weight: bold; cursor: pointer;">▶ Play</button>
+                        <button onclick="pauseRace()" style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏸ Pausa</button>
+                        <button onclick="resetRace()" style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏪ Reiniciar</button>
+                    </div>
+                    <div style="min-width: 600px; height: 500px; position: relative;">
+                        <div id="race-date-indicator" style="position: absolute; right: 40px; bottom: 40px; width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 20px; font-weight: bold; color: var(--text); background: rgba(0,0,0,0.7); pointer-events: none; z-index: 10;">Inicio</div>
+                        <canvas id="evolucionChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -5036,6 +5060,7 @@
             if (btn) btn.classList.add('active');
             if (id === 'tabla') updateTabla();
             if (id === 'todos') { updateMatchSelector(); renderTodos(); }
+            if (id === 'evolucion') renderEvolucionChart();
             if (id === 'llave') renderLlave();
         }
 
@@ -6447,6 +6472,296 @@
                         }
                     }
                 });
+        }
+
+        // ══════════════════════════════════════════
+        //  EVOLUCION DE PUNTOS (BAR CHART RACE)
+        // ══════════════════════════════════════════
+        var chartEvolucion = null;
+        var raceInterval = null;
+        var currentFrameIndex = 0;
+        var historyFrames = [];
+        var globalUserColors = {};
+        
+        function stringToColor(str) {
+            return globalUserColors[str] || '#ccc';
+        }
+
+        function renderEvolucionChart() {
+            var canvas = document.getElementById('evolucionChart');
+            if (!canvas) return;
+            
+            var users = Object.keys(pronosticos);
+            if (!users.length) return;
+            
+            var palette = [
+                '#4285F4', '#EA4335', '#FBBC05', '#34A853', '#FF6D00',
+                '#46BDC6', '#9C27B0', '#E91E63', '#009688', '#CDDC39',
+                '#FFC107', '#673AB7', '#03A9F4', '#8BC34A', '#FF5722',
+                '#795548', '#607D8B', '#F06292', '#BA68C8', '#4DB6AC'
+            ];
+            users.sort().forEach(function(u, i) {
+                globalUserColors[u] = palette[i % palette.length];
+            });
+            
+            var fechasSet = new Set();
+            Object.keys(FIXTURE).forEach(function (phase) {
+                FIXTURE[phase].forEach(function (m) {
+                    var r = RESULTADOS_OFICIALES[m.id];
+                    if (r && r.h !== '' && r.h !== undefined) {
+                        fechasSet.add(m.fecha);
+                    }
+                });
+            });
+            var fechas = Array.from(fechasSet);
+            var MESES = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12, Ene: 1, Abr: 4, Ago: 8, Dic: 12 };
+            function toKey(f) {
+                var fp = f.trim().split(' ');
+                var day = parseInt(fp[0], 10) || 0;
+                var mon = MESES[fp[1]] || 0;
+                return mon * 100 + day;
+            }
+            fechas.sort(function (a, b) { return toKey(a) - toKey(b); });
+            
+            historyFrames = [];
+            var puntosAcumulados = {};
+            users.forEach(function(u) { puntosAcumulados[u] = 0; });
+            
+            var frame0 = { date: 'Inicio', data: [] };
+            users.forEach(function(u) { frame0.data.push({ user: u, pts: 0 }); });
+            frame0.data.sort(function(a,b) { return a.user.localeCompare(b.user); });
+            historyFrames.push(frame0);
+            
+            fechas.forEach(function(f) {
+                var frame = { date: f, data: [] };
+                users.forEach(function(u) {
+                    var ptsF = calcPuntosFecha(u, f);
+                    puntosAcumulados[u] += (ptsF || 0);
+                    frame.data.push({ user: u, pts: puntosAcumulados[u] });
+                });
+                frame.data.sort(function(a, b) { return b.pts - a.pts || a.user.localeCompare(b.user); });
+                historyFrames.push(frame);
+            });
+            
+            var finalFrame = { date: 'Final', data: [] };
+            var bonusCierre = RESULTADOS_OFICIALES.bonusCierre || {};
+            users.forEach(function(u) {
+                var finalCalc = calcPuntos(u);
+                var officialTotal = finalCalc.pts + (bonusCierre[u] || 0);
+                finalFrame.data.push({ user: u, pts: officialTotal });
+            });
+            finalFrame.data.sort(function(a, b) { return b.pts - a.pts || a.user.localeCompare(b.user); });
+            historyFrames.push(finalFrame);
+            
+            var maxPts = finalFrame.data[0].pts;
+            
+            if (chartEvolucion) {
+                chartEvolucion.destroy();
+            }
+            
+            var avatarImageCache = window.avatarImageCache || {};
+            window.avatarImageCache = avatarImageCache;
+            
+            var avatarPlugin = {
+                id: 'avatarPlugin',
+                afterDraw: function(chart) {
+                    var ctx = chart.ctx;
+                    chart.data.datasets.forEach(function(dataset, i) {
+                        var meta = chart.getDatasetMeta(i);
+                        if (!meta || meta.hidden || !meta.data.length) return;
+                        
+                        var model = meta.data[0];
+                        if (!model) return;
+                        var x = model.x;
+                        var y = model.y;
+                        var label = dataset.label;
+                        var color = dataset.backgroundColor;
+                        
+                        var avatarUrl = avatares[label];
+                        
+                        ctx.beginPath();
+                        ctx.arc(x + 16, y, 12, 0, 2 * Math.PI);
+                        
+                        if (avatarUrl) {
+                            if (!avatarImageCache[label]) {
+                                var img = new Image();
+                                img.src = avatarUrl;
+                                avatarImageCache[label] = img;
+                            }
+                            var img = avatarImageCache[label];
+                            if (img.complete && img.naturalWidth !== 0) {
+                                ctx.save();
+                                ctx.clip();
+                                ctx.drawImage(img, x + 4, y - 12, 24, 24);
+                                ctx.restore();
+                            } else {
+                                ctx.fillStyle = color;
+                                ctx.fill();
+                                ctx.fillStyle = '#fff';
+                                ctx.font = 'bold 12px Inter, sans-serif';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(label.charAt(0).toUpperCase(), x + 16, y);
+                            }
+                        } else {
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                            ctx.fillStyle = '#fff';
+                            ctx.font = 'bold 12px Inter, sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(label.charAt(0).toUpperCase(), x + 16, y);
+                        }
+                        
+                        ctx.beginPath();
+                        ctx.arc(x + 16, y, 12, 0, 2 * Math.PI);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = '#fff';
+                        ctx.stroke();
+                        
+                        var pts = dataset.data[0].x;
+                        ctx.fillStyle = '#ccc';
+                        ctx.font = 'bold 12px Inter, sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.fillText(pts, x + 34, y);
+                        
+                        var maxWidth = x - 10;
+                        if (maxWidth > 20) {
+                            var shortName = label.split(' ')[0];
+                            ctx.fillStyle = '#fff';
+                            ctx.font = 'bold 11px Inter, sans-serif';
+                            ctx.textAlign = 'right';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                            ctx.shadowBlur = 2;
+                            ctx.fillText(shortName, x - 6, y, maxWidth);
+                            ctx.shadowBlur = 0;
+                        }
+                    });
+                }
+            };
+            
+            Chart.defaults.color = '#ccc';
+            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+            var ctx = canvas.getContext('2d');
+            currentFrameIndex = 0;
+            var initFrame = historyFrames[0];
+            
+            var datasets = users.map(function(u) {
+                var rank = initFrame.data.findIndex(function(d) { return d.user === u; });
+                var pts = initFrame.data[rank].pts;
+                return {
+                    label: u,
+                    data: [{ x: pts, y: rank }],
+                    backgroundColor: stringToColor(u),
+                    grouped: false,
+                    barThickness: 16,
+                    borderRadius: 4,
+                    borderWidth: 0
+                };
+            });
+
+            chartEvolucion = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { right: 70 } },
+                    animation: {
+                        duration: 800,
+                        easing: 'easeInOutCubic'
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true, 
+                            max: Math.ceil(maxPts * 1.1) 
+                        },
+                        y: { 
+                            type: 'linear',
+                            reverse: true,
+                            min: -0.5,
+                            max: users.length - 0.5,
+                            ticks: { 
+                                stepSize: 1,
+                                font: { size: 12, weight: 'bold' },
+                                callback: function(value) {
+                                    if (value !== Math.floor(value)) return '';
+                                    var frame = historyFrames[currentFrameIndex];
+                                    if (frame && frame.data[value]) {
+                                        return frame.data[value].user;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false },
+                        zoom: { zoom: { wheel: { enabled: false } }, pan: { enabled: false } }
+                    }
+                },
+                plugins: [avatarPlugin]
+            });
+            
+            updateRaceIndicator(0, initFrame.date);
+        }
+
+        function updateRaceIndicator(index, dateStr) {
+            var el = document.getElementById('race-date-indicator');
+            if (index > 0 && index < historyFrames.length - 1) {
+                el.innerHTML = '<div style="line-height:1.2; font-size:16px;">Fecha ' + index + '<br><span style="font-size:12px;color:#aaa">' + dateStr + '</span></div>';
+            } else {
+                el.innerHTML = dateStr;
+            }
+        }
+
+        function applyFrameData(frameIndex) {
+            var frame = historyFrames[frameIndex];
+            chartEvolucion.data.datasets.forEach(function(ds) {
+                var u = ds.label;
+                var rank = frame.data.findIndex(function(d) { return d.user === u; });
+                if (rank !== -1) {
+                    var pts = frame.data[rank].pts;
+                    ds.data[0] = { x: pts, y: rank };
+                }
+            });
+            updateRaceIndicator(frameIndex, frame.date);
+            chartEvolucion.update();
+        }
+
+        function playRace() {
+            if (raceInterval) return;
+            if (currentFrameIndex >= historyFrames.length - 1) {
+                currentFrameIndex = 0;
+            }
+            raceInterval = setInterval(function() {
+                currentFrameIndex++;
+                if (currentFrameIndex >= historyFrames.length) {
+                    pauseRace();
+                    return;
+                }
+                applyFrameData(currentFrameIndex);
+            }, 1200);
+        }
+
+        function pauseRace() {
+            if (raceInterval) {
+                clearInterval(raceInterval);
+                raceInterval = null;
+            }
+        }
+
+        function resetRace() {
+            pauseRace();
+            currentFrameIndex = 0;
+            if (!historyFrames.length) return;
+            applyFrameData(0);
         }
 
         function scrollToChatBottom() {
