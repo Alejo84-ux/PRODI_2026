@@ -3173,8 +3173,16 @@
                         avatares[currentUser] = dataUrl;
                         updateHeaderUser();
                         showToast('✅ Avatar actualizado'); 
+                        if (document.getElementById('avatar-upload')) {
+                            document.getElementById('avatar-upload').value = '';
+                        }
                     })
-                    .catch(function(err) { showToast('❌ Error: ' + err.message); });
+                    .catch(function(err) { 
+                        showToast('❌ Error: ' + err.message); 
+                        if (document.getElementById('avatar-upload')) {
+                            document.getElementById('avatar-upload').value = '';
+                        }
+                    });
                 };
                 img.src = e.target.result;
             };
