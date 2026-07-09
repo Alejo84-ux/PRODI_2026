@@ -2333,12 +2333,15 @@
         </div>
 
         <div id="evolucion" class="section">
-            <div class="card">
+            <div class="card" style="position: relative;">
                 <div class="card-header">
                     <div class="card-title">
                         <div class="dot"></div>Evolución de Posiciones
                     </div>
                 </div>
+                
+                <div id="race-date-indicator" style="position: absolute; right: 16px; bottom: 16px; width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: bold; color: var(--text); background: rgba(0,0,0,0.8); pointer-events: none; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">Inicio</div>
+                
                 <div style="padding: 16px; width: 100%; overflow-x: auto;">
                     <div style="margin-bottom: 16px; display: flex; gap: 8px; justify-content: center;">
                         <button onclick="playRace()" style="padding: 6px 16px; border-radius: 20px; border: none; background: var(--gold); color: #000; font-weight: bold; cursor: pointer;">▶ Play</button>
@@ -2346,8 +2349,20 @@
                         <button onclick="resetRace()" style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏪ Reiniciar</button>
                     </div>
                     <div style="min-width: 600px; height: 500px; position: relative;">
-                        <div id="race-date-indicator" style="position: absolute; right: 40px; bottom: 40px; width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 20px; font-weight: bold; color: var(--text); background: rgba(0,0,0,0.7); pointer-events: none; z-index: 10;">Inicio</div>
                         <canvas id="evolucionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="dot"></div>Hall of Fame 🏆
+                    </div>
+                </div>
+                <div style="padding: 16px; width: 100%; overflow-x: auto;">
+                    <div id="hall-of-fame-container" style="display: flex; gap: 16px; padding-bottom: 12px; overflow-x: auto;">
+                        <!-- JS renderiza el hall of fame aqui -->
                     </div>
                 </div>
             </div>
@@ -6710,12 +6725,14 @@
             });
             
             updateRaceIndicator(0, initFrame.date);
+            
+            renderHallOfFame();
         }
 
         function updateRaceIndicator(index, dateStr) {
             var el = document.getElementById('race-date-indicator');
             if (index > 0 && index < historyFrames.length - 1) {
-                el.innerHTML = '<div style="line-height:1.2; font-size:16px;">Fecha ' + index + '<br><span style="font-size:12px;color:#aaa">' + dateStr + '</span></div>';
+                el.innerHTML = '<div style="line-height:1.2; font-size:13px;">Fecha ' + index + '<br><span style="font-size:10px;color:#aaa">' + dateStr + '</span></div>';
             } else {
                 el.innerHTML = dateStr;
             }
@@ -6762,6 +6779,72 @@
             currentFrameIndex = 0;
             if (!historyFrames.length) return;
             applyFrameData(0);
+        }
+
+        function renderHallOfFame() {
+            var container = document.getElementById('hall-of-fame-container');
+            if (!container) return;
+            
+            var users = Object.keys(pronosticos);
+            if (!users.length) return;
+            
+            var fechasSet = new Set();
+            Object.keys(FIXTURE).forEach(function (phase) {
+                FIXTURE[phase].forEach(function (m) {
+                    var r = RESULTADOS_OFICIALES[m.id];
+                    if (r && r.h !== '' && r.h !== undefined) {
+                        fechasSet.add(m.fecha);
+                    }
+                });
+            });
+            var fechas = Array.from(fechasSet);
+            var MESES = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12, Ene: 1, Abr: 4, Ago: 8, Dic: 12 };
+            function toKey(f) {
+                var fp = f.trim().split(' ');
+                var day = parseInt(fp[0], 10) || 0;
+                var mon = MESES[fp[1]] || 0;
+                return mon * 100 + day;
+            }
+            fechas.sort(function (a, b) { return toKey(a) - toKey(b); });
+            
+            var html = '';
+            var fechaCount = 1;
+            fechas.forEach(function(f) {
+                var maxPts = -1;
+                var winners = [];
+                users.forEach(function(u) {
+                    var pts = calcPuntosFecha(u, f) || 0;
+                    if (pts > maxPts) {
+                        maxPts = pts;
+                        winners = [u];
+                    } else if (pts === maxPts) {
+                        winners.push(u);
+                    }
+                });
+                
+                if (maxPts > 0) {
+                    html += '<div style="flex: 0 0 auto; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 140px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">';
+                    html += '<div style="color: var(--gold); font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Fecha ' + fechaCount + '<br><span style="color:var(--text2);font-size:10px">' + f + '</span></div>';
+                    
+                    html += '<div style="display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-bottom: 12px;">';
+                    winners.forEach(function(w) {
+                        html += '<div style="display:flex; flex-direction:column; align-items:center;">';
+                        html += getAvatarHtml(w, '', 'width:48px;height:48px;border-radius:50%;margin-bottom:6px;border:2px solid var(--gold);box-shadow:0 0 8px rgba(255,215,0,0.4)');
+                        html += '<div style="font-size:12px; font-weight:600; color:var(--text); max-width:70px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + w.split(' ')[0] + '</div>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                    
+                    html += '<div style="display:inline-block; font-size: 15px; font-weight: 800; color: #fff; background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.3); padding: 4px 12px; border-radius: 20px;">' + maxPts + ' pts</div>';
+                    html += '</div>';
+                }
+                fechaCount++;
+            });
+            
+            if (html === '') {
+                html = '<div style="color:var(--text2); font-style:italic; padding: 20px; width: 100%; text-align: center;">Aún no hay resultados para calcular el Hall of Fame.</div>';
+            }
+            container.innerHTML = html;
         }
 
         function scrollToChatBottom() {
