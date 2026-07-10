@@ -2378,7 +2378,7 @@
                     style="position: absolute; right: 16px; bottom: 16px; width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: bold; color: var(--text); background: rgba(0,0,0,0.8); pointer-events: none; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
                     Inicio</div>
 
-                <div style="padding: 16px 16px 0 16px; width: 100%; display: flex; gap: 8px; justify-content: center;">
+                <div style="padding: 16px 16px 0 16px; width: 100%; display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;">
                     <button onclick="playRace()"
                         style="padding: 6px 16px; border-radius: 20px; border: none; background: var(--gold); color: #000; font-weight: bold; cursor: pointer;">▶
                         Play</button>
@@ -2388,9 +2388,16 @@
                     <button onclick="resetRace()"
                         style="padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer;">⏪
                         Reiniciar</button>
+                    <select id="race-speed-select" onchange="changeRaceSpeed(Number(this.value))"
+                        style="padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer; outline: none; font-weight: bold; font-family: 'Inter', sans-serif;">
+                        <option value="4800">0.25x (Muy lento)</option>
+                        <option value="2400">0.5x (Lento)</option>
+                        <option value="1600">0.75x</option>
+                        <option value="1200" selected>1.0x (Normal)</option>
+                    </select>
                 </div>
 
-                <div style="padding: 16px; width: 100%; overflow-x: auto;">
+                <div id="evolucionChartContainer" style="padding: 16px; width: 100%; overflow-x: auto; scroll-behavior: smooth;">
                     <div style="min-width: 600px; height: 500px; position: relative;">
                         <canvas id="evolucionChart"></canvas>
                     </div>
@@ -6626,6 +6633,7 @@
                 id: 'avatarPlugin',
                 afterDraw: function (chart) {
                     var ctx = chart.ctx;
+                    var maxX = 0;
                     chart.data.datasets.forEach(function (dataset, i) {
                         var meta = chart.getDatasetMeta(i);
                         if (!meta || meta.hidden || !meta.data.length) return;
@@ -6633,6 +6641,9 @@
                         var model = meta.data[0];
                         if (!model) return;
                         var x = model.x;
+                        if (x > maxX) {
+                            maxX = x;
+                        }
                         var y = model.y;
                         var label = dataset.label;
                         var color = dataset.backgroundColor;
@@ -6698,6 +6709,15 @@
                             ctx.shadowBlur = 0;
                         }
                     });
+
+                    // Auto-scroll logic on mobile devices
+                    var container = document.getElementById('evolucionChartContainer');
+                    if (container) {
+                        var targetScroll = Math.max(0, (maxX + 70) - container.clientWidth);
+                        if (targetScroll > container.scrollLeft || targetScroll === 0) {
+                            container.scrollLeft = targetScroll;
+                        }
+                    }
                 }
             };
 
@@ -6797,6 +6817,16 @@
             chartEvolucion.update();
         }
 
+        var raceSpeed = 1200;
+
+        function changeRaceSpeed(speed) {
+            raceSpeed = speed;
+            if (raceInterval) {
+                pauseRace();
+                playRace();
+            }
+        }
+
         function playRace() {
             if (raceInterval) return;
             if (currentFrameIndex >= historyFrames.length - 1) {
@@ -6809,7 +6839,7 @@
                     return;
                 }
                 applyFrameData(currentFrameIndex);
-            }, 1200);
+            }, raceSpeed);
         }
 
         function pauseRace() {
