@@ -4925,20 +4925,29 @@
                     }
                 });
 
-                var grandeBadge = '';
+                var extrasBadges = '';
                 var pExt = (pronosticos[r.u] && pronosticos[r.u].extras) || {};
                 var rExt = RESULTADOS_OFICIALES.extras || {};
-                if (pExt['ext_grande_afuera'] && rExt['ext_grande_afuera']) {
-                    var pVal = String(pExt['ext_grande_afuera']).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                    var rVal = String(rExt['ext_grande_afuera']).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                    if (pVal === rVal) {
-                        if (pVal === 'uruguay') {
-                            grandeBadge = '<span title="Acertó Grande Afuera (Uruguay)" style="font-size:14px;margin-left:6px">🇺🇾</span>';
-                        } else {
-                            grandeBadge = '<span title="Acertó Grande Afuera" style="font-size:14px;margin-left:6px">🎯</span>';
+
+                // Iconos por cada extra
+                var extIcons = {
+                    'ext_eq_goleador': '⚽', 'ext_eq_rojas': '🟥', 'ext_grande_afuera': '💀',
+                    'ext_batacazo': '💥', 'ext_mejor_jugador': '🌟', 'ext_mejor_gol': '🎯',
+                    'ext_mvp_final': '🏆', 'ext_cant_penales': '🥅', 'ext_goleador': '👟',
+                    'ext_valla_menos': '🧤', 'ext_gol_160': '🇦🇷', 'ext_subcampeon': '🥈'
+                };
+
+                EXTRAS_DATA.grid.forEach(function (e) {
+                    if (pExt[e.id] && rExt[e.id]) {
+                        var pVal = String(pExt[e.id]).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                        var rVal = String(rExt[e.id]).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                        if (pVal === rVal) {
+                            var icon = extIcons[e.id] || '✅';
+                            var shortLabel = e.label.length > 25 ? e.label.substring(0, 22) + '…' : e.label;
+                            extrasBadges += '<span title="Acertó: ' + e.label.replace(/"/g, '&quot;') + ' (' + pExt[e.id] + ')" style="font-size:10px;color:#4ade80;margin-left:4px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:1px 5px;border-radius:10px;white-space:nowrap">' + icon + '</span>';
                         }
                     }
-                }
+                });
 
                 // Flecha de posición
                 var arrow = '';
@@ -4953,7 +4962,7 @@
                 var safeU = r.u.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                 var isOnline = window.onlineUsersObj && window.onlineUsersObj[r.u] === true;
                 return '<tr class="clickable-row" onclick="verDesglose(\'' + safeU + '\')">' + '<td style="width:36px;text-align:center">' + rank + '</td>' +
-                    '<td><div class="player-cell">' + getAvatarHtml(r.u, 'avatar', '', '', isOnline) + '<span class="player-name">' + r.u + '</span>' + arrow + bonusBadge + golesBadge + sancionBadge + grandeBadge + '</div></td>' +
+                    '<td><div class="player-cell">' + getAvatarHtml(r.u, 'avatar', '', '', isOnline) + '<span class="player-name">' + r.u + '</span>' + arrow + bonusBadge + golesBadge + sancionBadge + extrasBadges + '</div></td>' +
                     '<td style="width:54px;text-align:center"><span class="pts-big">' + r.pts + '</span></td>' +
                     '<td style="width:42px;text-align:center" class="stat-cell">' + r.exactos + '</td>' +
                     '<td style="width:42px;text-align:center" class="stat-cell">' + r.parciales + '</td>' +
